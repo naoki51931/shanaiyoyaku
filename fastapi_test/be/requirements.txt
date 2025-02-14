@@ -1,0 +1,9 @@
+pymysql
+pydantic
+databases
+pydantic[email]
+setuptools
+uvicorn
+fastapi
+mysqlclient
+sqlalchemy

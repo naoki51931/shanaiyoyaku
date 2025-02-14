@@ -1,0 +1,2 @@
+INSERT INTO user (password,kanji_name,kata_name,position,is_superuser,is_approval,created_at,updated_at) VALUES ("passwordps", "naoki ueda", "naoki ueda", "C", True, 2, "2025-01-17 15:50:00", "2025-01-17 15:50:00");
+INSERT INTO user (password,kanji_name,kata_name,position,is_superuser,is_approval,created_at,updated_at) VALUES ("passwordps", "naoki kanda", "naoki kanda", "C", False, 2, "2025-01-17 15:50:00", "2025-01-17 15:50:00");

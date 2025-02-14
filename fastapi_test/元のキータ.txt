@@ -1,0 +1,39 @@
+https://qiita.com/KWS_0901/items/684ac71e728575b6eab0
+https://qiita.com/studio_meowtoon/items/1b2348cc8620d346a2f8
+https://qiita.com/toiee_kame/items/c3781abb53f385dae4f9#%E3%81%8A%E3%81%BE%E3%81%912--pip-%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E5%95%8F%E9%A1%8C
+https://zenn.dev/satto_sann/articles/b405ca8961d70fac99ff
+
+
+kaigi yoyaku
+https://www.udemy.com/course/python-fastapi/
+
+user db
+https://qiita.com/ryo-keima/items/e6ce42bb4c11432ea829
+
+
+kaigisitu yoyaku
+https://qiita.com/benjuwan/items/c4341ca41758b076a385
+
+datetime
+https://docs.pydantic.dev/2.3/usage/types/datetime/
+
+database saikouseinosai
+https://vlike-vlife.netlify.app/posts/docker_cant_remove_volume
+https://qiita.com/ryamate/items/8853c6b7ac7379d0c1a6
+
+created_at renkei
+https://zenn.dev/kou_kawa/articles/09-second-mysql-fastapi
+
+
+kore wo moto ni tukuru
+https://zenn.dev/kou_kawa/articles/08-first-mysql-fastapi
+
+ueto onaji younasikumi
+https://zenn.dev/tkrk/articles/4045f3b4f9189f
+
+korede baride-syonnera-naotta 
+https://zenn.dev/jin1125/articles/f084740f931d2b
+https://zenn.dev/tk_resilie/articles/fastapi0100_pydanticv2
+
+node no docker kaitearu yatu
+https://zenn.dev/convers39/articles/67eacf1c732401
