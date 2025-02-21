@@ -31,10 +31,8 @@ services:
     
   front:
     container_name: "front"
-    build:
-      context: ./be
-      dockerfile: ./front/Dockerfile
+    build: ./fe
     ports:
       - "3000:3000"
     volumes:
-      - ./be/front/front:/usr/src/front
+      - ./fe/front:/usr/src/front
