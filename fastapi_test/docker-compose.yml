@@ -36,3 +36,4 @@ services:
       - "3000:3000"
     volumes:
       - ./fe/front:/usr/src/front
+      - /usr/src/front/node_modules
