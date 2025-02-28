@@ -31,7 +31,7 @@ services:
     
   front:
     container_name: "front"
-    build: ./fe
+    build: ./fe/front
     ports:
       - "3000:3000"
     volumes:
