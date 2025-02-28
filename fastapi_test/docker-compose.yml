@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     container_name: "api"
-    build: ./be
+    build: ./be/api
     ports:
       - "8000:8000"
     volumes:
