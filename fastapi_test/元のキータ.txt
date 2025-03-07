@@ -37,3 +37,7 @@ https://zenn.dev/tk_resilie/articles/fastapi0100_pydanticv2
 
 node no docker kaitearu yatu
 https://zenn.dev/convers39/articles/67eacf1c732401
+
+react fastapi renkei
+https://qiita.com/Tadataka_Takahashi/items/2736b6b91910a861a466
+https://qiita.com/naritomo08/items/6def339a15ec3bbef78a

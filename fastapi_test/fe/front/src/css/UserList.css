@@ -1,0 +1,35 @@
+.UserList {
+	display: block;
+	text-align: center;
+	margin-right: auto;
+	margin-left: auto;
+}
+.title {
+	color: green;
+}
+.ul {
+	display: table;
+	padding: 0;
+	margin-right: auto;
+	margin-left: auto;
+	list-style: none;
+}
+.li {
+	padding-bottom: 8px;
+	margin-bottom: 8px;
+	display: flex;
+}
+.button {
+	background-color: aqua;
+	margin-left: 4px;
+    border-radius: 8px;
+	border: solid 1px black;
+	cursor: pointer;
+}
+.span {
+    border: 1px solid;
+    display: table-cell;
+    table-layout: fixed;
+    width: 100px;
+
+}
