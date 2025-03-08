@@ -74,14 +74,25 @@ export const UserList = () => {
 	return (
 		<div className="UserList">
 			<h1 className="title">ユーザー一覧　編集閲覧画面</h1>
-			<input value={password} onChange={(e) => setPassword(e.target.value)} />
-            <input value={kanji_name} onChange={(e) => setKanji_name(e.target.value)} />
-            <input value={kata_name} onChange={(e) => setKata_name(e.target.value)} />
-            <input value={position} onChange={(e) => setPosition(e.target.value)} />
-            <input value={is_approval} onChange={(e) => setIs_approval(e.target.value)} />
-			<button onClick={handlePush} className="button">
+            <h2>新規ユーザー追加</h2>
+            <div className="li">
+                <span className="span">パスワード</span>
+                <span className="span">名前（漢字）</span>
+                <span className="span">名前（カタカナ）</span>
+                <span className="span">役職</span>
+                <span className="span">承認</span>
+                <span className="span"></span>
+            </div>
+            <div className="li">
+			<span className="span"><input value={password} onChange={(e) => setPassword(e.target.value)} /></span>
+            <span className="span"><input value={kanji_name} onChange={(e) => setKanji_name(e.target.value)} /></span>
+            <span className="span"><input value={kata_name} onChange={(e) => setKata_name(e.target.value)} /></span>
+            <span className="span"><input value={position} onChange={(e) => setPosition(e.target.value)} /></span>
+            <span className="span"><input value={is_approval} onChange={(e) => setIs_approval(e.target.value)} /></span>
+			<span className="span"><button onClick={handlePush} className="button">
 				登録
-			</button>
+			</button></span>
+            </div>
 			<h2>ユーザー一覧</h2>
 			<ul className="ul">
                 <li className="li">
