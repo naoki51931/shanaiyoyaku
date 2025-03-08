@@ -75,15 +75,16 @@ export const UserList = () => {
 		<div className="UserList">
 			<h1 className="title">ユーザー一覧　編集閲覧画面</h1>
             <h2>新規ユーザー追加</h2>
-            <div className="li">
+        <ul className="ul">
+            <li className="li">
                 <span className="span">パスワード</span>
                 <span className="span">名前（漢字）</span>
                 <span className="span">名前（カタカナ）</span>
                 <span className="span">役職</span>
                 <span className="span">承認</span>
                 <span className="span"></span>
-            </div>
-            <div className="li">
+            </li>
+            <li className="li">
 			<span className="span"><input value={password} onChange={(e) => setPassword(e.target.value)} /></span>
             <span className="span"><input value={kanji_name} onChange={(e) => setKanji_name(e.target.value)} /></span>
             <span className="span"><input value={kata_name} onChange={(e) => setKata_name(e.target.value)} /></span>
@@ -92,7 +93,8 @@ export const UserList = () => {
 			<span className="span"><button onClick={handlePush} className="button">
 				登録
 			</button></span>
-            </div>
+            </li>
+            </ul>
 			<h2>ユーザー一覧</h2>
 			<ul className="ul">
                 <li className="li">
