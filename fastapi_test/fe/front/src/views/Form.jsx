@@ -34,7 +34,7 @@ export default function Form(props) {
                                 is_approval: res.data[i].is_approval,
                                 created_at: res.data[i].created_at,
                                 updated_at: res.data[i].updated_at,
-                            },
+                            }
                         ])
                     }
                         // props.setDisplay({
@@ -69,6 +69,7 @@ export default function Form(props) {
                     },
                 ])
             }
+        })
                 
     }
 
