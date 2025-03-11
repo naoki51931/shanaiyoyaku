@@ -1,3 +1,5 @@
+from typing import Union
+from unittest import result
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session, joinedload
@@ -8,7 +10,15 @@ from models.pydantic.user import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter()
 
+
 @router.post("/user/", response_model=UserResponse)
+async def get_user_by_name(kanji_name: str, db: Session = Depends(get_db)):
+    db_user = db.query(DBUser).filter(DBUser.kanji_name == kanji_name).first()
+    if db_user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return db_user
+
+@router.post("/user/new/", response_model=UserResponse)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = DBUser(**user.dict())
     db.add(db_user)

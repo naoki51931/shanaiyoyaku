@@ -47,3 +47,6 @@ https://zenn.dev/iccyan/articles/a3a915203b5665
 
 react modal jissou
 https://qiita.com/link9080/items/735f73d13044333abefd
+
+fastapi usecase
+https://zenn.dev/xronotech/articles/a948b200494c77

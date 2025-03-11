@@ -1,0 +1,91 @@
+import React, { useState } from 'react'
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import axios from 'axios';
+import NewForm from "./new/new";
+
+export default function Form(props) {
+    const [kanji_name, setKanji_name] = useState('');
+
+    const funSetKanji_name = (e) => {
+        setKanji_name(() => e.target.value);
+    }
+
+    const funPost = () => {
+        const params = new URLSearchParams();
+        params.append('kanji_name', kanji_name);
+        axios.post('/user/', params)
+            .then(function (res) {
+                console.log(res)
+                console.log("aaa")
+                console.log(res.data.message)
+                if(res.data.length != 0){
+                    console.log("bbb");
+                    let tmpUsers = []
+                    for (let i = 0; i < res.data.length; i++) {
+                        tmpUsers = tmpUsers.concat([
+                            {
+                                id: res.data[i].id,
+                                kanji_name: res.data[i].kanji_name,
+                                kata_name: res.data[i].kata_name,
+                                position: res.data[i].position,
+                                is_superuser: res.data[i].is_superuser,
+                                is_approval: res.data[i].is_approval,
+                                created_at: res.data[i].created_at,
+                                updated_at: res.data[i].updated_at,
+                            },
+                        ])
+                    }
+                        // props.setDisplay({
+                        //     ...props.display,
+                        //     id: v.id,
+                        //     name: v.name,
+                        //     password: v.password,
+                        //     mailAdress: v.mailAdress,
+                        // });
+                    props.setDisplay(tmpUsers);
+                    props.setFlag(true);
+                }else{
+                    props.setFlag(false);
+                }
+            })
+            .catch(function (error) {
+                console.log("error", error);
+            });
+        axios.get(Back_URL + "/user/all/").then((res) => {
+            let tmpUsers = []
+            for (let i = 0; i < res.data.length; i++) {
+                tmpUsers = tmpUsers.concat([
+                    {
+                        id: res.data[i].id,
+                        kanji_name: res.data[i].kanji_name,
+                        kata_name: res.data[i].kata_name,
+                        position: res.data[i].position,
+                        is_superuser: res.data[i].is_superuser,
+                        is_approval: res.data[i].is_approval,
+                        created_at: res.data[i].created_at,
+                        updated_at: res.data[i].updated_at,
+                    },
+                ])
+            }
+                
+    }
+
+    return (
+        <Grid container rowSpacing={1} position={'static'} marginTop={"15px"} marginLeft={"5px"}> 
+            <form>
+                <Grid item>
+                    <TextField
+                        label="名前(kanji)"
+                        value={kanji_name}
+                        onChange={funSetKanji_name}
+                    />
+                </Grid>                
+                <Grid item>
+                    <Button variant="contained" onClick={funPost}>検索</Button>
+                </Grid>
+            </form>
+        </Grid>
+    )
+}

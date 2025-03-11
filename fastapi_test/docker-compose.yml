@@ -18,16 +18,22 @@ services:
       - 3308:3308
     command: --port 3308
     tty: true
+    networks:
+      backend:
+        ipv4_address: 172.28.1.5
 
   api:
-    depends_on:
-      - db
     container_name: "api"
     build: ./be/api
     ports:
       - "8000:8000"
     volumes:
       - ./be/api:/usr/src/server
+    networks:
+      backend:
+        ipv4_address: 172.28.1.10
+    depends_on:
+      - db
     
   front:
     container_name: "front"
@@ -37,3 +43,15 @@ services:
     volumes:
       - ./fe/front:/usr/src/front
       - /usr/src/front/node_modules
+    networks:
+      - backend
+    depends_on:
+      - api
+
+networks:
+  backend:
+    driver: bridge
+    name: app_network
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
