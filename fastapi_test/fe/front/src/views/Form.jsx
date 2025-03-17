@@ -13,9 +13,10 @@ export default function Form(props) {
     }
 
     const funPost = () => {
-        const params = new URLSearchParams();
-        params.append('kanji_name', kanji_name);
-        axios.post('/user/', params)
+        // const params = new URLSearchParams();
+        const params = {'kanji_name': kanji_name};
+        console.log(params);
+        axios.post('http://localhost:8000/user/', params)
             .then(function (res) {
                 console.log(res)
                 console.log("aaa")
@@ -53,7 +54,7 @@ export default function Form(props) {
             .catch(function (error) {
                 console.log("error", error);
             });
-        axios.get(Back_URL + "/user/all/").then((res) => {
+        axios.post("http://localhost:8000/user/", params).then((res) => {
             let tmpUsers = []
             for (let i = 0; i < res.data.length; i++) {
                 tmpUsers = tmpUsers.concat([
@@ -69,6 +70,8 @@ export default function Form(props) {
                     },
                 ])
             }
+            props.setDisplay(tmpUsers);
+            props.setFlag(true);
         })
                 
     }

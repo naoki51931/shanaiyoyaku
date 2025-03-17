@@ -3,6 +3,7 @@ from unittest import result
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session, joinedload
+from pydantic import BaseModel
 
 from database.database import get_db
 from models.sqlalchemy.user import User as DBUser
@@ -10,10 +11,13 @@ from models.pydantic.user import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter()
 
+# リクエストbodyを定義
+class User(BaseModel):
+    kanji_name: str
 
 @router.post("/user/", response_model=UserResponse)
-async def get_user_by_name(kanji_name: str, db: Session = Depends(get_db)):
-    db_user = db.query(DBUser).filter(DBUser.kanji_name == kanji_name).first()
+async def get_user_by_name(user: User, db: Session = Depends(get_db)):
+    db_user = db.query(DBUser).filter(DBUser.kanji_name == user.kanji_name).first()
     if db_user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return db_user
