@@ -35,7 +35,7 @@ export default function List(props) {
     const [password, setPassword] = React.useState("");
     const [position, setPosition] = React.useState("");
     const [is_approval, setIs_approval] = React.useState("");
-    const openEditModal = (id, name, password, email) => {
+    const openEditModal = (id, kanji_name, kata_name, password, position, is_approval) => {
         setId(id);
         setKanji_name(kanji_name);
         setKata_name(kata_name);
@@ -53,6 +53,7 @@ export default function List(props) {
             <TableBody>
                 {props.searchResult.map((v) => 
                     <TableRow>
+                        {console.log("ccc")}
                     <TableCell align="left">{v.id}</TableCell>
                     <TableCell align="left">{v.kanji_name}</TableCell>
                     <TableCell align="left">{v.kata_name}</TableCell>
@@ -64,7 +65,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.name, v.password, v.mailAdress)}}>
+                                onClick={() => {openEditModal(v.id, v.kanji_name, v.kata_name, v.password, v.is_approval)}}>
                             Edit
                         </Button>
                     </TableCell>
@@ -81,14 +82,14 @@ export default function List(props) {
                 <TableHead>
                     <TableRow>
                         <TableCell align="left">id</TableCell>
-                        <TableCell align="left">名前(kanji)</TableCell>
-                        <TableCell align="left">名前(kata)</TableCell>
+                        <TableCell align="left">名前(漢字)</TableCell>
+                        <TableCell align="left">名前(カタカナ)</TableCell>
                         <TableCell align="left">パスワード</TableCell>
-                        <TableCell align="left">position</TableCell>
-                        <TableCell align="left">super user</TableCell>
-                        <TableCell align="left">approval user</TableCell>
-                        <TableCell align="left">created</TableCell>
-                        <TableCell align="left">uploaded</TableCell>
+                        <TableCell align="left">役職</TableCell>
+                        <TableCell align="left">管理者</TableCell>
+                        <TableCell align="left">承認ユーザー</TableCell>
+                        <TableCell align="left">作成日時</TableCell>
+                        <TableCell align="left">更新日時</TableCell>
                     </TableRow>
                 </TableHead>
                 {tableBody}
