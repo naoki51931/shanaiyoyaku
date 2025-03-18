@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from "react"
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -83,28 +83,78 @@ export default function Form(props) {
             .catch(function (error) {
                 console.log("error", error);
             });
-        axios.post("http://localhost:8000/user/", params).then((res) => {
-            let tmpUsers = []
-            for (let i = 0; i < res.data.length; i++) {
-                tmpUsers = tmpUsers.concat([
-                    {
-                        id: res.data[i].id,
-                        kanji_name: res.data[i].kanji_name,
-                        kata_name: res.data[i].kata_name,
-                        position: res.data[i].position,
-                        is_superuser: res.data[i].is_superuser,
-                        is_approval: res.data[i].is_approval,
-                        created_at: res.data[i].created_at,
-                        updated_at: res.data[i].updated_at,
-                    },
-                ])
-            }
-            props.setDisplay(tmpUsers);
-            props.setFlag(true);
-        })
                 
     }
 
+    const funget = () => {
+        axios.get('http://localhost:8000/user/all/')
+            .then(function (res) {
+                console.log(res.data.length)
+                console.log(res)
+                if(res.data.length > 1){
+                    let tmpUsers = []
+                    for (let i = 0; i < res.data.length; i++) {
+                        tmpUsers = tmpUsers.concat([
+                            {
+                                id: res.data[i].id,
+                                kanji_name: res.data[i].kanji_name,
+                                kata_name: res.data[i].kata_name,
+                                position: res.data[i].position,
+                                is_superuser: res.data[i].is_superuser,
+                                is_approval: res.data[i].is_approval,
+                                created_at: res.data[i].created_at,
+                                updated_at: res.data[i].updated_at,
+                            }
+                        ])
+                    }
+                        // props.setDisplay({
+                        //     ...props.display,
+                        //     id: v.id,
+                        //     name: v.name,
+                        //     password: v.password,
+                        //     mailAdress: v.mailAdress,
+                        // });
+                    console.log(tmpUsers);
+                    props.setDisplay(tmpUsers);
+                    props.setFlag(true);
+                } else if(res.data.length == 1 || res.data.length != 0){
+                    let tmpUsers = []
+                    tmpUsers = tmpUsers.concat([
+                        {
+                            id: res.data.id,
+                            kanji_name: res.data.kanji_name,
+                            kata_name: res.data.kata_name,
+                            position: res.data.position,
+                            is_superuser: res.data.is_superuser,
+                            is_approval: res.data.is_approval,
+                            created_at: res.data.created_at,
+                            updated_at: res.data.updated_at,
+                        }
+                    ])
+                        // props.setDisplay({
+                        //     ...props.display,
+                        //     id: v.id,
+                        //     name: v.name,
+                        //     password: v.password,
+                        //     mailAdress: v.mailAdress,
+                        // });
+                    console.log(tmpUsers);
+                    props.setDisplay(tmpUsers);
+                    props.setFlag(true);
+                }
+                else{
+                    props.setFlag(false);
+                }
+            })
+            .catch(function (error) {
+                console.log("error", error);
+            });
+    }
+
+    useEffect(() => {
+        funget()
+    }, [])
+    
     return (
         <Grid container rowSpacing={1} position={'static'} marginTop={"15px"} marginLeft={"5px"}> 
             <form>

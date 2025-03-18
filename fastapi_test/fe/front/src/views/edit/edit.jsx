@@ -41,20 +41,24 @@ export default function SignUp(props) {
       name: data.get('name'),
       id: props.id
     });
-    if (data.get('name') == ""){
-      alert("名前を入力して下さい。")
+    if (data.get('kanji_name') == ""){
+      alert("名前(漢字)を入力して下さい。")
+      return
+    }
+    if (data.get('kata_name') == ""){
+      alert("名前(カタカナ)を入力して下さい。")
       return
     }
     if (data.get('password') == ""){
       alert("パスワードを入力して下さい。")
       return
     }
-    if (data.get('email') == ""){
-      alert("メールアドレスを入力して下さい。")
+    if (data.get('position') == ""){
+      alert("役職を入力して下さい。")
       return
     }
-    if (data.get('email').match("^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$") == undefined){
-      alert("メールアドレスを正しく入力して下さい。")
+    if (data.get('is_approval') == ""){
+      alert("承認ユーザーを入力して下さい。")
       return
     }
     const params = new URLSearchParams();
@@ -116,7 +120,7 @@ export default function SignUp(props) {
                   required
                   fullWidth
                   id="kanji_name"
-                  label="名前(kanji)"
+                  label="名前(漢字)"
                   autoFocus
                   value={props.kanji_name}
                   onChange={(event) => props.setKanji_name(event.target.value)}
@@ -129,7 +133,7 @@ export default function SignUp(props) {
                   required
                   fullWidth
                   id="kata_name"
-                  label="名前(kata)"
+                  label="名前(カタカナ)"
                   autoFocus
                   value={props.kata_name}
                   onChange={(event) => props.setKata_name(event.target.value)}
@@ -153,7 +157,7 @@ export default function SignUp(props) {
                   required
                   fullWidth
                   id="position"
-                  label="position"
+                  label="役職"
                   name="position"
                   autoComplete="position"
                   value={props.position}
@@ -165,7 +169,7 @@ export default function SignUp(props) {
                   required
                   fullWidth
                   id="is_approval"
-                  label="is_approval"
+                  label="承認ユーザー"
                   name="is_approval"
                   autoComplete="is_approval"
                   value={props.is_approval}

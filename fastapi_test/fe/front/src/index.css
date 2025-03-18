@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.ReactModal__Content {
+  height: -webkit-fill-available;
+  overflow: scroll !important;
+  inset: 50% auto -35% 50% !important;
+}

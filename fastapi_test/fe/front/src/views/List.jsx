@@ -49,6 +49,7 @@ export default function List(props) {
         setEditModalIsOpen(false);
     }
 
+
     const tableBody = props !== undefined && props.displayFlag  ? (
             <TableBody>
                 {props.searchResult.map((v) => 
@@ -65,7 +66,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.kanji_name, v.kata_name, v.password, v.is_approval)}}>
+                                onClick={() => {openEditModal(v.id, v.kanji_name, v.kata_name, v.password, v.position, v.is_approval)}}>
                             Edit
                         </Button>
                     </TableCell>
