@@ -54,7 +54,6 @@ export default function List(props) {
             <TableBody>
                 {props.searchResult.map((v) => 
                     <TableRow>
-                        {console.log("ccc")}
                     <TableCell align="left">{v.id}</TableCell>
                     <TableCell align="left">{v.kanji_name}</TableCell>
                     <TableCell align="left">{v.kata_name}</TableCell>

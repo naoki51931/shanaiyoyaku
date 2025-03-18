@@ -36,9 +36,11 @@ export default function SignUp(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
+      kanji_name: data.get('kanji_name'),
+      kata_name: data.get('kata_name'),
       password: data.get('password'),
-      name: data.get('name'),
+      position: data.get('position'),
+      is_approval: data.get('is_approval'),
       id: props.id
     });
     if (data.get('kanji_name') == ""){
@@ -68,7 +70,7 @@ export default function SignUp(props) {
     params.append('position', data.get('position'));
     params.append('is_approval', data.get('is_approval'));
     params.append('id', props.id);
-    axios.put('/user/{props.id}/', params)
+    axios.put('http://localhost:8000/user/{props.id}', params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);
@@ -83,7 +85,7 @@ export default function SignUp(props) {
     });
     const params = new URLSearchParams();
     params.append('id', id);
-    axios.delete('/user/{id}/', params)
+    axios.delete('http://localhost:8000/user/{id}/', params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);

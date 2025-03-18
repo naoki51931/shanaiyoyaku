@@ -3,6 +3,7 @@ from unittest import result
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel
 
 from database.database import get_db
