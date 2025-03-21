@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -32,7 +33,10 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp(props) {
+  const [user ,setUser] = useState([]);
+
   const handleSubmit = (event) => {
+
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
@@ -64,11 +68,13 @@ export default function SignUp(props) {
       return
     }
     const params = new URLSearchParams();
-    params.append('kanji_name', data.get('kanji_name'));
-    params.append('kata_name', data.get('kata_name'));
-    params.append('password', data.get('password'));
-    params.append('position', data.get('position'));
-    params.append('is_approval', data.get('is_approval'));
+    
+    user.append('kanji_name', data.get('kanji_name'));
+    user.append('kata_name', data.get('kata_name'));
+    user.append('password', data.get('password'));
+    user.append('position', data.get('position'));
+    user.append('is_approval', data.get('is_approval'));
+    params.append('user' , user);
     params.append('id', props.id);
     axios.put('http://localhost:8000/user/{props.id}', params)
         .then(function (res) {
@@ -85,7 +91,7 @@ export default function SignUp(props) {
     });
     const params = new URLSearchParams();
     params.append('id', id);
-    axios.delete('http://localhost:8000/user/{id}/', params)
+    axios.delete('http://localhost:8000/user/{id}', params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);
