@@ -29,6 +29,7 @@ export default function Form(props) {
                         tmpUsers = tmpUsers.concat([
                             {
                                 id: res.data[i].id,
+                                user_name: res.data[i].user_name,
                                 kanji_name: res.data[i].kanji_name,
                                 kata_name: res.data[i].kata_name,
                                 password: res.data[i].password,
@@ -57,6 +58,7 @@ export default function Form(props) {
                     tmpUsers = tmpUsers.concat([
                         {
                             id: res.data.id,
+                            user_name: res.data.user_name,
                             kanji_name: res.data.kanji_name,
                             kata_name: res.data.kata_name,
                             password: res.data.password,
@@ -99,6 +101,7 @@ export default function Form(props) {
                         tmpUsers = tmpUsers.concat([
                             {
                                 id: res.data[i].id,
+                                user_name: res.data[i].user_name,
                                 kanji_name: res.data[i].kanji_name,
                                 kata_name: res.data[i].kata_name,
                                 password: res.data[i].password,
@@ -125,6 +128,7 @@ export default function Form(props) {
                     tmpUsers = tmpUsers.concat([
                         {
                             id: res.data.id,
+                            user_name: res.data.user_name,
                             kanji_name: res.data.kanji_name,
                             kata_name: res.data.kata_name,
                             password: res.data.password,

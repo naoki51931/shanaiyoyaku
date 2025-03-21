@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 class UserCreate(BaseModel):
+    user_name: Optional[str] = None
     password: Optional[str] = None
     kanji_name: Optional[str] = None
     kata_name: Optional[str] = None
@@ -13,6 +14,7 @@ class UserCreate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class UserUpdate(BaseModel):
+    user_name: Optional[str] = None
     password: Optional[str] = None
     kanji_name: Optional[str] = None
     kata_name: Optional[str] = None
@@ -24,6 +26,7 @@ class UserUpdate(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
+    user_name: Optional[str] = None
     password: Optional[str] = None
     kanji_name: Optional[str] = None
     kata_name: Optional[str] = None

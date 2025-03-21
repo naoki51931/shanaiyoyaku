@@ -38,6 +38,7 @@ export default function SignUp(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
+      user_name: data.get('user_name'),
       kanji_name: data.get('kanji_name'),
       kata_name: data.get('kata_name'),
       password: data.get('password'),
@@ -45,6 +46,10 @@ export default function SignUp(props) {
       is_approval: data.get('is_approval'),
       id: props.id
     });
+    if (data.get('user_name') == ""){
+      alert("ユーザーネームを入力して下さい。")
+      return
+    }
     if (data.get('kanji_name') == ""){
       alert("名前(漢字)を入力して下さい。")
       return
@@ -66,6 +71,7 @@ export default function SignUp(props) {
       return
     }
     const user = {
+      user_name: data.get('user_name'),
       kanji_name: data.get('kanji_name'),
       kata_name: data.get('kata_name'),
       password: data.get('password'),
@@ -122,6 +128,19 @@ export default function SignUp(props) {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  autoComplete="username"
+                  name="user_name"
+                  required
+                  fullWidth
+                  id="user_name"
+                  label="ユーザーネーム"
+                  autoFocus
+                  value={props.user_name}
+                  onChange={(event) => props.setUser_name(event.target.value)}
+                />
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   autoComplete="given-name"

@@ -23,11 +23,12 @@ function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [user_name, setUser_name] = React.useState('');
   const [kanji_name, setKanji_name] = React.useState('');
-    const [kata_name, setKata_name] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [position, setPosition] = React.useState('');
-    const [is_approval, setIs_approval] = React.useState('');
+  const [kata_name, setKata_name] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [position, setPosition] = React.useState('');
+  const [is_approval, setIs_approval] = React.useState('');
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -205,6 +206,8 @@ function ResponsiveAppBar() {
       
     >
         <New setIsOpen={setIsOpen}
+        user_name={user_name}
+        setUser_name={setUser_name}
         kanji_name={kanji_name}
         setKanji_name={setKanji_name}
         kata_name={kata_name}

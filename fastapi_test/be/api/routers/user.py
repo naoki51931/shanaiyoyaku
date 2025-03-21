@@ -1,3 +1,4 @@
+from sqlite3 import IntegrityError
 from typing import Union
 from unittest import result
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -25,11 +26,21 @@ async def get_user_by_name(user: User, db: Session = Depends(get_db)):
 
 @router.post("/user/new/", response_model=UserResponse)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = DBUser(**user.dict())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try:
+        db_user = DBUser(**user.dict())
+        db.add(db_user)
+        db.commit()
+    
+    except IntegrityError:
+        return {
+            "status": False,
+            'access_token': None,
+            "message": "このユーザー名は既に登録されています",
+            "data": None,
+        }
+    finally:
+        db.refresh(db_user)
+        return db_user
 
 
 @router.get("/user/all/")
@@ -39,6 +50,7 @@ def read_user_all(db: Session = Depends(get_db)):
         results = [
             {
                 "id": user.id,
+                "user_name": user.user_name,
                 "password": user.password,
                 "kanji_name": user.kanji_name,
                 "kata_name": user.kata_name,
@@ -73,6 +85,13 @@ async def update_user(user_id: int, user_update: UserUpdate, db: Session = Depen
             setattr(db_user, key, value)
 
         db.commit()
+    except IntegrityError:
+        return {
+            "status": False,
+            'access_token': None,
+            "message": "このユーザー名は既に登録されています",
+            "data": None,
+        }
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e

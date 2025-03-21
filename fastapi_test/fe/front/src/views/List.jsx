@@ -30,6 +30,7 @@ export default function List(props) {
 
     const [editModalIsOpen, setEditModalIsOpen] = React.useState(false);
     const [id, setId] = React.useState("");
+    const [user_name, setUser_name] = React.useState("");
     const [kanji_name, setKanji_name] = React.useState("");
     const [kata_name, setKata_name] = React.useState("");
     const [password, setPassword] = React.useState("");
@@ -37,6 +38,7 @@ export default function List(props) {
     const [is_approval, setIs_approval] = React.useState("");
     const openEditModal = (id, kanji_name, kata_name, password, position, is_approval) => {
         setId(id);
+        setUser_name(user_name);
         setKanji_name(kanji_name);
         setKata_name(kata_name);
         setPassword(password);
@@ -55,6 +57,7 @@ export default function List(props) {
                 {props.searchResult.map((v) => 
                     <TableRow>
                     <TableCell align="left">{v.id}</TableCell>
+                    <TableCell align="left">{v.user_name}</TableCell>
                     <TableCell align="left">{v.kanji_name}</TableCell>
                     <TableCell align="left">{v.kata_name}</TableCell>
                     <TableCell align="left">{v.password}</TableCell>
@@ -82,6 +85,7 @@ export default function List(props) {
                 <TableHead>
                     <TableRow>
                         <TableCell align="left">id</TableCell>
+                        <TableCell align="left">ユーザーネーム</TableCell>
                         <TableCell align="left">名前(漢字)</TableCell>
                         <TableCell align="left">名前(カタカナ)</TableCell>
                         <TableCell align="left">パスワード</TableCell>
@@ -101,7 +105,7 @@ export default function List(props) {
                 style={customStyles}
                 contentLabel="Example Modal"
                 >
-                <Edit  setEditModalIsOpen={setEditModalIsOpen} id={id} kanji_name={kanji_name} kata_name={kata_name} setKanji_name={setKanji_name} setKata_name={setKata_name} password={password} setPassword={setPassword} position={position} setPosition={setPosition} is_approval={is_approval} setIs_approval={setIs_approval}/>
+                <Edit  setEditModalIsOpen={setEditModalIsOpen} id={id} user_name={user_name} setUser_name={setUser_name} kanji_name={kanji_name} kata_name={kata_name} setKanji_name={setKanji_name} setKata_name={setKata_name} password={password} setPassword={setPassword} position={position} setPosition={setPosition} is_approval={is_approval} setIs_approval={setIs_approval}/>
                 </Modal>
             </div>
 

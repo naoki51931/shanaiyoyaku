@@ -12,6 +12,7 @@ from db import ENGINE
 class UserTable(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_name = Column(String(30), unique=True, nullable=False)
     password = Column(String(30), nullable=False)
     kanji_name = Column(String(30), nullable=False)
     kata_name = Column(String(30), nullable=False)
@@ -25,6 +26,7 @@ class UserTable(Base):
 class User(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     id: int
+    user_name: str
     password: str
     kanji_name: str
     kata_name: str

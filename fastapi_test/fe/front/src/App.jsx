@@ -9,6 +9,7 @@ import New from './views/new/new';
 export default function App() {
   const [display, setDisplay] = useState([]);
   const [flag, setFlag] = useState(false);
+  const [user_name, setUser_name] = React.useState('');
   const [kanji_name, setKanji_name] = React.useState('');
   const [kata_name, setKata_name] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -34,6 +35,8 @@ export default function App() {
           <Route
             path="/new"
             element={<New 
+              user_name={user_name}
+              setUser_name={setUser_name}
               kanji_name={kanji_name}
               setKanji_name={setKanji_name}
               kata_name={kata_name}
