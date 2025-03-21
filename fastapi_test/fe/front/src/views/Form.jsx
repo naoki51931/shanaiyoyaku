@@ -31,6 +31,7 @@ export default function Form(props) {
                                 id: res.data[i].id,
                                 kanji_name: res.data[i].kanji_name,
                                 kata_name: res.data[i].kata_name,
+                                password: res.data[i].password,
                                 position: res.data[i].position,
                                 is_superuser: res.data[i].is_superuser,
                                 is_approval: res.data[i].is_approval,
@@ -58,6 +59,7 @@ export default function Form(props) {
                             id: res.data.id,
                             kanji_name: res.data.kanji_name,
                             kata_name: res.data.kata_name,
+                            password: res.data.password,
                             position: res.data.position,
                             is_superuser: res.data.is_superuser,
                             is_approval: res.data.is_approval,
@@ -99,6 +101,7 @@ export default function Form(props) {
                                 id: res.data[i].id,
                                 kanji_name: res.data[i].kanji_name,
                                 kata_name: res.data[i].kata_name,
+                                password: res.data[i].password,
                                 position: res.data[i].position,
                                 is_superuser: res.data[i].is_superuser,
                                 is_approval: res.data[i].is_approval,
@@ -124,6 +127,7 @@ export default function Form(props) {
                             id: res.data.id,
                             kanji_name: res.data.kanji_name,
                             kata_name: res.data.kata_name,
+                            password: res.data.password,
                             position: res.data.position,
                             is_superuser: res.data.is_superuser,
                             is_approval: res.data.is_approval,
@@ -160,7 +164,7 @@ export default function Form(props) {
             <form>
                 <Grid item>
                     <TextField
-                        label="名前(kanji)"
+                        label="名前(漢字)"
                         value={kanji_name}
                         onChange={funSetKanji_name}
                     />

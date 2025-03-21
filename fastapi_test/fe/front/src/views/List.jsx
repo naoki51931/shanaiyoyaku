@@ -59,7 +59,7 @@ export default function List(props) {
                     <TableCell align="left">{v.kata_name}</TableCell>
                     <TableCell align="left">{v.password}</TableCell>
                     <TableCell align="left">{v.position}</TableCell>
-                    <TableCell align="left">{v.is_superuser}</TableCell>
+                    <TableCell align="left">{v.is_superuser && <span>〇</span>}</TableCell>
                     <TableCell align="left">{v.is_approval}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>

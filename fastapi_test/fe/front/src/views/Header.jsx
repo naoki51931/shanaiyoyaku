@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom'; // ✅ 追加
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -22,6 +23,11 @@ function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [kanji_name, setKanji_name] = React.useState('');
+    const [kata_name, setKata_name] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [position, setPosition] = React.useState('');
+    const [is_approval, setIs_approval] = React.useState('');
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -39,6 +45,7 @@ function ResponsiveAppBar() {
   };
 
   function openModal() {
+    console.log("openModal called");  // ✅ モーダルが呼ばれているか確認
     setIsOpen(true);
   }
 
@@ -48,6 +55,7 @@ function ResponsiveAppBar() {
 
   const customStyles = {
     content: {
+      position: 'fixed',     // ✅ 固定配置で画面に表示されるように
       top: "20%",
       left: "50%",
       right: "auto",
@@ -61,7 +69,7 @@ function ResponsiveAppBar() {
 
   return (
     
-    <AppBar position="static">
+    <><AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -113,14 +121,15 @@ function ResponsiveAppBar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center" 
-                  component="a"
-                  href="new/new.jsx">
-                    {page}
-                  </Typography>
-                </MenuItem>
-              ))}
+              <Button
+                key={page}
+                component={Link}  // ✅ 変更
+                to="/new"         // ✅ ルートを指定
+                sx={{ my: 2, color: 'black', display: 'block' }}
+              >
+                {page}
+              </Button>
+            ))}
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -186,17 +195,27 @@ function ResponsiveAppBar() {
         </Toolbar>
       </Container>
       <div>
-        <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel="Example Modal"
-        >
-          <New  setIsOpen={setIsOpen} />
-        </Modal>
+
       </div>
-    </AppBar>
-    
+    </AppBar><Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      style={customStyles}
+      contentLabel="ユーザー追加フォーム"
+      
+    >
+        <New setIsOpen={setIsOpen}
+        kanji_name={kanji_name}
+        setKanji_name={setKanji_name}
+        kata_name={kata_name}
+        setKata_name={setKata_name}
+        password={password}
+        setPassword={setPassword}
+        position={position}
+        setPosition={setPosition}
+        is_approval={is_approval}
+        setIs_approval={setIs_approval} />
+      </Modal></>
   );
 }
 export default ResponsiveAppBar;

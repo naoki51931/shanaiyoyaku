@@ -36,10 +36,13 @@ export default function SignUp(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
+      kanji_name: data.get('kanji_name'),
+      kata_name: data.get('kata_name'),
       password: data.get('password'),
-      name: data.get('name')
+      position: data.get('position'),
+      is_approval: data.get('is_approval')
     });
+    console.log('props.setIsOpen:', props.setIsOpen);
     if (data.get('kanji_name') == ""){
       alert("名前(漢字)を入力して下さい。")
       return
@@ -60,19 +63,24 @@ export default function SignUp(props) {
       alert("承認ユーザーを入力して下さい。")
       return
     }
-    const params = new URLSearchParams();
-    params.append('kanji_name', data.get('kanji_name'));
-    params.append('kata_name', data.get('kata_name'));
-    params.append('password', data.get('password'));
-    params.append('position', data.get('position'));
-    params.append('is_approval', data.get('is_approval'));
-    axios.post('/user/new/', params)
+    const user = {
+      kanji_name: data.get('kanji_name'),
+      kata_name: data.get('kata_name'),
+      password: data.get('password'),
+      position: data.get('position'),
+      is_approval: data.get('is_approval'),
+    };
+    axios.post('http://localhost:8000/user/new/', user, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    })
         .then(function (res) {
             console.log(res)
-            props.setIsOpen(false);
         })
         .catch(function (error) {
             console.log("error", error);
+            alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
         });
   };
 
@@ -105,8 +113,8 @@ export default function SignUp(props) {
                   id="kanji_name"
                   label="名前(漢字)"
                   autoFocus
-                  value={props.kanji_name}
-                  onChange={(event) => props.setKanji_name(event.target.value)}
+                  value={props.kanji_name ?? ''}
+                  onChange={(event) => props.setKanji_name && props.setKanji_name(event.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -118,8 +126,8 @@ export default function SignUp(props) {
                   id="kata_name"
                   label="名前(カタカナ)"
                   autoFocus
-                  value={props.kata_name}
-                  onChange={(event) => props.setKata_name(event.target.value)}
+                  value={props.kata_name ?? ''}
+                  onChange={(event) => props.setKata_name && props.setKata_name(event.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -131,8 +139,8 @@ export default function SignUp(props) {
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                  value={props.password}
-                  onChange={(event) => props.setPassword(event.target.value)}
+                  value={props.password ?? ''}
+                  onChange={(event) => props.setPassword && props.setPassword(event.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -143,8 +151,8 @@ export default function SignUp(props) {
                   label="役職"
                   name="position"
                   autoComplete="position"
-                  value={props.position}
-                  onChange={(event) => props.setPosition(event.target.value)}
+                  value={props.position ?? ''}
+                  onChange={(event) => props.setPosition && props.setPosition(event.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -155,8 +163,8 @@ export default function SignUp(props) {
                   label="承認ユーザー"
                   name="is_approval"
                   autoComplete="is_approval"
-                  value={props.is_approval}
-                  onChange={(event) => props.setIs_approval(event.target.value)}
+                  value={props.is_approval ?? ''}
+                  onChange={(event) => props.setIs_approval && props.setIs_approval(event.target.value)}
                 />
               </Grid>
               {/* <Grid item xs={12}>
