@@ -131,6 +131,7 @@ function ResponsiveAppBar() {
                 {page}
               </Button>
             ))}
+              <Button component={Link} to="/login">ログイン</Button>
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />

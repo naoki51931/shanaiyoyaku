@@ -36,7 +36,7 @@ export default function List(props) {
     const [password, setPassword] = React.useState("");
     const [position, setPosition] = React.useState("");
     const [is_approval, setIs_approval] = React.useState("");
-    const openEditModal = (id, kanji_name, kata_name, password, position, is_approval) => {
+    const openEditModal = (id, user_name, kanji_name, kata_name, password, position, is_approval) => {
         setId(id);
         setUser_name(user_name);
         setKanji_name(kanji_name);
@@ -68,7 +68,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.kanji_name, v.kata_name, v.password, v.position, v.is_approval)}}>
+                                onClick={() => {openEditModal(v.id, v.user_name, v.kanji_name, v.kata_name, v.password, v.position, v.is_approval)}}>
                             Edit
                         </Button>
                     </TableCell>

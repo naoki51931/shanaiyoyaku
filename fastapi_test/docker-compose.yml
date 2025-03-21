@@ -8,8 +8,9 @@ services:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: sample_db
       MYSQL_USER: mysqluser
-      MYSQL_PASSWORD: mysqlpass
+      MYSQL_PASSWORD: $DB_PASSWORD
       MYSQL_ROOT_HOST: '%'
+      SECRET_KEY: $SECRET_KEY
     volumes:
       - ./db/data:/var/lib/mysql
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf

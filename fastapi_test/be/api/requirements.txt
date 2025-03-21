@@ -8,3 +8,9 @@ fastapi
 mysqlclient
 sqlalchemy
 cryptography
+pytz
+python-dotenv
+passlib[bcrypt]
+itsdangerous
+python-jose[cryptography]
+jose

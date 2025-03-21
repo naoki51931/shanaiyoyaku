@@ -5,6 +5,7 @@ import Header from './views/Header'
 import Form from './views/Form'
 import List from './views/List';
 import New from './views/new/new';
+import LoginForm from './views/LoginForm';
 
 export default function App() {
   const [display, setDisplay] = useState([]);
@@ -49,6 +50,7 @@ export default function App() {
               setIs_approval={setIs_approval}
             />}
           />
+          <Route path="/login" element={<LoginForm />} />
         </Routes>
       </>
     </Router>

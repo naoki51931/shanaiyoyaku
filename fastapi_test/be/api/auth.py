@@ -1,0 +1,81 @@
+from datetime import timedelta, datetime
+import os
+from jose import jwt, JWTError
+from passlib.context import CryptContext
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+from database.database import get_db
+from models.sqlalchemy.user import User as DBUser
+from models.pydantic.user import UserCreate, UserResponse
+
+SECRET_KEY = os.environ.get("SECRET_KEY")  # セキュリティ上、環境変数に保存するのが理想的です
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+router = APIRouter()
+
+# パスワードのハッシュ化
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# OAuth2のスキーム
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# パスワードのハッシュ化関数
+def hash_password(password: str):
+    return pwd_context.hash(password)
+
+# パスワード検証関数
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+# JWTトークンの作成関数
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+# ユーザー認証関数
+def authenticate_user(db: Session, username: str, password: str):
+    user = db.query(DBUser).filter(DBUser.user_name == username).first()
+    if not user or not verify_password(password, user.password):
+        return False
+    return user
+
+# 🔒 ログインエンドポイント
+@router.post("/token")
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), 
+    db: Session = Depends(get_db)
+):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="ユーザー名またはパスワードが正しくありません",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # トークンの生成
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": user.user_name}, expires_delta=access_token_expires)
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# 🔐 保護されたエンドポイントの例
+@router.get("/users/me", response_model=UserResponse)
+async def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    user = db.query(DBUser).filter(DBUser.user_name == username).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    return user
