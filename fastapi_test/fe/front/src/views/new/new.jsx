@@ -61,10 +61,12 @@ export default function SignUp(props) {
       return
     }
     const params = new URLSearchParams();
-    params.append('name', data.get('name'));
+    params.append('kanji_name', data.get('kanji_name'));
+    params.append('kata_name', data.get('kata_name'));
     params.append('password', data.get('password'));
-    params.append('email', data.get('email'));
-    axios.post('/api/new', params)
+    params.append('position', data.get('position'));
+    params.append('is_approval', data.get('is_approval'));
+    axios.post('/user/new/', params)
         .then(function (res) {
             console.log(res)
             props.setIsOpen(false);

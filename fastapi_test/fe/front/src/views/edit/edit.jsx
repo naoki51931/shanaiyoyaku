@@ -33,8 +33,6 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp(props) {
-  const [user ,setUser] = useState([]);
-
   const handleSubmit = (event) => {
 
     event.preventDefault();
@@ -67,16 +65,19 @@ export default function SignUp(props) {
       alert("承認ユーザーを入力して下さい。")
       return
     }
-    const params = new URLSearchParams();
-    
-    user.append('kanji_name', data.get('kanji_name'));
-    user.append('kata_name', data.get('kata_name'));
-    user.append('password', data.get('password'));
-    user.append('position', data.get('position'));
-    user.append('is_approval', data.get('is_approval'));
-    params.append('user' , user);
-    params.append('id', props.id);
-    axios.put('http://localhost:8000/user/{props.id}', params)
+    const user = {
+      kanji_name: data.get('kanji_name'),
+      kata_name: data.get('kata_name'),
+      password: data.get('password'),
+      position: data.get('position'),
+      is_approval: data.get('is_approval'),
+   };
+  
+    axios.put(`http://localhost:8000/user/${props.id}`, user, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);
