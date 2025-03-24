@@ -131,7 +131,13 @@ function ResponsiveAppBar() {
                 {page}
               </Button>
             ))}
-              <Button component={Link} to="/login">ログイン</Button>
+              <Button 
+                component={Link} 
+                to="/login"
+                sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  ログイン
+                </Button>
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -163,6 +169,13 @@ function ResponsiveAppBar() {
                 {page}
               </Button>
             ))}
+            <Button 
+              component={Link} 
+              to="/login"
+              sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                ログイン
+              </Button>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>

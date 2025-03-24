@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,6 +7,21 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    // 🔹 トークン有効期限チェック (ログアウト処理)
+    useEffect(() => {
+        const checkTokenExpiry = () => {
+            const exp = localStorage.getItem('token_exp');
+            if (exp && Date.now() >= exp * 1000) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('token_exp');
+                navigate('/login'); // 有効期限切れ時にログアウト
+            }
+        };
+
+        const interval = setInterval(checkTokenExpiry, 60000); // 🔄 1分ごとにチェック
+        return () => clearInterval(interval); // ✅ クリーンアップ
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -25,14 +40,14 @@ const Login = () => {
 
             const token = response.data.access_token;
             localStorage.setItem('token', token); // トークンを保存
+            const tokenPayload = JSON.parse(atob(token.split('.')[1])); // デコード
+            localStorage.setItem('token_exp', tokenPayload.exp);
+
             navigate('/dashboard'); // ダッシュボードへ遷移
         } catch (err) {
-            if (err.response && err.response.status === 401) {
-                setError('認証に失敗しました。ユーザー名またはパスワードが間違っています。');
-            } else {
-                setError('ログイン中にエラーが発生しました。後でもう一度お試しください。');
-            }
-        }
+            const errorMessage = err.response?.data?.detail || 'ログイン中にエラーが発生しました。';
+            setError(errorMessage);
+        }        
     };
 
     return (
