@@ -10,19 +10,28 @@ const Login = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
+
         try {
-            const response = await axios.post('http://localhost:8000/token', {
-                username,
-                password,
-            }, {
+            // `application/x-www-form-urlencoded` のデータ形式に変換
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('password', password);
+
+            // FastAPI の `/token` エンドポイントにリクエスト
+            const response = await axios.post('http://localhost:8000/auth/token', formData, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
 
             const token = response.data.access_token;
-            localStorage.setItem('token', token);
-            navigate('/dashboard');
+            localStorage.setItem('token', token); // トークンを保存
+            navigate('/dashboard'); // ダッシュボードへ遷移
         } catch (err) {
-            setError('ログインに失敗しました。ユーザー名またはパスワードが間違っています。');
+            if (err.response && err.response.status === 401) {
+                setError('認証に失敗しました。ユーザー名またはパスワードが間違っています。');
+            } else {
+                setError('ログイン中にエラーが発生しました。後でもう一度お試しください。');
+            }
         }
     };
 

@@ -1,7 +1,7 @@
 CREATE TABLE user (
     id INT NOT NULL AUTO_INCREMENT,
     user_name VARCHAR(30) UNIQUE NOT NULL,
-    password VARCHAR(30) NOT NULL,
+    password VARCHAR(128) NOT NULL,
     kanji_name VARCHAR(30) NOT NULL,
     kata_name VARCHAR(30) NOT NULL,
     position VARCHAR(20) NOT NULL,

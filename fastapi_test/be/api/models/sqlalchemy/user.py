@@ -7,7 +7,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_name = Column(String(30), unique=True, nullable=False)
-    password = Column(String(30), nullable=False)
+    password = Column(String(128), nullable=False)
     kanji_name = Column(String(30), nullable=False)
     kata_name = Column(String(30), nullable=False)
     position = Column(String(20), nullable=False)
