@@ -1,11 +1,17 @@
 import './App.css';
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './views/Header'
 import Form from './views/Form'
 import List from './views/List';
 import New from './views/new/new';
 import LoginForm from './views/LoginForm';
+
+// 🔹 認証状態を確認するカスタムコンポーネント
+const PrivateRoute = ({ element }) => {
+  const token = localStorage.getItem('token');
+  return token ? element : <Navigate to="/login" />;
+};
 
 export default function App() {
   const [display, setDisplay] = useState([]);
@@ -24,14 +30,14 @@ export default function App() {
         <Header />
         {/* ルーティング設定 */}
         <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Form display={display} setDisplay={setDisplay} setFlag={setFlag} />
-                <List searchResult={display} displayFlag={flag} />
-              </>
-            }
+         <Route 
+              path="/" 
+              element={<PrivateRoute element={
+                  <>
+                      <Form display={display} setDisplay={setDisplay} setFlag={setFlag} />
+                      <List searchResult={display} displayFlag={flag} />
+                  </>
+              } />}
           />
           <Route
             path="/new"

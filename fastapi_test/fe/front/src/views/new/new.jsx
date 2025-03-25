@@ -35,13 +35,18 @@ export default function SignUp(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+
+    const isLoggedIn = Boolean(localStorage.getItem('token'));
+    const positionValue = isLoggedIn ? data.get('position') : 'C';
+    const isApprovalValue = isLoggedIn ? data.get('is_approval') : '1'; // 未ログインの場合は is_approval を「1」に強制
+
     console.log({
       user_name: data.get('user_name'),
       kanji_name: data.get('kanji_name'),
       kata_name: data.get('kata_name'),
       password: data.get('password'),
-      position: data.get('position'),
-      is_approval: data.get('is_approval')
+      position: positionValue,
+      is_approval: isApprovalValue,
     });
     console.log('props.setIsOpen:', props.setIsOpen);
     if (data.get('user_name') == ""){
@@ -79,7 +84,8 @@ export default function SignUp(props) {
     axios.post('http://localhost:8000/user/new/', user, {
       headers: {
           'Content-Type': 'application/json'
-      }
+      },
+      withCredentials: true  // 追加（必要なら）
     })
         .then(function (res) {
             console.log(res)
