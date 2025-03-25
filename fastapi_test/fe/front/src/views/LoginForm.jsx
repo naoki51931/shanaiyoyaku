@@ -45,7 +45,7 @@ const Login = () => {
             const tokenPayload = JSON.parse(atob(token.split('.')[1])); // デコード
             localStorage.setItem('token_exp', tokenPayload.exp);
 
-            // navigate('/dashboard'); // ダッシュボードへ遷移
+            navigate('/'); // rootへ遷移
         } catch (err) {
             const errorMessage = err.response?.data?.detail || 'ログイン中にエラーが発生しました。';
             setError(errorMessage);
