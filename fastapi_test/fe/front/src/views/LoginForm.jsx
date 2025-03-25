@@ -35,7 +35,9 @@ const Login = () => {
 
             // FastAPI の `/token` エンドポイントにリクエスト
             const response = await axios.post('http://localhost:8000/auth/token', formData, {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                withCredentials: true,  // 追加（必要なら）
+                
             });
 
             const token = response.data.access_token;
@@ -43,7 +45,7 @@ const Login = () => {
             const tokenPayload = JSON.parse(atob(token.split('.')[1])); // デコード
             localStorage.setItem('token_exp', tokenPayload.exp);
 
-            navigate('/dashboard'); // ダッシュボードへ遷移
+            // navigate('/dashboard'); // ダッシュボードへ遷移
         } catch (err) {
             const errorMessage = err.response?.data?.detail || 'ログイン中にエラーが発生しました。';
             setError(errorMessage);

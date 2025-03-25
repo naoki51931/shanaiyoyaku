@@ -4,13 +4,15 @@ services:
   db:
     image: mysql:8.0
     container_name: db
+    env_file:
+      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       MYSQL_DATABASE: sample_db
       MYSQL_USER: mysqluser
-      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_HOST: '%'
-      SECRET_KEY: $SECRET_KEY
+      SECRET_KEY: ${SECRET_KEY}
     volumes:
       - ./db/data:/var/lib/mysql
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
@@ -25,6 +27,8 @@ services:
 
   api:
     container_name: "api"
+    env_file:
+      - .env
     build: ./be/api
     ports:
       - "8000:8000"
@@ -38,6 +42,8 @@ services:
     
   front:
     container_name: "front"
+    env_file:
+      - .env
     build: ./fe/front
     ports:
       - "3000:3000"

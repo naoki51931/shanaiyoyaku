@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 import os
-from jose import jwt, JWTError, ExpiredSignatureError, JWTClaimsError
+from jose import jwt, JWTError, ExpiredSignatureError
 from passlib.context import CryptContext
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -8,6 +8,10 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from models.sqlalchemy.user import User as DBUser
 from models.pydantic.user import UserCreate, UserResponse
+from dotenv import load_dotenv
+
+
+load_dotenv()  # .envファイルから環境変数を読み込む
 
 SECRET_KEY = os.environ.get("SECRET_KEY")  # セキュリティ上、環境変数に保存するのが理想的です
 if not SECRET_KEY:
@@ -22,7 +26,7 @@ router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OAuth2のスキーム
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 # パスワードのハッシュ化関数
 def hash_password(password: str):
@@ -81,10 +85,8 @@ async def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depen
             )
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="トークンの有効期限が切れています。")
-    except JWTClaimsError:
-        raise HTTPException(status_code=401, detail="トークンのクレームが無効です。")
     except JWTError:
-        raise HTTPException(status_code=401, detail="無効なトークンです。")
+        raise HTTPException(status_code=401, detail="無効なトークンまたはトークンクレームが無効です。")
 
 
     user = db.query(DBUser).filter(DBUser.user_name == username).first()

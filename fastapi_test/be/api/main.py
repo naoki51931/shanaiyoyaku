@@ -8,6 +8,7 @@ from logging import getLogger, StreamHandler
 
 
 from routers import user
+from auth import router as auth_router  # auth.py をインポート
 
 app = FastAPI()
 
@@ -44,3 +45,4 @@ async def handler(request:Request, exc:RequestValidationError):
     return JSONResponse(content={}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 app.include_router(user.router)
+app.include_router(auth_router, prefix="/auth")  # 認証用のエンドポイントを登録

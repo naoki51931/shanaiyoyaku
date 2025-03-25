@@ -14,3 +14,4 @@ passlib[bcrypt]
 itsdangerous
 python-jose[cryptography]
 jose
+python-multipart
