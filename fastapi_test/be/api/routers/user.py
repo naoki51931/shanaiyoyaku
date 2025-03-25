@@ -1,11 +1,11 @@
 from sqlite3 import IntegrityError
 from typing import Union
-from unittest import result
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel
+import bcrypt
 
 from database.database import get_db
 from models.sqlalchemy.user import User as DBUser
@@ -17,6 +17,11 @@ router = APIRouter()
 class User(BaseModel):
     kanji_name: str
 
+# パスワードハッシュ化関数
+def hash_password(password: str) -> str:
+    # bcryptでハッシュ化
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
 @router.post("/user/", response_model=UserResponse)
 async def get_user_by_name(user: User, db: Session = Depends(get_db)):
     db_user = db.query(DBUser).filter(DBUser.kanji_name == user.kanji_name).first()
@@ -27,7 +32,11 @@ async def get_user_by_name(user: User, db: Session = Depends(get_db)):
 @router.post("/user/new/", response_model=UserResponse)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        db_user = DBUser(**user.dict())
+        # パスワードをハッシュ化
+        hashed_password = hash_password(user.password)
+
+        # ユーザーの作成（ハッシュ化されたパスワードを使用）
+        db_user = DBUser(**user.dict(), password=hashed_password)
         db.add(db_user)
         db.commit()
     
@@ -66,7 +75,6 @@ def read_user_all(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @router.get("/user/{user_id}", response_model=UserResponse)
 def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
     db_user = db.query(DBUser).filter(DBUser.id == user_id).first()
@@ -80,6 +88,10 @@ async def update_user(user_id: int, user_update: UserUpdate, db: Session = Depen
         db_user = db.query(DBUser).filter(DBUser.id == user_id).first()
         if db_user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+        # パスワードが更新された場合にのみハッシュ化
+        if user_update.password:
+            user_update.password = hash_password(user_update.password)
 
         for key, value in user_update.dict(exclude_unset=True).items():
             setattr(db_user, key, value)
