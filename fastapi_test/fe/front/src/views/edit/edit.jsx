@@ -14,6 +14,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
+
 
 function Copyright(props) {
   return (
@@ -31,18 +33,54 @@ function Copyright(props) {
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
+const BASE_URL = "http://localhost:8000";
+
 
 export default function SignUp(props) {
   const handleSubmit = (event) => {
 
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    
+
+    const token = localStorage.getItem('token'); // ローカルストレージに保存されているトークン
+    console.log(token);
+    if (typeof token !== 'string') {
+      console.error("Invalid token:", token); // トークンが文字列でない場合、エラーメッセージを表示
+    }
+    const decodedToken = jwtDecode(token);
+    const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
+
+    console.log(loginUserIsApproval);
+    // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
+    if (loginUserIsApproval !== 2) {
+      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
+      return; // ユーザー作成をキャンセル
+    }
+
+    const loginUserPosition = decodedToken?.position; // ログインユーザーの役職
+    const loginUserIsSuperuser = decodedToken?.is_superuser; // ログインユーザーが管理者かどうか
+
+    const targetUserPosition = data.get('position'); // 変更対象の役職
+
+    // 役職制御ロジック
+    const positionHierarchy = ['C', 'B', 'A'];
+
+    if (loginUserIsSuperuser) {
+      // 管理者は役職変更をABCすべてに対して設定でき、承認フラグを2に設定
+      data.set('is_approval', '2');
+    } else if (positionHierarchy.indexOf(targetUserPosition) > positionHierarchy.indexOf(loginUserPosition)) {
+      // 権限が不足している場合は承認フラグを1に設定
+      data.set('is_approval', '1');
+    }
+
+
     console.log({
       user_name: data.get('user_name'),
       kanji_name: data.get('kanji_name'),
       kata_name: data.get('kata_name'),
       password: data.get('password'),
-      position: data.get('position'),
+      position: targetUserPosition,
       is_approval: data.get('is_approval'),
       id: props.id
     });
@@ -75,11 +113,11 @@ export default function SignUp(props) {
       kanji_name: data.get('kanji_name'),
       kata_name: data.get('kata_name'),
       password: data.get('password'),
-      position: data.get('position'),
+      position: targetUserPosition,
       is_approval: data.get('is_approval'),
-   };
+    };    
   
-    axios.put(`http://localhost:8000/user/${props.id}`, user, {
+    axios.put(BASE_URL + `/user/${props.id}`, user, {
         headers: {
             'Content-Type': 'application/json'
         }
@@ -92,13 +130,13 @@ export default function SignUp(props) {
             console.log("error", error);
         });
   };
-  const DeleteUser = (id) => {
+  const DeleteUser = () => {
     console.log({
-      id: id
+      id: props.id
     });
     const params = new URLSearchParams();
-    params.append('id', id);
-    axios.delete('http://localhost:8000/user/{id}', params)
+    params.append('id', props.id);
+    axios.delete(BASE_URL + `/user/${props.id}`, params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);
@@ -137,7 +175,7 @@ export default function SignUp(props) {
                   id="user_name"
                   label="ユーザーネーム"
                   autoFocus
-                  value={props.user_name}
+                  value={props.user_name || ""}
                   onChange={(event) => props.setUser_name(event.target.value)}
                 />
               </Grid>
@@ -150,7 +188,7 @@ export default function SignUp(props) {
                   id="kanji_name"
                   label="名前(漢字)"
                   autoFocus
-                  value={props.kanji_name}
+                  value={props.kanji_name || ""}
                   onChange={(event) => props.setKanji_name(event.target.value)}
                 />
               </Grid>
@@ -163,7 +201,7 @@ export default function SignUp(props) {
                   id="kata_name"
                   label="名前(カタカナ)"
                   autoFocus
-                  value={props.kata_name}
+                  value={props.kata_name || ""}
                   onChange={(event) => props.setKata_name(event.target.value)}
                 />
               </Grid>
@@ -176,7 +214,7 @@ export default function SignUp(props) {
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                  value={props.password}
+                  value={props.password || ""}
                   onChange={(event) => props.setPassword(event.target.value)}
                 />
               </Grid>
@@ -188,7 +226,7 @@ export default function SignUp(props) {
                   label="役職"
                   name="position"
                   autoComplete="position"
-                  value={props.position}
+                  value={props.position || ""}
                   onChange={(event) => props.setPosition(event.target.value)}
                 />
               </Grid>
@@ -200,7 +238,7 @@ export default function SignUp(props) {
                   label="承認ユーザー"
                   name="is_approval"
                   autoComplete="is_approval"
-                  value={props.is_approval}
+                  value={props.is_approval || ""}
                   onChange={(event) => props.setIs_approval(event.target.value)}
                 />
               </Grid>
@@ -225,7 +263,7 @@ export default function SignUp(props) {
               variant="contained"
               color="error"
               sx={{ mt: 3, mb: 2 }}
-              onClick={() => {DeleteUser(props.id)}}
+              onClick={() => {DeleteUser()}}
             >
               Delete
             </Button>

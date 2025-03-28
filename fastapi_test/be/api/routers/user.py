@@ -36,20 +36,22 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
         hashed_password = hash_password(user.password)
 
         # ユーザーの作成（ハッシュ化されたパスワードを使用）
-        db_user = DBUser(**user.dict(), password=hashed_password)
+        db_user = DBUser(**{k: v for k, v in user.dict().items() if k != 'password'}, password=hashed_password)
         db.add(db_user)
         db.commit()
-    
+        db.refresh(db_user)
+        return db_user  
     except IntegrityError:
+        db.rollback()
         return {
             "status": False,
-            'access_token': None,
+            "access_token": None,
             "message": "このユーザー名は既に登録されています",
             "data": None,
         }
-    finally:
-        db.refresh(db_user)
-        return db_user
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
 @router.get("/user/all/")

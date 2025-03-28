@@ -68,7 +68,15 @@ async def login_for_access_token(
     
     # トークンの生成
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub": user.user_name}, expires_delta=access_token_expires)
+    access_token = create_access_token(
+        data={
+            "sub": user.user_name,
+            "position": user.position,          # positionを追加
+            "is_approval": user.is_approval,    # is_approvalを追加
+            "is_superuser": user.is_superuser,  # is_superuserを追加
+        }, 
+        expires_delta=access_token_expires
+    )
     
     return {"access_token": access_token, "token_type": "bearer"}
 

@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
+
 
 function Copyright(props) {
   return (
@@ -36,9 +38,23 @@ export default function SignUp(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
+    
     const isLoggedIn = Boolean(localStorage.getItem('token'));
-    const positionValue = isLoggedIn ? data.get('position') : 'C';
-    const isApprovalValue = isLoggedIn ? data.get('is_approval') : '1'; // 未ログインの場合は is_approval を「1」に強制
+    const token = isLoggedIn ? localStorage.getItem('token') : null;
+    const decodedToken = token ? jwtDecode(token) : null;
+    const loginUserPosition = decodedToken?.position || 'C'; // ログインユーザーの役職を取得
+
+    let positionValue = data.get('position');
+    let isApprovalValue = data.get('is_approval');
+
+    // 役職制限のロジック
+    const positionHierarchy = ['C', 'B', 'A']; // 役職の順序（C < B < A）
+
+    if (positionHierarchy.indexOf(positionValue) > positionHierarchy.indexOf(loginUserPosition)) {
+      // ログインユーザーの役職より上位の役職に変更しようとする場合
+      isApprovalValue = '1'; // 承認ユーザーを1に設定
+      alert('選択した役職は変更できません。未承認ユーザーとして設定されました。');
+    }
 
     console.log({
       user_name: data.get('user_name'),
@@ -78,8 +94,8 @@ export default function SignUp(props) {
       kanji_name: data.get('kanji_name'),
       kata_name: data.get('kata_name'),
       password: data.get('password'),
-      position: data.get('position'),
-      is_approval: data.get('is_approval'),
+      position: positionValue,
+      is_approval: isApprovalValue,
     };
     axios.post('http://localhost:8000/user/new/', user, {
       headers: {
