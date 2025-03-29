@@ -84,6 +84,10 @@ def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return db_user
 
+def is_hashed(password: str) -> bool:
+    """bcryptでハッシュ化されたパスワードかを判定"""
+    return password.startswith("$2b$")
+
 @router.put("/user/{user_id}", response_model=UserResponse)
 async def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
     try:
@@ -91,8 +95,8 @@ async def update_user(user_id: int, user_update: UserUpdate, db: Session = Depen
         if db_user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        # パスワードが更新された場合にのみハッシュ化
-        if user_update.password:
+        # パスワードが存在し、かつ未ハッシュの場合にのみハッシュ化
+        if user_update.password and not is_hashed(user_update.password):
             user_update.password = hash_password(user_update.password)
 
         for key, value in user_update.dict(exclude_unset=True).items():
