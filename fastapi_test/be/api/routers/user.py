@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel
 import bcrypt
+from sqlalchemy import or_
 
 from database.database import get_db
 from models.sqlalchemy.user import User as DBUser
@@ -22,12 +23,33 @@ def hash_password(password: str) -> str:
     # bcryptでハッシュ化
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-@router.post("/user/", response_model=UserResponse)
-async def get_user_by_name(user: User, db: Session = Depends(get_db)):
-    db_user = db.query(DBUser).filter(DBUser.kanji_name == user.kanji_name).first()
-    if db_user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    return db_user
+# 検索リクエスト用の Pydantic モデル
+class UserSearch(BaseModel):
+    query: str
+
+@router.post("/user/search/", response_model=list[UserResponse])
+async def search_users(user_search: UserSearch, db: Session = Depends(get_db)):
+    """
+    user_name、kanji_name、kata_name のいずれかにキーワードが含まれるユーザーを検索する
+    """
+    query = user_search.query.strip()  # 前後の空白を除去
+
+    db_users = (
+        db.query(DBUser)
+        .filter(
+            or_(
+                DBUser.user_name.ilike(f"%{query}%"),
+                DBUser.kanji_name.ilike(f"%{query}%"),
+                DBUser.kata_name.ilike(f"%{query}%"),
+            )
+        )
+        .all()
+    )
+
+    if not db_users:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matching users found")
+
+    return db_users
 
 @router.post("/user/new/", response_model=UserResponse)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
