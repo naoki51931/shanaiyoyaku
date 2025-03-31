@@ -6,6 +6,8 @@ import Form from './views/Form'
 import List from './views/List';
 import New from './views/new/new';
 import LoginForm from './views/LoginForm';
+import ConfeList from './conference_room/List';
+
 
 // 🔹 認証状態を確認するカスタムコンポーネント
 const PrivateRoute = ({ element }) => {
@@ -57,6 +59,7 @@ export default function App() {
             />}
           />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/confe_room" element={<ConfeList />} />
         </Routes>
       </>
     </Router>
