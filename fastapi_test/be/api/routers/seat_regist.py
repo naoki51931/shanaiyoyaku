@@ -27,7 +27,7 @@ def get_offices(db: Session = Depends(get_db)):
 @router.post("/seat/search/", response_model=list[SeatRegistResponse])
 async def search_seats(seat_search: SeatRegistSearch, db: Session = Depends(get_db)):
     """
-    seat_name、office_name、office_id のいずれかにキーワードが含まれるユーザーを検索する
+    seat_name、office_name、office_id のいずれかにキーワードが含まれる座席を検索する
     """
     query = seat_search.query.strip()
 
@@ -38,7 +38,6 @@ async def search_seats(seat_search: SeatRegistSearch, db: Session = Depends(get_
         .filter(
             or_(
                 DBSeatRegist.seat_name.ilike(f"%{query}%"),
-                DBSeatRegist.office_name.ilike(f"%{query}%"),
                 DBOffice.office_name.ilike(f"%{query}%"),
             )
         )
@@ -72,7 +71,7 @@ async def create_seat(seat: SeatRegistCreate, db: Session = Depends(get_db)):
 @router.get("/seat/all/")
 def read_seat_all(db: Session = Depends(get_db)):
     try:
-        seats_data = db.query(DBSeatRegist).options(joinedload(DBSeatRegist.parent)).all()
+        seats_data = db.query(DBSeatRegist).options(joinedload(DBSeatRegist.office)).all()
         results = [
             {
                 "id": seat.id,
