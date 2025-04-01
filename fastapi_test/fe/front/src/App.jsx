@@ -6,7 +6,7 @@ import Form from './views/Form'
 import List from './views/List';
 import New from './views/new/new';
 import LoginForm from './views/LoginForm';
-import ConfeList from './conference_room/List';
+import SeatRegist from './views/seat_regist/seat_regist';
 
 
 // 🔹 認証状態を確認するカスタムコンポーネント
@@ -59,7 +59,7 @@ export default function App() {
             />}
           />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/confe_room" element={<ConfeList />} />
+          <Route path="/seat_regist" element={<SeatRegist />} />
         </Routes>
       </>
     </Router>

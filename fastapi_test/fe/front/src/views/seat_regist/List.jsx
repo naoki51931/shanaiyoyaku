@@ -15,32 +15,12 @@ import axios from 'axios';
 export default function List(props) {
     const [editModalIsOpen, setEditModalIsOpen] = React.useState(false);
     const [id, setId] = React.useState("");
-    const [confe_room_name, setConfe_room_name] = React.useState("");
+    const [seat_name, setSeat_name] = React.useState("");
     const [office_name, setOffice_name] = React.useState("");
 
-    // ログインユーザーの情報を取得
-    React.useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                if (!token) return;
-
-                const response = await axios.get("http://localhost:8000/auth/users/me", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                setIs_superUser(response.data.is_superuser); // 管理者かどうかを取得
-            } catch (error) {
-                console.error("ユーザー情報の取得に失敗しました", error);
-            }
-        };
-
-        fetchUserInfo();
-    }, []);
-
-    const openEditModal = (id, confe_room_name, office_name) => {
+    const openEditModal = (id, seat_name, office_name) => {
         setId(id);
-        setConfe_room_name(confe_room_name);
+        setSeat_name(seat_name);
         setOffice_name(office_name);
         setEditModalIsOpen(true);
     };
@@ -54,7 +34,7 @@ export default function List(props) {
             {props.searchResult.map((v) => 
                 <TableRow key={v.id}>
                     <TableCell align="left">{v.id}</TableCell>
-                    <TableCell align="left">{v.confe_room_name}</TableCell>
+                    <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
@@ -74,8 +54,8 @@ export default function List(props) {
             <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell align="left">会議室id</TableCell>
-                        <TableCell align="left">会議室ネーム</TableCell>
+                        <TableCell align="left">座席id</TableCell>
+                        <TableCell align="left">座席名</TableCell>
                         <TableCell align="left">事務所名</TableCell>
                         <TableCell align="left">作成日時</TableCell>
                         <TableCell align="left">更新日時</TableCell>
@@ -103,7 +83,7 @@ export default function List(props) {
                 >
                     <Edit
                         setEditModalIsOpen={setEditModalIsOpen}
-                        id={id} confe_room_name={confe_room_name} setConfe_room_name={setConfe_room_name}
+                        id={id} seat_name={seat_name} setSeat_name={setSeat_name}
                         office_name={office_name} setOffice_name={setOffice_name}
                     />
                 </Modal>

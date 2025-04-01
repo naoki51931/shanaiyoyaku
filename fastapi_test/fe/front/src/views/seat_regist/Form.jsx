@@ -13,7 +13,7 @@ export default function Form(props) {
     };
 
     const searchUsers = () => {
-        axios.post('http://localhost:8000/user/search/', { query })
+        axios.post('http://localhost:8000/seat/search/', { query })
             .then((res) => {
                 console.log("検索結果:", res.data);
                 
@@ -31,7 +31,7 @@ export default function Form(props) {
     };
 
     const funget = () => {
-        axios.get('http://localhost:8000/user/all/')
+        axios.get('http://localhost:8000/seat/all/')
             .then(function (res) {
                 console.log(res.data.length)
                 console.log(res)
@@ -41,15 +41,8 @@ export default function Form(props) {
                         tmpUsers = tmpUsers.concat([
                             {
                                 id: res.data[i].id,
-                                user_name: res.data[i].user_name,
-                                kanji_name: res.data[i].kanji_name,
-                                kata_name: res.data[i].kata_name,
-                                password: res.data[i].password,
-                                position: res.data[i].position,
-                                is_superuser: res.data[i].is_superuser,
-                                is_approval: res.data[i].is_approval,
-                                created_at: res.data[i].created_at,
-                                updated_at: res.data[i].updated_at,
+                                seat_name: res.data[i].seat_name,
+                                office_name: res.data[i].office_name,
                             }
                         ])
                     }
@@ -68,15 +61,8 @@ export default function Form(props) {
                     tmpUsers = tmpUsers.concat([
                         {
                             id: res.data.id,
-                            user_name: res.data.user_name,
-                            kanji_name: res.data.kanji_name,
-                            kata_name: res.data.kata_name,
-                            password: res.data.password,
-                            position: res.data.position,
-                            is_superuser: res.data.is_superuser,
-                            is_approval: res.data.is_approval,
-                            created_at: res.data.created_at,
-                            updated_at: res.data.updated_at,
+                            seat_name: res.data.seat_name,
+                            office_name: res.data.office_name,
                         }
                     ])
                         // props.setDisplay({
@@ -108,7 +94,7 @@ export default function Form(props) {
             <form onSubmit={(e) => { e.preventDefault(); searchUsers(); }}>
                 <Grid item>
                     <TextField
-                        label="名前を入力 (漢字・カナ・ユーザー名)"
+                        label="座席名を入力"
                         value={query}
                         onChange={handleQueryChange}
                     />

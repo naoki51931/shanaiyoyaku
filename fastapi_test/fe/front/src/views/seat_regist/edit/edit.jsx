@@ -76,48 +76,24 @@ export default function SignUp(props) {
 
 
     console.log({
-      user_name: data.get('user_name'),
-      kanji_name: data.get('kanji_name'),
-      kata_name: data.get('kata_name'),
-      password: data.get('password'),
-      position: targetUserPosition,
-      is_approval: data.get('is_approval'),
+      seat_name: data.get('seat_name'),
+      office_name: data.get('office_name'),
       id: props.id
     });
-    if (data.get('user_name') == ""){
-      alert("ユーザーネームを入力して下さい。")
+    if (data.get('seat_name') == ""){
+      alert("座席名を入力して下さい。")
       return
     }
-    if (data.get('kanji_name') == ""){
-      alert("名前(漢字)を入力して下さい。")
-      return
-    }
-    if (data.get('kata_name') == ""){
-      alert("名前(カタカナ)を入力して下さい。")
-      return
-    }
-    if (data.get('password') == ""){
-      alert("パスワードを入力して下さい。")
-      return
-    }
-    if (data.get('position') == ""){
-      alert("役職を入力して下さい。")
-      return
-    }
-    if (data.get('is_approval') == ""){
-      alert("承認ユーザーを入力して下さい。")
+    if (data.get('office_name') == ""){
+      alert("事務所名を選択して下さい。")
       return
     }
     const user = {
-      user_name: data.get('user_name'),
-      kanji_name: data.get('kanji_name'),
-      kata_name: data.get('kata_name'),
-      password: data.get('password'),
-      position: targetUserPosition,
-      is_approval: data.get('is_approval'),
+      user_name: data.get('seat_name'),
+      kanji_name: data.get('office_name'),
     };    
   
-    axios.put(BASE_URL + `/user/${props.id}`, user, {
+    axios.put(BASE_URL + `/seat/${props.id}`, user, {
         headers: {
             'Content-Type': 'application/json'
         }
@@ -136,7 +112,7 @@ export default function SignUp(props) {
     });
     const params = new URLSearchParams();
     params.append('id', props.id);
-    axios.delete(BASE_URL + `/user/${props.id}`, params)
+    axios.delete(BASE_URL + `/seat/${props.id}`, params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);
@@ -168,80 +144,28 @@ export default function SignUp(props) {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="username"
-                  name="user_name"
+                  autoComplete="seat_name"
+                  name="seat_name"
                   required
                   fullWidth
-                  id="user_name"
-                  label="ユーザーネーム"
+                  id="seat_name"
+                  label="座席名"
                   autoFocus
-                  value={props.user_name || ""}
-                  onChange={(event) => props.setUser_name(event.target.value)}
+                  value={props.seat_name || ""}
+                  onChange={(event) => props.setSeat_name(event.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="given-name"
-                  name="kanji_name"
+                  autoComplete="office_name-name"
+                  name="office_name"
                   required
                   fullWidth
-                  id="kanji_name"
-                  label="名前(漢字)"
+                  id="office_name"
+                  label="事務所名"
                   autoFocus
-                  value={props.kanji_name || ""}
-                  onChange={(event) => props.setKanji_name(event.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  autoComplete="given-name"
-                  name="kata_name"
-                  required
-                  fullWidth
-                  id="kata_name"
-                  label="名前(カタカナ)"
-                  autoFocus
-                  value={props.kata_name || ""}
-                  onChange={(event) => props.setKata_name(event.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="パスワード"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  value={props.password || ""}
-                  onChange={(event) => props.setPassword(event.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  title="役職は「A」「B」「C」の三つです。"
-                  id="position"
-                  label="役職"
-                  name="position"
-                  autoComplete="position"
-                  value={props.position || ""}
-                  onChange={(event) => props.setPosition(event.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  title="承認ユーザーが2になることですべての機能が使用できます。デフォルトは1です。"
-                  id="is_approval"
-                  label="承認ユーザー"
-                  name="is_approval"
-                  autoComplete="is_approval"
-                  value={props.is_approval || ""}
-                  onChange={(event) => props.setIs_approval(event.target.value)}
+                  value={props.office_name || ""}
+                  onChange={(event) => props.setOffice_name(event.target.value)}
                 />
               </Grid>
               {/* <Grid item xs={12}>
