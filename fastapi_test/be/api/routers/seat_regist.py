@@ -18,16 +18,25 @@ router = APIRouter()
 class SeatRegistSearch(BaseModel):
     query: str
 
-@router.get("/offices/", response_model=list[str])
+# ① レスポンス用のスキーマを定義
+class OfficeResponse(BaseModel):
+    id: int
+    office_name: str
+
+    class Config:
+        orm_mode = True
+
+# ② 修正されたエンドポイント
+@router.get("/office/all/", response_model=list[OfficeResponse])
 def get_offices(db: Session = Depends(get_db)):
-    """オフィス名の一覧を取得"""
-    offices = db.query(DBOffice.office_name).all()
-    return [office.office_name for office in offices]
+    """オフィスのIDと名前の一覧を取得"""
+    offices = db.query(DBOffice).all()
+    return offices
 
 @router.post("/seat/search/", response_model=list[SeatRegistResponse])
 async def search_seats(seat_search: SeatRegistSearch, db: Session = Depends(get_db)):
     """
-    seat_name、office_name、office_id のいずれかにキーワードが含まれる座席を検索する
+    seat_name、office_name のいずれかにキーワードが含まれる座席を検索する
     """
     query = seat_search.query.strip()
 
@@ -47,7 +56,19 @@ async def search_seats(seat_search: SeatRegistSearch, db: Session = Depends(get_
     if not db_seats:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matching seats found")
 
-    return db_seats
+    results = [
+        {
+            "id": seat.id,
+            "seat_name": seat.seat_name,
+            "office_id": seat.office_id,
+            "office_name": seat.office.office_name if seat.office else None,
+            "created_at": seat.created_at,
+            "updated_at": seat.updated_at,
+        }
+        for seat in db_seats
+    ]
+
+    return results
 
 @router.post("/seat/new/", response_model=SeatRegistResponse)
 async def create_seat(seat: SeatRegistCreate, db: Session = Depends(get_db)):

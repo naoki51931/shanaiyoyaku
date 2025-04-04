@@ -43,6 +43,8 @@ export default function Form(props) {
                                 id: res.data[i].id,
                                 seat_name: res.data[i].seat_name,
                                 office_name: res.data[i].office_name,
+                                created_at: res.data[i].created_at,
+                                updated_at: res.data[i].updated_at,
                             }
                         ])
                     }
@@ -63,6 +65,8 @@ export default function Form(props) {
                             id: res.data.id,
                             seat_name: res.data.seat_name,
                             office_name: res.data.office_name,
+                            created_at: res.data.created_at,
+                            updated_at: res.data.updated_at,
                         }
                     ])
                         // props.setDisplay({

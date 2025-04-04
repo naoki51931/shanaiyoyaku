@@ -59,7 +59,7 @@ export default function App() {
             />}
           />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/seat_regist" element={<SeatRegist />} />
+          <Route path="/seat_regist/*" element={<SeatRegist />} />
         </Routes>
       </>
     </Router>

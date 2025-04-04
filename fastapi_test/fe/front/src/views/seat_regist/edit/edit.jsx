@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,6 +15,8 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+
 
 
 function Copyright(props) {
@@ -37,6 +39,18 @@ const BASE_URL = "http://localhost:8000";
 
 
 export default function SignUp(props) {
+  const [offices, setOffices] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/office/all/`)
+      .then((res) => {
+        setOffices(res.data);
+      })
+      .catch((error) => {
+        console.error("オフィス取得エラー:", error);
+      });
+  }, []);
+
   const handleSubmit = (event) => {
 
     event.preventDefault();
@@ -77,20 +91,20 @@ export default function SignUp(props) {
 
     console.log({
       seat_name: data.get('seat_name'),
-      office_name: data.get('office_name'),
+      office_id: data.get('office_id'),
       id: props.id
     });
     if (data.get('seat_name') == ""){
       alert("座席名を入力して下さい。")
       return
     }
-    if (data.get('office_name') == ""){
+    if (data.get('office_id') == ""){
       alert("事務所名を選択して下さい。")
       return
     }
     const user = {
-      user_name: data.get('seat_name'),
-      kanji_name: data.get('office_name'),
+      seat_name: data.get('seat_name'),
+      office_id: data.get('office_id'),
     };    
   
     axios.put(BASE_URL + `/seat/${props.id}`, user, {
@@ -156,17 +170,25 @@ export default function SignUp(props) {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  autoComplete="office_name-name"
-                  name="office_name"
-                  required
-                  fullWidth
-                  id="office_name"
-                  label="事務所名"
-                  autoFocus
-                  value={props.office_name || ""}
-                  onChange={(event) => props.setOffice_name(event.target.value)}
-                />
+                <FormControl fullWidth required>
+                  <InputLabel id="office-select-label">事務所</InputLabel>
+                  <Select
+                    labelId="office-select-label"
+                    id="office_id"
+                    name="office_id"
+                    value={props.office_id || ""}
+                    label="事務所"
+                    onChange={(event) => props.setOffice_id(event.target.value)}
+                  >
+                    {/* 空の状態の場合のデフォルト表示 */}
+                    <MenuItem value="">オフィスを選択してください</MenuItem>
+                    {offices.map((office) => (
+                      <MenuItem key={office.id} value={office.id}>
+                        {office.office_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               {/* <Grid item xs={12}>
                 <FormControlLabel

@@ -145,6 +145,20 @@ function ResponsiveAppBar() {
                 >
                   ログイン
                 </Button>
+                <Button 
+                  component={Link} 
+                  to="/seat_regist"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  座席一覧
+                </Button>
+                <Button 
+                  component={Link} 
+                  to="/seat_regist/new"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  座席追加
+                </Button>
               </Menu>
             </Box>
 
@@ -184,6 +198,20 @@ function ResponsiveAppBar() {
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 ログイン
+              </Button>
+              <Button 
+                component={Link} 
+                to="/seat_regist"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                座席一覧
+              </Button>
+              <Button 
+                component={Link} 
+                to="/seat_regist/new"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                座席追加
               </Button>
             </Box>
 

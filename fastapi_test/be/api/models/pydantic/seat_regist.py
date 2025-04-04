@@ -18,6 +18,7 @@ class SeatRegistResponse(BaseModel):
     id: int
     seat_name: Optional[str] = None
     office_id: Optional[int] = None
+    office_name: Optional[str] = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 

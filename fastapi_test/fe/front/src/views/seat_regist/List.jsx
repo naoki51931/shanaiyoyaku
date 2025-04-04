@@ -16,12 +16,12 @@ export default function List(props) {
     const [editModalIsOpen, setEditModalIsOpen] = React.useState(false);
     const [id, setId] = React.useState("");
     const [seat_name, setSeat_name] = React.useState("");
-    const [office_name, setOffice_name] = React.useState("");
+    const [office_id, setOffice_id] = React.useState("");
 
-    const openEditModal = (id, seat_name, office_name) => {
+    const openEditModal = (id, seat_name, office_id) => {
         setId(id);
         setSeat_name(seat_name);
-        setOffice_name(office_name);
+        setOffice_id(office_id);
         setEditModalIsOpen(true);
     };
 
@@ -40,7 +40,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.user_name, v.kanji_name, v.kata_name, v.password, v.position, v.is_approval)}}>
+                                onClick={() => {openEditModal(v.id, v.seat_name, v.office_id)}}>
                             Edit
                         </Button>
                     </TableCell>
@@ -84,7 +84,7 @@ export default function List(props) {
                     <Edit
                         setEditModalIsOpen={setEditModalIsOpen}
                         id={id} seat_name={seat_name} setSeat_name={setSeat_name}
-                        office_name={office_name} setOffice_name={setOffice_name}
+                        office_id={office_id} setOffice_id={setOffice_id}
                     />
                 </Modal>
             </div>
