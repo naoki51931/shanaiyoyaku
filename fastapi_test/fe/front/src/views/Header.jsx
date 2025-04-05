@@ -128,6 +128,13 @@ function ResponsiveAppBar() {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
+                <Button 
+                  component={Link} 
+                  to="/"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  ユーザー一覧
+                </Button>
                 {pages.map((page) => (
                   <Button
                     key={page}
@@ -183,6 +190,13 @@ function ResponsiveAppBar() {
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              <Button 
+                component={Link} 
+                to="/"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                ユーザー一覧
+              </Button>
               {pages.map((page) => (
                 <Button
                   key={page}

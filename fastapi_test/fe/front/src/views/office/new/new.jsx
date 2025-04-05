@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { useState, useEffect } from "react"
+import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,8 +16,6 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
-import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
-
 
 
 function Copyright(props) {
@@ -35,88 +34,60 @@ function Copyright(props) {
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
-const BASE_URL = "http://localhost:8000";
-
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/office/all/`)
+    axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
       .then((res) => {
         setOffices(res.data);
       })
       .catch((error) => {
-        console.error("オフィス取得エラー:", error);
+        console.error('オフィス情報の取得に失敗:', error);
       });
   }, []);
 
-  const handleSubmit = (event) => {
 
+  const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+
     
-
-    const token = localStorage.getItem('token'); // ローカルストレージに保存されているトークン
-    console.log(token);
-    if (typeof token !== 'string') {
-      console.error("Invalid token:", token); // トークンが文字列でない場合、エラーメッセージを表示
-    }
-    const decodedToken = jwtDecode(token);
-    const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
-
-    console.log(loginUserIsApproval);
-    // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
-    if (loginUserIsApproval !== 2) {
-      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
-      return; // ユーザー作成をキャンセル
-    }
-
+    const isLoggedIn = Boolean(localStorage.getItem('token'));
+    const token = isLoggedIn ? localStorage.getItem('token') : null;
+    const decodedToken = token ? jwtDecode(token) : null;
+    const loginUserPosition = decodedToken?.position || 'C'; // ログインユーザーの役職を取得
 
     console.log({
-      seat_name: data.get('seat_name'),
+      office_name: data.get('office_name'),
       office_id: data.get('office_id'),
-      id: props.id
     });
-    if (data.get('seat_name') == ""){
-      alert("座席名を入力して下さい。")
+    console.log('props.setIsOpen:', props.setIsOpen);
+    if (data.get('office_name') == ""){
+      alert("事業所名を入力して下さい。")
       return
     }
     if (data.get('office_id') == ""){
-      alert("事務所名を選択して下さい。")
+      alert("事業所idを入力して下さい。")
       return
     }
     const user = {
-      seat_name: data.get('seat_name'),
+      office_name: data.get('office_name'),
       office_id: data.get('office_id'),
-    };    
-  
-    axios.put(BASE_URL + `/seat/${props.id}`, user, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
+    };
+    axios.post('http://localhost:8000/seat/new/', user, {
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      withCredentials: true  // 追加（必要なら）
     })
         .then(function (res) {
             console.log(res)
-            props.setEditModalIsOpen(false);
         })
         .catch(function (error) {
             console.log("error", error);
-        });
-  };
-  const DeleteUser = () => {
-    console.log({
-      id: props.id
-    });
-    const params = new URLSearchParams();
-    params.append('id', props.id);
-    axios.delete(BASE_URL + `/seat/${props.id}`, params)
-        .then(function (res) {
-            console.log(res)
-            props.setEditModalIsOpen(false);
-        })
-        .catch(function (error) {
-            console.log("error", error);
+            alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
         });
   };
 
@@ -136,43 +107,35 @@ export default function SignUp(props) {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Edit
+            New
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="seat_name"
-                  name="seat_name"
+                  autoComplete="office_name"
+                  name="office_name"
                   required
                   fullWidth
-                  id="seat_name"
-                  label="座席名"
+                  id="office_name"
+                  label="事業所名"
                   autoFocus
-                  value={props.seat_name || ""}
-                  onChange={(event) => props.setSeat_name(event.target.value)}
+                  value={props.office_name ?? ''}
+                  onChange={(event) => props.setOffice_name && props.setOffice_name(event.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel id="office-select-label">事務所</InputLabel>
-                  <Select
-                    labelId="office-select-label"
-                    id="office_id"
-                    name="office_id"
-                    value={props.office_id || ""}
-                    label="事務所"
-                    onChange={(event) => props.setOffice_id(event.target.value)}
-                  >
-                    {/* 空の状態の場合のデフォルト表示 */}
-                    <MenuItem value="">オフィスを選択してください</MenuItem>
-                    {offices.map((office) => (
-                      <MenuItem key={office.id} value={office.id}>
-                        {office.office_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <TextField
+                  autoComplete="office_id"
+                  name="office_id"
+                  required
+                  fullWidth
+                  id="office_id"
+                  label="事業所id"
+                  autoFocus
+                  value={props.office_id ?? ''}
+                  onChange={(event) => props.setOffice_id && props.setOffice_id(event.target.value)}
+                />
               </Grid>
               {/* <Grid item xs={12}>
                 <FormControlLabel
@@ -187,17 +150,7 @@ export default function SignUp(props) {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Update
-            </Button>
-            <Button
-              type="button"
-              fullWidth
-              variant="contained"
-              color="error"
-              sx={{ mt: 3, mb: 2 }}
-              onClick={() => {DeleteUser()}}
-            >
-              Delete
+              Create
             </Button>
             {/* <Grid container justifyContent="flex-end">
               <Grid item>

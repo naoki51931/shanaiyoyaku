@@ -12,7 +12,7 @@ export default function Form(props) {
         setQuery(e.target.value);
     };
 
-    const searchSeats = () => {
+    const searchOffices = () => {
         axios.post('http://localhost:8000/seat/search/', { query })
             .then((res) => {
                 console.log("検索結果:", res.data);
@@ -41,8 +41,8 @@ export default function Form(props) {
                         tmpUsers = tmpUsers.concat([
                             {
                                 id: res.data[i].id,
-                                seat_name: res.data[i].seat_name,
                                 office_name: res.data[i].office_name,
+                                office_id: res.data[i].office_id,
                                 created_at: res.data[i].created_at,
                                 updated_at: res.data[i].updated_at,
                             }
@@ -63,8 +63,8 @@ export default function Form(props) {
                     tmpUsers = tmpUsers.concat([
                         {
                             id: res.data.id,
-                            seat_name: res.data.seat_name,
                             office_name: res.data.office_name,
+                            office_id: res.data.office_id,
                             created_at: res.data.created_at,
                             updated_at: res.data.updated_at,
                         }
@@ -95,16 +95,16 @@ export default function Form(props) {
     
     return (
         <Grid container rowSpacing={1} position={'static'} marginTop={"15px"} marginLeft={"5px"}> 
-            <form onSubmit={(e) => { e.preventDefault(); searchSeats(); }}>
+            <form onSubmit={(e) => { e.preventDefault(); searchOffices(); }}>
                 <Grid item>
                     <TextField
-                        label="座席名を入力"
+                        label="事業所名を入力"
                         value={query}
                         onChange={handleQueryChange}
                     />
                 </Grid>                
                 <Grid item>
-                    <Button variant="contained" onClick={searchSeats}>検索</Button>
+                    <Button variant="contained" onClick={searchOffices}>検索</Button>
                 </Grid>
             </form>
         </Grid>
