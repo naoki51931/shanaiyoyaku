@@ -135,16 +135,13 @@ function ResponsiveAppBar() {
                 >
                   ユーザー一覧
                 </Button>
-                {pages.map((page) => (
-                  <Button
-                    key={page}
-                    component={Link}
-                    to="/new"
-                    sx={{ my: 2, color: 'black', display: 'block' }}
-                  >
-                    {page}
-                  </Button>
-                ))}
+                <Button
+                  component={Link}
+                  to="/new"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  ユーザー追加
+                </Button>
                 <Button 
                   component={Link} 
                   to="/login"
@@ -165,6 +162,20 @@ function ResponsiveAppBar() {
                   sx={{ my: 2, color: 'black', display: 'block' }}
                 >
                   座席追加
+                </Button>
+                <Button 
+                  component={Link} 
+                  to="/office"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  事業所一覧
+                </Button>
+                <Button 
+                  component={Link} 
+                  to="/office/new"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  事業所追加
                 </Button>
               </Menu>
             </Box>
@@ -226,6 +237,20 @@ function ResponsiveAppBar() {
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 座席追加
+              </Button>
+              <Button 
+                component={Link} 
+                to="/office"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                事業所一覧
+              </Button>
+              <Button 
+                component={Link} 
+                to="/office/new"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                事業所追加
               </Button>
             </Box>
 

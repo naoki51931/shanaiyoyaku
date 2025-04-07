@@ -162,8 +162,8 @@ export default function SignUp(props) {
                   id="office_id"
                   label="事業所id"
                   autoFocus
-                  value={props.office_name || ""}
-                  onChange={(event) => props.setOffice_name(event.target.value)}
+                  value={props.office_id || ""}
+                  onChange={(event) => props.setOffice_id(event.target.value)}
                 />
               </Grid>
               {/* <Grid item xs={12}>

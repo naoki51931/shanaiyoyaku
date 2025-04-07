@@ -59,6 +59,16 @@ export default function SignUp(props) {
     const decodedToken = token ? jwtDecode(token) : null;
     const loginUserPosition = decodedToken?.position || 'C'; // ログインユーザーの役職を取得
 
+
+    const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
+
+    console.log(loginUserIsApproval);
+    // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
+    if (loginUserIsApproval !== 2) {
+      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
+      return; // ユーザー作成をキャンセル
+    }
+
     console.log({
       seat_name: data.get('seat_name'),
       office_name: data.get('office_name'),

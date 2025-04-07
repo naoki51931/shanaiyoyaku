@@ -43,6 +43,7 @@ export default function Form(props) {
                                 id: res.data[i].id,
                                 seat_name: res.data[i].seat_name,
                                 office_name: res.data[i].office_name,
+                                office_id: res.data[i].office_id,
                                 created_at: res.data[i].created_at,
                                 updated_at: res.data[i].updated_at,
                             }
