@@ -76,7 +76,7 @@ export default function SignUp(props) {
       office_name: data.get('office_name'),
       office_id: data.get('office_id'),
     };
-    axios.post('http://localhost:8000/seat/new/', user, {
+    axios.post('http://localhost:8000/office/new/', user, {
       headers: {
           'Content-Type': 'application/json'
       },

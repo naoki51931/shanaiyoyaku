@@ -2,8 +2,6 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from be.api.models.sqlalchemy.seat_regist import SeatRegist
-
 class OfficeCreate(BaseModel):
     office_name: Optional[str] = None
     office_id: Optional[str] = None

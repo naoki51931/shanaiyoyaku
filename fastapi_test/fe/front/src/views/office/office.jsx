@@ -11,7 +11,7 @@ const PrivateRoute = ({ element }) => {
   return token ? element : <Navigate to="/login" />;
 };
 
-export default function SeatRegist() {
+export default function Office() {
   const [display, setDisplay] = useState([]);
   const [flag, setFlag] = useState(false);
   const [office_name, setOffice_name] = React.useState("");

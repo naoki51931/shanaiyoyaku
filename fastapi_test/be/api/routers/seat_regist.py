@@ -19,19 +19,19 @@ class SeatRegistSearch(BaseModel):
     query: str
 
 # ① レスポンス用のスキーマを定義
-class OfficeResponse(BaseModel):
-    id: int
-    office_name: str
+# class OfficeResponse(BaseModel):
+#     id: int
+#     office_name: str
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
 
 # ② 修正されたエンドポイント
-@router.get("/office/all/", response_model=list[OfficeResponse])
-def get_offices(db: Session = Depends(get_db)):
-    """オフィスのIDと名前の一覧を取得"""
-    offices = db.query(DBOffice).all()
-    return offices
+# @router.get("/office/all/", response_model=list[OfficeResponse])
+# def get_offices(db: Session = Depends(get_db)):
+#     """オフィスのIDと名前の一覧を取得"""
+#     offices = db.query(DBOffice).all()
+#     return offices
 
 @router.post("/seat/search/", response_model=list[SeatRegistResponse])
 async def search_seats(seat_search: SeatRegistSearch, db: Session = Depends(get_db)):

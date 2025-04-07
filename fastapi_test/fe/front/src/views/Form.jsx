@@ -35,7 +35,7 @@ export default function Form(props) {
             .then(function (res) {
                 console.log(res.data.length)
                 console.log(res)
-                if(res.data.length > 1){
+                if(res.data.length > 0){
                     let tmpUsers = []
                     for (let i = 0; i < res.data.length; i++) {
                         tmpUsers = tmpUsers.concat([
@@ -62,33 +62,7 @@ export default function Form(props) {
                         // });
                     console.log(tmpUsers);
                     props.setDisplay(tmpUsers);
-                    props.setFlag(true);
-                } else if(res.data.length == 1 || res.data.length != 0){
-                    let tmpUsers = []
-                    tmpUsers = tmpUsers.concat([
-                        {
-                            id: res.data.id,
-                            user_name: res.data.user_name,
-                            kanji_name: res.data.kanji_name,
-                            kata_name: res.data.kata_name,
-                            password: res.data.password,
-                            position: res.data.position,
-                            is_superuser: res.data.is_superuser,
-                            is_approval: res.data.is_approval,
-                            created_at: res.data.created_at,
-                            updated_at: res.data.updated_at,
-                        }
-                    ])
-                        // props.setDisplay({
-                        //     ...props.display,
-                        //     id: v.id,
-                        //     name: v.name,
-                        //     password: v.password,
-                        //     mailAdress: v.mailAdress,
-                        // });
-                    console.log(tmpUsers);
-                    props.setDisplay(tmpUsers);
-                    props.setFlag(true);
+                    props.setFlag(true);   
                 }
                 else{
                     props.setFlag(false);

@@ -91,7 +91,7 @@ export default function SignUp(props) {
       office_id: data.get('office_id'),
     };    
   
-    axios.put(BASE_URL + `/seat/${props.id}`, user, {
+    axios.put(BASE_URL + `/office/${props.id}`, user, {
         headers: {
             'Content-Type': 'application/json'
         }
@@ -110,7 +110,7 @@ export default function SignUp(props) {
     });
     const params = new URLSearchParams();
     params.append('id', props.id);
-    axios.delete(BASE_URL + `/seat/${props.id}`, params)
+    axios.delete(BASE_URL + `/office/${props.id}`, params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);
@@ -152,6 +152,7 @@ export default function SignUp(props) {
                   value={props.office_name || ""}
                   onChange={(event) => props.setOffice_name(event.target.value)}
                 />
+                </Grid>
                 <Grid item xs={12}>
                 <TextField
                   autoComplete="office_id"

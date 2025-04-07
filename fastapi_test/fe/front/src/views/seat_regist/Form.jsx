@@ -35,7 +35,7 @@ export default function Form(props) {
             .then(function (res) {
                 console.log(res.data.length)
                 console.log(res)
-                if(res.data.length > 1){
+                if(res.data.length > 0){
                     let tmpUsers = []
                     for (let i = 0; i < res.data.length; i++) {
                         tmpUsers = tmpUsers.concat([
@@ -48,27 +48,6 @@ export default function Form(props) {
                             }
                         ])
                     }
-                        // props.setDisplay({
-                        //     ...props.display,
-                        //     id: v.id,
-                        //     name: v.name,
-                        //     password: v.password,
-                        //     mailAdress: v.mailAdress,
-                        // });
-                    console.log(tmpUsers);
-                    props.setDisplay(tmpUsers);
-                    props.setFlag(true);
-                } else if(res.data.length == 1 || res.data.length != 0){
-                    let tmpUsers = []
-                    tmpUsers = tmpUsers.concat([
-                        {
-                            id: res.data.id,
-                            seat_name: res.data.seat_name,
-                            office_name: res.data.office_name,
-                            created_at: res.data.created_at,
-                            updated_at: res.data.updated_at,
-                        }
-                    ])
                         // props.setDisplay({
                         //     ...props.display,
                         //     id: v.id,
