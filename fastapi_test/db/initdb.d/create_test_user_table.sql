@@ -31,3 +31,19 @@ CREATE TABLE `seat_regist` (
     FOREIGN KEY (office_id) REFERENCES office(id),
     PRIMARY KEY (id)
 );
+
+CREATE TABLE `seat_reservation` (
+    id INT NOT NULL AUTO_INCREMENT,
+    reserve_id INT UNIQUE NOT NULL,
+    todo_content VARCHAR(30) NOT NULL,
+    person_id INT NOT NULL,
+    seat_id INT NOT NULL,
+    start_time DATETIME NOT NULL,
+    finish_time DATETIME NOT NULL,
+    reserve_day DATETIME NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (person_id) REFERENCES user(id),
+    FOREIGN KEY (seat_id) REFERENCES seat_regist(id),
+    PRIMARY KEY (id)
+);

@@ -2,6 +2,8 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, f
 from sqlalchemy.orm import relationship
 from database.database import Base
 from models.sqlalchemy.office import Office as DBOffice
+from models.sqlalchemy.seat_reservation import SeatReservation
+
 
 
 class SeatRegist(Base):
@@ -15,3 +17,6 @@ class SeatRegist(Base):
 
      # Office とのリレーション
     office = relationship("Office", back_populates="seats")
+
+     # Office とのリレーション
+    seat_reserve_id = relationship("Office", back_populates="seat_regist")
