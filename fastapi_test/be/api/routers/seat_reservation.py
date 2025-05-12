@@ -13,7 +13,7 @@ from models.pydantic.seat_reservation import (
 
 router = APIRouter()
 
-@router.get("/reservation/all/", response_model=list[SeatReservationResponse])
+@router.get("/seat_reservation/all/", response_model=list[SeatReservationResponse])
 def get_all_reservations(db: Session = Depends(get_db)):
     try:
         reservations = db.query(DBSeatReservation).options(
@@ -24,14 +24,14 @@ def get_all_reservations(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/reservation/{reservation_id}", response_model=SeatReservationResponse)
+@router.get("/seat_reservation/{reservation_id}", response_model=SeatReservationResponse)
 def get_reservation_by_id(reservation_id: int, db: Session = Depends(get_db)):
     reservation = db.query(DBSeatReservation).filter(DBSeatReservation.id == reservation_id).first()
     if reservation is None:
         raise HTTPException(status_code=404, detail="Reservation not found")
     return reservation
 
-@router.post("/reservation/new/", response_model=SeatReservationResponse)
+@router.post("/seat_reservation/new/", response_model=SeatReservationResponse)
 def create_reservation(reservation: SeatReservationCreate, db: Session = Depends(get_db)):
     try:
         db_reservation = DBSeatReservation(**reservation.dict())
@@ -46,7 +46,7 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.put("/reservation/{reservation_id}", response_model=SeatReservationResponse)
+@router.put("/seat_reservation/{reservation_id}", response_model=SeatReservationResponse)
 def update_reservation(reservation_id: int, reservation_update: SeatReservationUpdate, db: Session = Depends(get_db)):
     db_reservation = db.query(DBSeatReservation).filter(DBSeatReservation.id == reservation_id).first()
     if db_reservation is None:
@@ -63,7 +63,7 @@ def update_reservation(reservation_id: int, reservation_update: SeatReservationU
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.delete("/reservation/{reservation_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/seat_reservation/{reservation_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_reservation(reservation_id: int, db: Session = Depends(get_db)):
     db_reservation = db.query(DBSeatReservation).filter(DBSeatReservation.id == reservation_id).first()
     if db_reservation is None:
