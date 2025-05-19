@@ -2,3 +2,4 @@ INSERT INTO user (user_name,password,kanji_name,kata_name,position,is_superuser,
 INSERT INTO user (user_name,password,kanji_name,kata_name,position,is_superuser,is_approval,is_active,created_at,updated_at) VALUES ("kanda0121", "passwordps", "naoki kanda", "naoki kanda", "C", False, 2, True, "2025-01-17 15:50:00", "2025-01-17 15:50:00");
 INSERT INTO office (office_name,office_id) VALUES ("京都駅前事務所"," O-01");
 INSERT INTO seat_regist (seat_name,office_id) VALUES ("SA-01", 1);
+INSERT INTO pasokon (pasokon_name,office_id) VALUES ("P-01", 1);

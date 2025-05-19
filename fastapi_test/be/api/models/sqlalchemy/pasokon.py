@@ -7,6 +7,9 @@ class Pasokon(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     pasokon_name = Column(String(30), unique=True, nullable=False)
-    pasokon_id = Column(String(30), unique=True, nullable=False)
+    office_id = Column(String(30), unique=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    # Office とのリレーション
+    office = relationship("Office", back_populates="pasokon")

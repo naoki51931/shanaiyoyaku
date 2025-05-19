@@ -82,11 +82,11 @@ export default function SignUp(props) {
       alert("パソコンidを入力して下さい。")
       return
     }
-    const user = {
+    const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       pasokon_id: data.get('pasokon_id'),
     };
-    axios.post('http://localhost:8000/pasokon/new/', user, {
+    axios.post('http://localhost:8000/pasokon/new/', pasokon, {
       headers: {
           'Content-Type': 'application/json'
       },

@@ -86,12 +86,12 @@ export default function SignUp(props) {
       alert("パソコンidを入力して下さい。")
       return
     }
-    const user = {
+    const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       pasokon_id: data.get('pasokon_id'),
     };    
   
-    axios.put(BASE_URL + `/pasokon/${props.id}`, user, {
+    axios.put(BASE_URL + `/pasokon/${props.id}`, pasokon, {
         headers: {
             'Content-Type': 'application/json'
         }

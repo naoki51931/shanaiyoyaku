@@ -82,11 +82,11 @@ export default function SignUp(props) {
       alert("事業所idを入力して下さい。")
       return
     }
-    const user = {
+    const office = {
       office_name: data.get('office_name'),
       office_id: data.get('office_id'),
     };
-    axios.post('http://localhost:8000/office/new/', user, {
+    axios.post('http://localhost:8000/office/new/', office, {
       headers: {
           'Content-Type': 'application/json'
       },

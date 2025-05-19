@@ -82,11 +82,11 @@ export default function SignUp(props) {
       alert("事務所名を選択して下さい。")
       return
     }
-    const user = {
+    const seat = {
       seat_name: data.get('seat_name'),
       office_id: parseInt(data.get('office_id')),
     };
-    axios.post('http://localhost:8000/seat/new/', user, {
+    axios.post('http://localhost:8000/seat/new/', seat, {
       headers: {
           'Content-Type': 'application/json'
       },

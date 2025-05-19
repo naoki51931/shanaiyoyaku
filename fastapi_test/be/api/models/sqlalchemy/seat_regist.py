@@ -18,5 +18,5 @@ class SeatRegist(Base):
      # Office とのリレーション
     office = relationship("Office", back_populates="seats")
 
-     # Office とのリレーション
-    seat_reserve_id = relationship("Office", back_populates="seat_regist")
+     # seat_reservation とのリレーション
+    seat_reserve_id = relationship("SeatReservation", back_populates="seat_regist")

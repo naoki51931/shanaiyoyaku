@@ -38,15 +38,15 @@ const defaultTheme = createTheme();
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
 
-  useEffect(() => {
-    axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
-      .then((res) => {
-        setOffices(res.data);
-      })
-      .catch((error) => {
-        console.error('オフィス情報の取得に失敗:', error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
+  //     .then((res) => {
+  //       setOffices(res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error('オフィス情報の取得に失敗:', error);
+  //     });
+  // }, []);
 
 
   const handleSubmit = (event) => {
@@ -82,11 +82,16 @@ export default function SignUp(props) {
       alert("事務所名を選択して下さい。")
       return
     }
-    const user = {
-      seat_name: data.get('seat_name'),
-      office_id: parseInt(data.get('office_id')),
+    const seat_reservation = {
+      reserve_id: data.get('reserve_id'),
+      todo_content: data.get('todo_content'),
+      person_id: data.get('person_id'),
+      seat_id: data.get('seat_id'),
+      start_time: data.get('start_time'),
+      finish_time: data.get('finish_time'),
+      reserve_day: data.get('reserve_day'),
     };
-    axios.post('http://localhost:8000/seat/new/', user, {
+    axios.post('http://localhost:8000/seat_reservation/new/', seat_reservation, {
       headers: {
           'Content-Type': 'application/json'
       },

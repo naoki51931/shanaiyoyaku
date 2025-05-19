@@ -86,12 +86,12 @@ export default function SignUp(props) {
       alert("事業所idを入力して下さい。")
       return
     }
-    const user = {
+    const office = {
       office_name: data.get('office_name'),
       office_id: data.get('office_id'),
     };    
   
-    axios.put(BASE_URL + `/office/${props.id}`, user, {
+    axios.put(BASE_URL + `/office/${props.id}`, office, {
         headers: {
             'Content-Type': 'application/json'
         }

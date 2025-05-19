@@ -86,12 +86,12 @@ export default function SignUp(props) {
       alert("事務所名を選択して下さい。")
       return
     }
-    const user = {
+    const seat = {
       seat_name: data.get('seat_name'),
       office_id: data.get('office_id'),
     };    
   
-    axios.put(BASE_URL + `/seat/${props.id}`, user, {
+    axios.put(BASE_URL + `/seat/${props.id}`, seat, {
         headers: {
             'Content-Type': 'application/json'
         }

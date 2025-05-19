@@ -9,6 +9,7 @@ from sqlalchemy import or_
 
 from database.database import get_db
 from models.sqlalchemy.pasokon import Pasokon as DBPasokon
+from models.sqlalchemy.office import Office as DBOffice
 from models.pydantic.pasokon import PasokonCreate, PasokonResponse, PasokonUpdate
 
 router = APIRouter()
@@ -27,9 +28,11 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
 
     db_pasokons = (
         db.query(DBPasokon)
+        .join(DBOffice)
+        .options(joinedload(DBPasokon.office))
         .filter(
             or_(
-                DBPasokon.pasokon_id.ilike(f"%{query}%"),
+                DBPasokon.office_id.ilike(f"%{query}%"),
                 DBPasokon.pasokon_name.ilike(f"%{query}%"),
             )
         )
@@ -43,7 +46,8 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
         {
             "id": pasokon.id,
             "pasokon_name": pasokon.pasokon_name,
-            "pasokon_id": pasokon.pasokon_id,
+            "office_id": pasokon.office_id,
+            "office_name": pasokon.office.office_name if pasokon.office else None,
             "created_at": pasokon.created_at,
             "updated_at": pasokon.updated_at,
         }
@@ -79,7 +83,8 @@ def read_pasokon_all(db: Session = Depends(get_db)):
             {
                 "id": pasokon.id,
                 "pasokon_name": pasokon.pasokon_name,
-                "pasokon_id": pasokon.pasokon_id,
+                "office_id": pasokon.office_id,
+                "office_name": pasokon.office.office_name if pasokon.office else None,
                 "created_at": pasokon.created_at.isoformat() if pasokon.created_at else None,
                 "updated_at": pasokon.updated_at.isoformat() if pasokon.updated_at else None,
             }
@@ -110,7 +115,7 @@ async def update_pasokon(pasokon_id: int, pasokon_update: PasokonUpdate, db: Ses
     except IntegrityError:
         return {
             "status": False,
-            "message": "この事業所名は既に登録されています",
+            "message": "このパソコン名は既に登録されています",
             "data": None,
         }
     except SQLAlchemyError as e:
