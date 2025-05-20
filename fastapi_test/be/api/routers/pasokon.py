@@ -29,7 +29,7 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
     db_pasokons = (
         db.query(DBPasokon)
         .join(DBOffice)
-        .options(joinedload(DBPasokon.office))
+        .options(joinedload(DBPasokon.office_in_pasokon))
         .filter(
             or_(
                 DBPasokon.office_id.ilike(f"%{query}%"),
@@ -47,7 +47,7 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
             "id": pasokon.id,
             "pasokon_name": pasokon.pasokon_name,
             "office_id": pasokon.office_id,
-            "office_name": pasokon.office.office_name if pasokon.office else None,
+            "office_name": pasokon.office_in_pasokon.office_name if pasokon.office_in_pasokon else None,
             "created_at": pasokon.created_at,
             "updated_at": pasokon.updated_at,
         }
@@ -84,7 +84,7 @@ def read_pasokon_all(db: Session = Depends(get_db)):
                 "id": pasokon.id,
                 "pasokon_name": pasokon.pasokon_name,
                 "office_id": pasokon.office_id,
-                "office_name": pasokon.office.office_name if pasokon.office else None,
+                "office_name": pasokon.office_in_pasokon.office_name if pasokon.office_in_pasokon else None,
                 "created_at": pasokon.created_at.isoformat() if pasokon.created_at else None,
                 "updated_at": pasokon.updated_at.isoformat() if pasokon.updated_at else None,
             }

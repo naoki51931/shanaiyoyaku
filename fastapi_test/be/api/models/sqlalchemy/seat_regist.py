@@ -20,3 +20,6 @@ class SeatRegist(Base):
 
      # seat_reservation とのリレーション
     seat_reserve_id = relationship("SeatReservation", back_populates="seat_regist")
+
+    # Pasokonとのリレーションを定義
+    pasokon_seats = relationship("Pasokon", back_populates="seat_in_pasokon")

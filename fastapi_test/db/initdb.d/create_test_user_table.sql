@@ -35,10 +35,12 @@ CREATE TABLE `seat_regist` (
 CREATE TABLE `pasokon` (
     id INT NOT NULL AUTO_INCREMENT,
     pasokon_name VARCHAR(30) UNIQUE NOT NULL,
-    office_id VARCHAR(30) UNIQUE NOT NULL,
+    office_id INT UNIQUE NOT NULL,
+    seat_id INT UNIQUE NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (office_id) REFERENCES office(id),
+    FOREIGN KEY (seat_id) REFERENCES seat_regist(id),
     PRIMARY KEY (id)
 );
 

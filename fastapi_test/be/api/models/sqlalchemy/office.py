@@ -12,3 +12,5 @@ class Office(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     seats = relationship("SeatRegist", back_populates="office")
+
+    pasokon_in_office = relationship("Pasokon", back_populates="office_in_pasokon")
