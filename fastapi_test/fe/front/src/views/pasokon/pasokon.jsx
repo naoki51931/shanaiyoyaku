@@ -15,8 +15,11 @@ export default function Pasokon() {
   const [display, setDisplay] = useState([]);
   const [flag, setFlag] = useState(false);
   const [pasokon_name, setPasokon_name] = React.useState("");
-  const [pasokon_id, setPasokon_id] = React.useState("");
-  
+  const [office_id, setOffice_id] = React.useState("");
+  const [office_name, setOffice_name] = React.useState("");
+  const [seat_id, setSeat_id] = React.useState("");
+  const [seat_name, setSeat_name] = React.useState("");
+
   return (
     <Routes>
       <Route 
@@ -33,8 +36,14 @@ export default function Pasokon() {
           element={<New 
             pasokon_name={pasokon_name}
             setPasokon_name={setPasokon_name}
-            pasokon_id={pasokon_id}
-            setPasokon_id={setPasokon_id}
+            office_id={office_id}
+            setOffice_id={setOffice_id}
+            office_name={office_name}
+            setOffice_name={setOffice_name}
+            seat_id={seat_id}
+            setSeat_id={setSeat_id}
+            seat_name={seat_name}
+            setSeat_name={setSeat_name}
           />}
         />
     </Routes>

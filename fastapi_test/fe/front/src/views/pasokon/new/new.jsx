@@ -36,15 +36,26 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp(props) {
-  const [pasokons, setPasokons] = useState([]);
+  const [offices, setOffices] = useState([]);
+  const [seats, setSeats] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/pasokon/all/') // ← オフィス一覧を取得するエンドポイント
+    axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
       .then((res) => {
-        setPasokons(res.data);
+        setOffices(res.data);
       })
       .catch((error) => {
         console.error('オフィス情報の取得に失敗:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/seat/all/') // ← オフィス一覧を取得するエンドポイント
+      .then((res) => {
+        setSeats(res.data);
+      })
+      .catch((error) => {
+        console.error('シート情報の取得に失敗:', error);
       });
   }, []);
 
@@ -65,26 +76,32 @@ export default function SignUp(props) {
     console.log(loginUserIsApproval);
     // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
     if (loginUserIsApproval !== 2) {
-      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
-      return; // ユーザー作成をキャンセル
+      alert("パソコン登録には管理者及び上位ユーザーの承認が必要です。");
+      return; // パソコン登録をキャンセル
     }
 
     console.log({
       pasokon_name: data.get('pasokon_name'),
-      pasokon_id: data.get('pasokon_id'),
+      office_id: data.get('office_id'),
+      seat_id: data.get('seat_id'),
     });
     console.log('props.setIsOpen:', props.setIsOpen);
     if (data.get('pasokon_name') == ""){
       alert("パソコン名を入力して下さい。")
       return
     }
-    if (data.get('pasokon_id') == ""){
-      alert("パソコンidを入力して下さい。")
+    if (data.get('office_name') == ""){
+      alert("事務所名を選択して下さい。")
+      return
+    }
+    if (data.get('seat_name') == ""){
+      alert("座席名を選択して下さい。")
       return
     }
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
-      pasokon_id: data.get('pasokon_id'),
+      office_id: data.get('office_id'),
+      seat_id: data.get('seat_id'),
     };
     axios.post('http://localhost:8000/pasokon/new/', pasokon, {
       headers: {
@@ -135,17 +152,46 @@ export default function SignUp(props) {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  autoComplete="pasokon_id"
-                  name="pasokon_id"
-                  required
-                  fullWidth
-                  id="pasokon_id"
-                  label="パソコンid"
-                  autoFocus
-                  value={props.pasokon_id ?? ''}
-                  onChange={(event) => props.setPasokon_id && props.setPasokon_id(event.target.value)}
-                />
+                <FormControl fullWidth required>
+                  <InputLabel id="office-select-label">事務所</InputLabel>
+                  <Select
+                    labelId="office-select-label"
+                    id="office_id"
+                    name="office_id"
+                    value={props.office_id ?? ''}
+                    label="事務所"
+                    onChange={(event) => props.setOffice_id && props.setOffice_id(event.target.value)}
+                  >
+                    {/* 空の状態の場合のデフォルト表示 */}
+                    <MenuItem value="">オフィスを選択してください</MenuItem>
+                    {offices.map((office) => (
+                      <MenuItem key={office.id} value={office.id}>
+                        {office.office_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="seat-select-label">座席</InputLabel>
+                  <Select
+                    labelId="seat-select-label"
+                    id="seat_id"
+                    name="seat_id"
+                    value={props.seat_id ?? ''}
+                    label="座席"
+                    onChange={(event) => props.setSeat_id && props.setSeat_id(event.target.value)}
+                  >
+                    {/* 空の状態の場合のデフォルト表示 */}
+                    <MenuItem value="">オフィスを選択してください</MenuItem>
+                    {seats.map((seat) => (
+                      <MenuItem key={seat.id} value={seat.id}>
+                        {seat.seat_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               {/* <Grid item xs={12}>
                 <FormControlLabel

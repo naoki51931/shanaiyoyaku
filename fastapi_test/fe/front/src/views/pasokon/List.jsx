@@ -16,12 +16,18 @@ export default function List(props) {
     const [editModalIsOpen, setEditModalIsOpen] = React.useState(false);
     const [id, setId] = React.useState("");
     const [pasokon_name, setPasokon_name] = React.useState("");
-    const [pasokon_id, setPasokon_id] = React.useState("");
+    const [office_id, setOffice_id] = React.useState("");
+    const [office_name, setOffice_name] = React.useState("");
+    const [seat_id, setSeat_id] = React.useState("");
+    const [seat_name, setSeat_name] = React.useState("");
 
     const openEditModal = (id, pasokon_name, pasokon_id) => {
         setId(id);
         setPasokon_name(pasokon_name);
-        setPasokon_id(pasokon_id);
+        setOffice_id(office_id);
+        setOffice_name(office_name);
+        setSeat_id(seat_id);
+        setSeat_name(seat_name);
         setEditModalIsOpen(true);
     };
 
@@ -35,7 +41,10 @@ export default function List(props) {
                 <TableRow key={v.id}>
                     <TableCell align="left">{v.id}</TableCell>
                     <TableCell align="left">{v.pasokon_name}</TableCell>
-                    <TableCell align="left">{v.pasokon_id}</TableCell>
+                    <TableCell align="left">{v.office_id}</TableCell>
+                    <TableCell align="left">{v.office_name}</TableCell>
+                    <TableCell align="left">{v.seat_id}</TableCell>
+                    <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
@@ -56,7 +65,10 @@ export default function List(props) {
                     <TableRow>
                         <TableCell align="left">id</TableCell>
                         <TableCell align="left">パソコン名</TableCell>
-                        <TableCell align="left">パソコンid</TableCell>
+                        <TableCell align="left">事業所ID</TableCell>
+                        <TableCell align="left">事業所名</TableCell>
+                        <TableCell align="left">座席ID</TableCell>
+                        <TableCell align="left">座席名</TableCell>
                         <TableCell align="left">作成日時</TableCell>
                         <TableCell align="left">更新日時</TableCell>
                     </TableRow>
@@ -83,7 +95,7 @@ export default function List(props) {
                 >
                     <Edit
                         setEditModalIsOpen={setEditModalIsOpen}
-                        id={id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} pasokon_id={pasokon_id} setPasokon_id={setPasokon_id}
+                        id={id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} office_id={office_id} setOffice_id={setOffice_id} office_name={office_name} setOffice_name={setOffice_name} seat_id={seat_id} setSeat_id={setSeat_id} seat_name={seat_name} setSeat_name={setSeat_name}
                     />
                 </Modal>
             </div>

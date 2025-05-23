@@ -68,8 +68,8 @@ export default function SignUp(props) {
     console.log(loginUserIsApproval);
     // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
     if (loginUserIsApproval !== 2) {
-      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
-      return; // ユーザー作成をキャンセル
+      alert("シート作成には管理者及び上位ユーザーの承認が必要です。");
+      return; // シート作成をキャンセル
     }
 
 
