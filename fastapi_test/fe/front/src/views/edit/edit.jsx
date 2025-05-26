@@ -16,7 +16,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
 
-
+// Copyright コンポーネントはそのまま
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -30,19 +30,14 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 const BASE_URL = "http://localhost:8000";
 
-
 export default function SignUp(props) {
   const handleSubmit = (event) => {
-
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     
-
     const token = localStorage.getItem('token'); // ローカルストレージに保存されているトークン
     console.log(token);
     if (typeof token !== 'string') {
@@ -51,7 +46,6 @@ export default function SignUp(props) {
     const decodedToken = jwtDecode(token);
     const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
 
-    console.log(loginUserIsApproval);
     // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
     if (loginUserIsApproval !== 2) {
       alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
@@ -73,7 +67,6 @@ export default function SignUp(props) {
       // 権限が不足している場合は承認フラグを1に設定
       data.set('is_approval', '1');
     }
-
 
     console.log({
       user_name: data.get('user_name'),
@@ -115,8 +108,8 @@ export default function SignUp(props) {
       password: data.get('password'),
       position: targetUserPosition,
       is_approval: data.get('is_approval'),
-    };    
-  
+    };
+
     axios.put(BASE_URL + `/user/${props.id}`, user, {
         headers: {
             'Content-Type': 'application/json'
@@ -130,6 +123,7 @@ export default function SignUp(props) {
             console.log("error", error);
         });
   };
+
   const DeleteUser = () => {
     console.log({
       id: props.id
@@ -144,6 +138,18 @@ export default function SignUp(props) {
         .catch(function (error) {
             console.log("error", error);
         });
+  };
+
+  const handlePositionChange = (event) => {
+    // 役職の入力値を大文字のA, B, Cに正規化
+    let positionValue = event.target.value;
+
+    // 役職が全角や小文字の場合に変換
+    positionValue = positionValue
+      .replace(/[ａ-ｚＡ-Ｚ]/g, (match) => String.fromCharCode(match.charCodeAt(0) - 0xfee0)) // 全角→半角変換
+      .toUpperCase(); // 小文字→大文字変換
+
+    props.setPosition && props.setPosition(positionValue);
   };
 
   return (
@@ -228,7 +234,7 @@ export default function SignUp(props) {
                   name="position"
                   autoComplete="position"
                   value={props.position || ""}
-                  onChange={(event) => props.setPosition(event.target.value)}
+                  onChange={handlePositionChange} // 変更された役職を処理
                 />
               </Grid>
               <Grid item xs={12}>
@@ -244,12 +250,6 @@ export default function SignUp(props) {
                   onChange={(event) => props.setIs_approval(event.target.value)}
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
             </Grid>
             <Button
               type="submit"
@@ -269,13 +269,6 @@ export default function SignUp(props) {
             >
               Delete
             </Button>
-            {/* <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid> */}
           </Box>
         </Box>
         <Copyright sx={{ mt: 5 }} />

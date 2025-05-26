@@ -15,7 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
 
-
+// Copyright コンポーネントはそのまま
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -30,7 +30,6 @@ function Copyright(props) {
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function SignUp(props) {
@@ -38,7 +37,6 @@ export default function SignUp(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    
     const isLoggedIn = Boolean(localStorage.getItem('token'));
     const token = isLoggedIn ? localStorage.getItem('token') : null;
     const decodedToken = token ? jwtDecode(token) : null;
@@ -64,7 +62,7 @@ export default function SignUp(props) {
       position: positionValue,
       is_approval: isApprovalValue,
     });
-    console.log('props.setIsOpen:', props.setIsOpen);
+
     if (data.get('user_name') == ""){
       alert("ユーザーネームを入力して下さい。")
       return
@@ -89,6 +87,7 @@ export default function SignUp(props) {
       alert("承認ユーザーを入力して下さい。")
       return
     }
+
     const user = {
       user_name: data.get('user_name'),
       kanji_name: data.get('kanji_name'),
@@ -97,6 +96,7 @@ export default function SignUp(props) {
       position: positionValue,
       is_approval: isApprovalValue,
     };
+
     axios.post('http://localhost:8000/user/new/', user, {
       headers: {
           'Content-Type': 'application/json'
@@ -110,6 +110,18 @@ export default function SignUp(props) {
             console.log("error", error);
             alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
         });
+  };
+
+  const handlePositionChange = (event) => {
+    // 役職の入力値を大文字のA, B, Cに正規化
+    let positionValue = event.target.value;
+
+    // 役職が全角や小文字の場合に変換
+    positionValue = positionValue
+      .replace(/[ａ-ｚＡ-Ｚ]/g, (match) => String.fromCharCode(match.charCodeAt(0) - 0xfee0)) // 全角→半角変換
+      .toUpperCase(); // 小文字→大文字変換
+
+    props.setPosition && props.setPosition(positionValue);
   };
 
   return (
@@ -194,7 +206,7 @@ export default function SignUp(props) {
                   name="position"
                   autoComplete="position"
                   value={props.position ?? ''}
-                  onChange={(event) => props.setPosition && props.setPosition(event.target.value)}
+                  onChange={handlePositionChange} // 変更された役職を処理
                 />
               </Grid>
               <Grid item xs={12}>
@@ -210,12 +222,6 @@ export default function SignUp(props) {
                   onChange={(event) => props.setIs_approval && props.setIs_approval(event.target.value)}
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
             </Grid>
             <Button
               type="submit"
@@ -225,13 +231,6 @@ export default function SignUp(props) {
             >
               Create
             </Button>
-            {/* <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid> */}
           </Box>
         </Box>
         <Copyright sx={{ mt: 5 }} />
