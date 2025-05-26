@@ -1,12 +1,9 @@
-import * as React from 'react';
 import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -86,15 +83,15 @@ export default function SignUp(props) {
       seat_id: data.get('seat_id'),
     });
     console.log('props.setIsOpen:', props.setIsOpen);
-    if (data.get('pasokon_name') == ""){
+    if (data.get('pasokon_name') === ""){
       alert("パソコン名を入力して下さい。")
       return
     }
-    if (data.get('office_name') == ""){
+    if (data.get('office_name') === ""){
       alert("事務所名を選択して下さい。")
       return
     }
-    if (data.get('seat_name') == ""){
+    if (data.get('seat_name') === ""){
       alert("座席名を選択して下さい。")
       return
     }

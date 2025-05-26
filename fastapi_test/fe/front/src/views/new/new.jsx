@@ -1,10 +1,7 @@
-import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -29,7 +26,6 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function SignUp(props) {
@@ -63,27 +59,27 @@ export default function SignUp(props) {
       is_approval: isApprovalValue,
     });
 
-    if (data.get('user_name') == ""){
+    if (data.get('user_name') === ""){
       alert("ユーザーネームを入力して下さい。")
       return
     }
-    if (data.get('kanji_name') == ""){
+    if (data.get('kanji_name') === ""){
       alert("名前(漢字)を入力して下さい。")
       return
     }
-    if (data.get('kata_name') == ""){
+    if (data.get('kata_name') === ""){
       alert("名前(カタカナ)を入力して下さい。")
       return
     }
-    if (data.get('password') == ""){
+    if (data.get('password') === ""){
       alert("パスワードを入力して下さい。")
       return
     }
-    if (data.get('position') == ""){
+    if (data.get('position') === ""){
       alert("役職を入力して下さい。")
       return
     }
-    if (data.get('is_approval') == ""){
+    if (data.get('is_approval') === ""){
       alert("承認ユーザーを入力して下さい。")
       return
     }
@@ -122,6 +118,17 @@ export default function SignUp(props) {
       .toUpperCase(); // 小文字→大文字変換
 
     props.setPosition && props.setPosition(positionValue);
+  };
+
+  const handleApprovalChange = (event) => {
+    let approvalValue = event.target.value;
+
+    // 承認ユーザーの入力が全角の場合、半角に変換
+    approvalValue = approvalValue.replace(/[Ａ-Ｚａ-ｚ０-９]/g, (match) => 
+      String.fromCharCode(match.charCodeAt(0) - 0xfee0) // 全角→半角変換
+    );
+
+    props.setIs_approval && props.setIs_approval(approvalValue);
   };
 
   return (
@@ -219,7 +226,7 @@ export default function SignUp(props) {
                   name="is_approval"
                   autoComplete="is_approval"
                   value={props.is_approval ?? ''}
-                  onChange={(event) => props.setIs_approval && props.setIs_approval(event.target.value)}
+                  onChange={handleApprovalChange} // 承認ユーザーが全角入力される場合に変換
                 />
               </Grid>
             </Grid>

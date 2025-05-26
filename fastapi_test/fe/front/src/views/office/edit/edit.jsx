@@ -1,11 +1,8 @@
-import * as React from 'react';
 import { useState, useEffect } from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -15,7 +12,6 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
-import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 
 
@@ -78,11 +74,11 @@ export default function SignUp(props) {
       office_id: data.get('office_id'),
       id: props.id
     });
-    if (data.get('office_name') == ""){
+    if (data.get('office_name') === ""){
       alert("事業所名を入力して下さい。")
       return
     }
-    if (data.get('office_id') == ""){
+    if (data.get('office_id') === ""){
       alert("事業所idを入力して下さい。")
       return
     }

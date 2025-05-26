@@ -77,20 +77,20 @@ export default function Form(props) {
         funget()
     }, [])
     
-    return (
-        // <Grid container rowSpacing={1} position={'static'} marginTop={"15px"} marginLeft={"5px"}> 
-        //     <form onSubmit={(e) => { e.preventDefault(); searchSeats(); }}>
-        //         <Grid item>
-        //             <TextField
-        //                 label="座席名を入力"
-        //                 value={query}
-        //                 onChange={handleQueryChange}
-        //             />
-        //         </Grid>                
-        //         <Grid item>
-        //             <Button variant="contained" onClick={searchSeats}>検索</Button>
-        //         </Grid>
-        //     </form>
-        // </Grid>
-    )
+    // return (
+    //     <Grid container rowSpacing={1} position={'static'} marginTop={"15px"} marginLeft={"5px"}> 
+    //         <form onSubmit={(e) => { e.preventDefault(); searchSeats(); }}>
+    //             <Grid item>
+    //                 <TextField
+    //                     label="座席名を入力"
+    //                     value={query}
+    //                     onChange={handleQueryChange}
+    //                 />
+    //             </Grid>                
+    //             <Grid item>
+    //                 <Button variant="contained" onClick={searchSeats}>検索</Button>
+    //             </Grid>
+    //         </form>
+    //     </Grid>
+    // )
 }

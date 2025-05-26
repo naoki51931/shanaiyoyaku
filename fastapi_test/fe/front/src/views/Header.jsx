@@ -130,6 +130,13 @@ function ResponsiveAppBar() {
               >
                 <Button 
                   component={Link} 
+                  to="/login"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  ログイン
+                </Button>
+                <Button 
+                  component={Link} 
                   to="/"
                   sx={{ my: 2, color: 'black', display: 'block' }}
                 >
@@ -141,13 +148,6 @@ function ResponsiveAppBar() {
                   sx={{ my: 2, color: 'black', display: 'block' }}
                 >
                   ユーザー追加
-                </Button>
-                <Button 
-                  component={Link} 
-                  to="/login"
-                  sx={{ my: 2, color: 'black', display: 'block' }}
-                >
-                  ログイン
                 </Button>
                 <Button 
                   component={Link} 
@@ -177,6 +177,35 @@ function ResponsiveAppBar() {
                 >
                   事業所追加
                 </Button>
+                <Button 
+                  component={Link} 
+                  to="/pasokon"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  パソコン一覧
+                </Button>
+                <Button 
+                  component={Link} 
+                  to="/pasokon/new"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  パソコン追加
+                </Button>
+                <Button 
+                  component={Link} 
+                  to="/seat_reservation"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  座席予約一覧
+                </Button>
+                <Button 
+                  component={Link} 
+                  to="/seat_reservation/new"
+                  sx={{ my: 2, color: 'black', display: 'block' }}
+                >
+                  座席予約追加
+                </Button>
+                
               </Menu>
             </Box>
 
@@ -203,6 +232,13 @@ function ResponsiveAppBar() {
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               <Button 
                 component={Link} 
+                to="/login"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                ログイン
+              </Button>
+              <Button 
+                component={Link} 
                 to="/"
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
@@ -217,13 +253,6 @@ function ResponsiveAppBar() {
                   {page}
                 </Button>
               ))}
-              <Button 
-                component={Link} 
-                to="/login"
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                ログイン
-              </Button>
               <Button 
                 component={Link} 
                 to="/seat_regist"
@@ -251,6 +280,34 @@ function ResponsiveAppBar() {
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 事業所追加
+              </Button>
+              <Button 
+                component={Link} 
+                to="/pasokon"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                パソコン一覧
+              </Button>
+              <Button 
+                component={Link} 
+                to="/pasokon/new"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                パソコン追加
+              </Button>
+              <Button 
+                component={Link} 
+                to="/seat_reservation"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                座席予約一覧
+              </Button>
+              <Button 
+                component={Link} 
+                to="/seat_reservation/new"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                座席予約追加
               </Button>
             </Box>
 

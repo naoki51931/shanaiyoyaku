@@ -1,11 +1,8 @@
-import * as React from 'react';
 import { useState, useEffect } from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -78,11 +75,11 @@ export default function SignUp(props) {
       office_id: data.get('office_id'),
       id: props.id
     });
-    if (data.get('seat_name') == ""){
+    if (data.get('seat_name') === ""){
       alert("座席名を入力して下さい。")
       return
     }
-    if (data.get('office_id') == ""){
+    if (data.get('office_id') === ""){
       alert("事務所名を選択して下さい。")
       return
     }

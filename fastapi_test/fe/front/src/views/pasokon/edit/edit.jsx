@@ -1,11 +1,8 @@
-import * as React from 'react';
 import { useState, useEffect } from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -39,12 +36,12 @@ const BASE_URL = "http://localhost:8000";
 
 
 export default function SignUp(props) {
-  const [pasokons, setPasokons] = useState([]);
+  const [offices, setOffices] = useState([]);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/pasokon/all/`)
+    axios.get(`${BASE_URL}/office/all/`)
       .then((res) => {
-        setPasokons(res.data);
+        setOffices(res.data);
       })
       .catch((error) => {
         console.error("オフィス取得エラー:", error);
@@ -78,11 +75,11 @@ export default function SignUp(props) {
       pasokon_id: data.get('office_id'),
       id: props.id
     });
-    if (data.get('pasokon_name') == ""){
+    if (data.get('pasokon_name') === ""){
       alert("パソコン名を入力して下さい。")
       return
     }
-    if (data.get('office_id') == ""){
+    if (data.get('office_id') === ""){
       alert("事務所名を選択して下さい。")
       return
     }

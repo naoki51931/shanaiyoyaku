@@ -8,6 +8,9 @@ import New from './views/new/new';
 import LoginForm from './views/LoginForm';
 import SeatRegist from './views/seat_regist/seat_regist';
 import Office from './views/office/office';
+import Pasokon from './views/pasokon/pasokon';
+import SeatReservation from './views/seat_reservation/seat_reservation';
+
 
 
 // 🔹 認証状態を確認するカスタムコンポーネント
@@ -62,6 +65,8 @@ export default function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/seat_regist/*" element={<SeatRegist />} />
           <Route path="/office/*" element={<Office />} />
+          <Route path="/pasokon/*" element={<Pasokon />} />
+          <Route path="/seat_reservation/*" element={<SeatReservation />} />
         </Routes>
       </>
     </Router>
