@@ -15,8 +15,78 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Modal from "react-modal";
 import New from './new/new';
+import axios from 'axios';
 
-const pages = ['ユーザー追加'];
+// トークンをリフレッシュする関数
+const getAccessToken = async () => {
+  const refreshToken = localStorage.getItem('refresh_token');
+  if (!refreshToken) {
+    throw new Error('Refresh token not found');
+  }
+
+  try {
+    const response = await axios.post('http://localhost:8000/auth/refresh_token/', {
+      refresh_token: refreshToken, // リフレッシュトークンを送信
+    });
+    const { access_token } = response.data; // 新しいアクセストークンを受け取る
+    localStorage.setItem('token', access_token); // ローカルストレージに保存
+    return access_token;
+  } catch (error) {
+    console.error('Failed to refresh access token:', error);
+    throw new Error('Failed to refresh token');
+  }
+};
+
+// リクエストを送る関数（トークンが切れていたらリフレッシュして再試行）
+const makeRequest = async (endpoint, method = 'GET', data = null) => {
+  let token = localStorage.getItem('token'); // 現在のアクセストークンを取得
+
+  if (!token) {
+    console.error('No token found, unable to make request');
+    return;
+  }
+
+  try {
+    const response = await axios({
+      url: `http://localhost:8000${endpoint}`,
+      method: method,
+      headers: {
+        'Authorization': `Bearer ${token}`, // トークンをAuthorizationヘッダーに追加
+        'Content-Type': 'application/json',
+      },
+      data: data, // POSTデータなどがある場合
+    });
+
+    return response.data; // 正常にレスポンスを返す
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      // トークンが無効または期限切れの場合（401エラー）
+      console.log('Token expired or invalid, refreshing token...');
+      try {
+        token = await getAccessToken(); // 新しいトークンを取得
+        // 新しいトークンでリクエストを再試行
+        const retryResponse = await axios({
+          url: `http://localhost:8000${endpoint}`,
+          method: method,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          data: data,
+        });
+
+        return retryResponse.data; // 新しいトークンでのレスポンスを返す
+      } catch (refreshError) {
+        console.error('Error while refreshing token:', refreshError);
+        throw new Error('Authentication failed');
+      }
+    } else {
+      console.error('Request failed:', error);
+      throw new Error('Request failed');
+    }
+  }
+};
+
 const settings = [];
 
 function ResponsiveAppBar() {
@@ -88,6 +158,7 @@ function ResponsiveAppBar() {
               href="/"
               sx={{
                 mr: 2,
+                pr: 3,
                 display: { xs: 'none', md: 'flex' },
                 fontFamily: 'monospace',
                 fontWeight: 700,
@@ -96,7 +167,7 @@ function ResponsiveAppBar() {
                 textDecoration: 'none',
               }}
             >
-              User
+              Seat_reservation
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -226,7 +297,7 @@ function ResponsiveAppBar() {
                 textDecoration: 'none',
               }}
             >
-              LOGO
+              Seat_reservation
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
@@ -244,15 +315,13 @@ function ResponsiveAppBar() {
               >
                 ユーザー一覧
               </Button>
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={openModal}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {page}
-                </Button>
-              ))}
+              <Button 
+                component={Link} 
+                to="/new"
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                ユーザー追加
+              </Button>
               <Button 
                 component={Link} 
                 to="/seat_regist"
