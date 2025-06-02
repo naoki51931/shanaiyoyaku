@@ -37,6 +37,8 @@ const BASE_URL = "http://localhost:8000";
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [seats, setSeats] = useState([]);
 
   useEffect(() => {
     axios.get(`${BASE_URL}/office/all/`)
@@ -45,6 +47,26 @@ export default function SignUp(props) {
       })
       .catch((error) => {
         console.error("オフィス取得エラー:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+      axios.get('http://localhost:8000/user/all/') // ← オフィス一覧を取得するエンドポイント
+        .then((res) => {
+          setUsers(res.data);
+        })
+        .catch((error) => {
+          console.error('ユーザー情報の取得に失敗:', error);
+        });
+    }, []);
+  
+  useEffect(() => {
+    axios.get('http://localhost:8000/seat/all/') // ← オフィス一覧を取得するエンドポイント
+      .then((res) => {
+        setSeats(res.data);
+      })
+      .catch((error) => {
+        console.error('予約シート情報の取得に失敗:', error);
       });
   }, []);
 
@@ -117,7 +139,7 @@ export default function SignUp(props) {
       reserve_day: data.get('reserve_day'),
     };   
   
-    axios.put(BASE_URL + `/seat/${props.id}`, user, {
+    axios.put(BASE_URL + `/seat/${props.id}`, seat_reservation, {
         headers: {
             'Content-Type': 'application/json'
         }
@@ -221,11 +243,11 @@ export default function SignUp(props) {
                     id="seat_id"
                     name="seat_id"
                     value={props.seat_id || ""}
-                    label="予約者"
+                    label="予約シート"
                     onChange={(event) => props.setSeat_id(event.target.value)}
                   >
                     {/* 空の状態の場合のデフォルト表示 */}
-                    <MenuItem value="">予約者を選択してください</MenuItem>
+                    <MenuItem value="">予約シートを選択してください</MenuItem>
                     {seats.map((seat) => (
                       <MenuItem key={seat.id} value={seat.id}>
                         {seat.seat_name}

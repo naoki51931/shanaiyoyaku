@@ -1,5 +1,5 @@
 import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -58,12 +58,12 @@ export default function SignUp(props) {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/seat_regist/all/') // ← オフィス一覧を取得するエンドポイント
+    axios.get('http://localhost:8000/seat/all/') // ← オフィス一覧を取得するエンドポイント
       .then((res) => {
         setSeats(res.data);
       })
       .catch((error) => {
-        console.error('オフィス情報の取得に失敗:', error);
+        console.error('予約シート情報の取得に失敗:', error);
       });
   }, []);
 
@@ -229,7 +229,7 @@ export default function SignUp(props) {
                     onChange={(event) => props.setSeat_id && props.setSeat_id(event.target.value)}
                   >
                     {/* 空の状態の場合のデフォルト表示 */}
-                    <MenuItem value="">オフィスを選択してください</MenuItem>
+                    <MenuItem value="">予約シートを選択してください</MenuItem>
                     {seats.map((seat) => (
                       <MenuItem key={seat.id} value={seat.id}>
                         {seat.seat_name}
