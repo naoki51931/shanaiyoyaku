@@ -71,22 +71,51 @@ export default function SignUp(props) {
 
 
     console.log({
-      seat_name: data.get('seat_name'),
-      office_id: data.get('office_id'),
-      id: props.id
+      reserve_id: data.get('reserve_id'),
+      todo_content: data.get('todo_content'),
+      person_id: data.get('person_id'),
+      seat_id: data.get('seat_id'),
+      start_time: data.get('start_time'),
+      finish_time: data.get('finish_time'),
+      reserve_day: data.get('reserve_day'),
     });
-    if (data.get('seat_name') === ""){
-      alert("座席名を入力して下さい。")
+    if (data.get('reserve_id') === ""){
+      alert("予約IDを入力して下さい。")
       return
     }
-    if (data.get('office_id') === ""){
-      alert("事務所名を選択して下さい。")
+    if (data.get('todo_content') === ""){
+      alert("タスク内容を入力して下さい。")
       return
     }
-    const user = {
-      seat_name: data.get('seat_name'),
-      office_id: data.get('office_id'),
-    };    
+    if (data.get('person_id') === ""){
+      alert("人物IDを選択して下さい。")
+      return
+    }
+    if (data.get('seat_id') === ""){
+      alert("座席IDを選択して下さい。")
+      return
+    }
+    if (data.get('start_time') === ""){
+      alert("開始時間を選択して下さい。")
+      return
+    }
+    if (data.get('finish_time') === ""){
+      alert("終了時間を選択して下さい。")
+      return
+    }
+    if (data.get('reserve_day') === ""){
+      alert("予約日を選択して下さい。")
+      return
+    }
+    const seat_reservation = {
+      reserve_id: data.get('reserve_id'),
+      todo_content: data.get('todo_content'),
+      person_id: data.get('person_id'),
+      seat_id: data.get('seat_id'),
+      start_time: data.get('start_time'),
+      finish_time: data.get('finish_time'),
+      reserve_day: data.get('reserve_day'),
+    };   
   
     axios.put(BASE_URL + `/seat/${props.id}`, user, {
         headers: {
@@ -139,37 +168,116 @@ export default function SignUp(props) {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="seat_name"
-                  name="seat_name"
+                  autoComplete="reserve_id"
+                  name="reserve_id"
                   required
                   fullWidth
-                  id="seat_name"
-                  label="座席名"
+                  id="reserve_id"
+                  label="予約ID"
                   autoFocus
-                  value={props.seat_name || ""}
-                  onChange={(event) => props.setSeat_name(event.target.value)}
+                  value={props.reserve_id || ""}
+                  onChange={(event) => props.setReserve_id(event.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  autoComplete="todo_content"
+                  name="todo_content"
+                  required
+                  fullWidth
+                  id="todo_content"
+                  label="タスク内容"
+                  autoFocus
+                  value={props.todo_content || ""}
+                  onChange={(event) => props.setTodo_content(event.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
-                  <InputLabel id="office-select-label">事務所</InputLabel>
+                  <InputLabel id="person-select-label">予約者</InputLabel>
                   <Select
-                    labelId="office-select-label"
-                    id="office_id"
-                    name="office_id"
-                    value={props.office_id || ""}
-                    label="事務所"
-                    onChange={(event) => props.setOffice_id(event.target.value)}
+                    labelId="person-select-label"
+                    id="person_id"
+                    name="person_id"
+                    value={props.person_id || ""}
+                    label="予約者"
+                    onChange={(event) => props.setPerson_id(event.target.value)}
                   >
                     {/* 空の状態の場合のデフォルト表示 */}
-                    <MenuItem value="">オフィスを選択してください</MenuItem>
-                    {offices.map((office) => (
-                      <MenuItem key={office.id} value={office.id}>
-                        {office.office_name}
+                    <MenuItem value="">予約者を選択してください</MenuItem>
+                    {users.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.kanji_name}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="seat-select-label">予約シート</InputLabel>
+                  <Select
+                    labelId="seat-select-label"
+                    id="seat_id"
+                    name="seat_id"
+                    value={props.seat_id || ""}
+                    label="予約者"
+                    onChange={(event) => props.setSeat_id(event.target.value)}
+                  >
+                    {/* 空の状態の場合のデフォルト表示 */}
+                    <MenuItem value="">予約者を選択してください</MenuItem>
+                    {seats.map((seat) => (
+                      <MenuItem key={seat.id} value={seat.id}>
+                        {seat.seat_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  label="開始時間"
+                  type="datetime-local"
+                  id="start_time"
+                  name="start_time"
+                  value={props.start_time || ""}
+                  onChange={(event) => props.setStart_time(event.target.value)}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  label="終了時間"
+                  type="datetime-local"
+                  id="finish_time"
+                  name="finish_time"
+                  value={props.finish_time || ""}
+                  onChange={(event) => props.setFinish_time(event.target.value)}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  label="予約日時"
+                  type="datetime-local"
+                  id="reserve_day"
+                  name="reserve_day"
+                  value={props.reserve_day || ""}
+                  onChange={(event) => props.setReserve_day(event.target.value)}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
               </Grid>
               {/* <Grid item xs={12}>
                 <FormControlLabel
