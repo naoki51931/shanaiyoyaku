@@ -34,7 +34,6 @@ def get_reservation_by_id(reservation_id: int, db: Session = Depends(get_db)):
 @router.post("/seat_reservation/new/", response_model=SeatReservationResponse)
 def create_reservation(reservation: SeatReservationCreate, db: Session = Depends(get_db)):
     overlapping_reservation = db.query(DBSeatReservation).filter(
-        DBSeatReservation.reserve_id == reservation.reserve_id,
         DBSeatReservation.finish_time > reservation.start_time,
         DBSeatReservation.start_time < reservation.finish_time
     ).first()
@@ -74,7 +73,6 @@ def update_reservation(reservation_id: int, reservation_update: SeatReservationU
     # 自分以外の同じ座席IDで期間が重なっている予約を探す
     overlapping_reservation = db.query(DBSeatReservation).filter(
         DBSeatReservation.id != reservation_id,
-        DBSeatReservation.reserve_id == updated_seat_id,
         DBSeatReservation.finish_time > updated_start,
         DBSeatReservation.start_time < updated_end
     ).first()

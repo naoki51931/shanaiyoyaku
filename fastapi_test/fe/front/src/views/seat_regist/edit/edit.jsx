@@ -63,8 +63,9 @@ export default function SignUp(props) {
     const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
 
     console.log(loginUserIsApproval);
+    const Approval_level = 2;
     // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
-    if (loginUserIsApproval !== 2) {
+    if (loginUserIsApproval !== Approval_level) {
       alert("シート作成には管理者及び上位ユーザーの承認が必要です。");
       return; // シート作成をキャンセル
     }
