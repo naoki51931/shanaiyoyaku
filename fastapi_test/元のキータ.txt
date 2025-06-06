@@ -50,3 +50,6 @@ https://qiita.com/link9080/items/735f73d13044333abefd
 
 fastapi usecase
 https://zenn.dev/xronotech/articles/a948b200494c77
+
+git conflict kaisyou
+https://qiita.com/crarrry/items/c5964512e21e383b73da

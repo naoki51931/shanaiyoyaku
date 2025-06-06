@@ -33,6 +33,16 @@ def get_reservation_by_id(reservation_id: int, db: Session = Depends(get_db)):
 
 @router.post("/seat_reservation/new/", response_model=SeatReservationResponse)
 def create_reservation(reservation: SeatReservationCreate, db: Session = Depends(get_db)):
+    overlapping_reservation = db.query(DBSeatReservation).filter(
+        DBSeatReservation.reserve_id == reservation.reserve_id,
+        DBSeatReservation.finish_time > reservation.start_time,
+        DBSeatReservation.start_time < reservation.finish_time
+    ).first()
+
+    if overlapping_reservation:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="すでに座席予約がされています")
+    
     try:
         db_reservation = DBSeatReservation(**reservation.dict())
         db.add(db_reservation)
@@ -50,7 +60,27 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
 def update_reservation(reservation_id: int, reservation_update: SeatReservationUpdate, db: Session = Depends(get_db)):
     db_reservation = db.query(DBSeatReservation).filter(DBSeatReservation.id == reservation_id).first()
     if db_reservation is None:
+        db.rollback()
         raise HTTPException(status_code=404, detail="Reservation not found")
+    
+    # 更新後の値を一時的に仮適用（元の値をベースに未指定フィールドは維持）
+    updated_data = db_reservation.__dict__.copy()
+    updated_data.update(reservation_update.dict(exclude_unset=True))
+
+    updated_start = updated_data.get("start_time")
+    updated_end = updated_data.get("finish_time")
+    updated_seat_id = updated_data.get("reserve_id")
+
+    # 自分以外の同じ座席IDで期間が重なっている予約を探す
+    overlapping_reservation = db.query(DBSeatReservation).filter(
+        DBSeatReservation.id != reservation_id,
+        DBSeatReservation.reserve_id == updated_seat_id,
+        DBSeatReservation.finish_time > updated_start,
+        DBSeatReservation.start_time < updated_end
+    ).first()
+
+    if overlapping_reservation:
+        raise HTTPException(status_code=400, detail="すでに座席予約がされています")
 
     for key, value in reservation_update.dict(exclude_unset=True).items():
         setattr(db_reservation, key, value)
