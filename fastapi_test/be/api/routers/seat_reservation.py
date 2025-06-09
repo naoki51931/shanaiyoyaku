@@ -11,6 +11,10 @@ from models.pydantic.seat_reservation import (
     SeatReservationResponse
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 @router.get("/seat_reservation/all/", response_model=list[SeatReservationResponse])
@@ -20,7 +24,7 @@ def get_all_reservations(db: Session = Depends(get_db)):
             joinedload(DBSeatReservation.user),
             joinedload(DBSeatReservation.seat_regist)
         ).all()
-        # 必要に応じて、person_name と seat_name を SeatReservationResponse 形式で追加
+        
         response = []
         for reservation in reservations:
             response.append({
@@ -28,9 +32,9 @@ def get_all_reservations(db: Session = Depends(get_db)):
                 "reserve_id": reservation.reserve_id,
                 "todo_content": reservation.todo_content,
                 "person_id": reservation.person_id,
-                "person_name": reservation.user.kanji_name,  # ユーザーの名前
+                "person_name": reservation.user.kanji_name if reservation.user else "不明",  # ユーザーが存在しない場合にデフォルト値
                 "seat_id": reservation.seat_id,
-                "seat_name": reservation.seat_regist.seat_name,  # 座席の名前
+                "seat_name": reservation.seat_regist.seat_name if reservation.seat_regist else "不明",  # 座席が存在しない場合にデフォルト値
                 "start_time": reservation.start_time,
                 "finish_time": reservation.finish_time,
                 "reserve_day": reservation.reserve_day,
@@ -39,14 +43,18 @@ def get_all_reservations(db: Session = Depends(get_db)):
             })
         
         return response
+    except SQLAlchemyError as e:
+        logger.error(f"Database error: {str(e)}")  # エラーメッセージをログに出力
+        raise HTTPException(status_code=500, detail="内部サーバーエラーが発生しました")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Unexpected error: {str(e)}")  # その他のエラーもログに出力
+        raise HTTPException(status_code=500, detail="予期しないエラーが発生しました")
 
 @router.get("/seat_reservation/{reservation_id}", response_model=SeatReservationResponse)
 def get_reservation_by_id(reservation_id: int, db: Session = Depends(get_db)):
     reservation = db.query(DBSeatReservation).filter(DBSeatReservation.id == reservation_id).first()
     if reservation is None:
-        raise HTTPException(status_code=404, detail="Reservation not found")
+        raise HTTPException(status_code=404, detail="予約が見つかりません")
     return reservation
 
 @router.post("/seat_reservation/new/", response_model=SeatReservationResponse)
@@ -57,7 +65,6 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
     ).first()
 
     if overlapping_reservation:
-        db.rollback()
         raise HTTPException(status_code=400, detail="すでに座席予約がされています")
     
     try:
@@ -66,29 +73,27 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
         db.commit()
         db.refresh(db_reservation)
         return db_reservation
-    except IntegrityError:
-        db.rollback()
+    except IntegrityError as e:
+        db.rollback()  # 必ずロールバックする
         raise HTTPException(status_code=400, detail="予約IDが既に存在しています")
     except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        db.rollback()  # 必ずロールバックする
+        raise HTTPException(status_code=400, detail=f"データベースエラー: {str(e)}")
 
 @router.put("/seat_reservation/{reservation_id}", response_model=SeatReservationResponse)
 def update_reservation(reservation_id: int, reservation_update: SeatReservationUpdate, db: Session = Depends(get_db)):
     db_reservation = db.query(DBSeatReservation).filter(DBSeatReservation.id == reservation_id).first()
     if db_reservation is None:
-        db.rollback()
-        raise HTTPException(status_code=404, detail="Reservation not found")
+        raise HTTPException(status_code=404, detail="予約が見つかりません")
     
-    # 更新後の値を一時的に仮適用（元の値をベースに未指定フィールドは維持）
-    updated_data = db_reservation.__dict__.copy()
-    updated_data.update(reservation_update.dict(exclude_unset=True))
+    # 変更されたデータを更新
+    for key, value in reservation_update.dict(exclude_unset=True).items():
+        setattr(db_reservation, key, value)
 
-    updated_start = updated_data.get("start_time")
-    updated_end = updated_data.get("finish_time")
-    updated_seat_id = updated_data.get("reserve_id")
-
-    # 自分以外の同じ座席IDで期間が重なっている予約を探す
+    # 更新後の値を使用して重複する予約がないか確認
+    updated_start = db_reservation.start_time
+    updated_end = db_reservation.finish_time
+    
     overlapping_reservation = db.query(DBSeatReservation).filter(
         DBSeatReservation.id != reservation_id,
         DBSeatReservation.finish_time > updated_start,
@@ -98,22 +103,19 @@ def update_reservation(reservation_id: int, reservation_update: SeatReservationU
     if overlapping_reservation:
         raise HTTPException(status_code=400, detail="すでに座席予約がされています")
 
-    for key, value in reservation_update.dict(exclude_unset=True).items():
-        setattr(db_reservation, key, value)
-
     try:
-        db.commit()
-        db.refresh(db_reservation)
-        return db_reservation
+        db.commit()  # データベースをコミット
+        db.refresh(db_reservation)  # 更新されたオブジェクトを再取得
+        return db_reservation  # 更新された予約情報を返す
     except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+        db.rollback()  # 何か問題があればロールバック
+        raise HTTPException(status_code=400, detail=f"データベースエラー: {str(e)}")
 
 @router.delete("/seat_reservation/{reservation_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_reservation(reservation_id: int, db: Session = Depends(get_db)):
     db_reservation = db.query(DBSeatReservation).filter(DBSeatReservation.id == reservation_id).first()
     if db_reservation is None:
-        raise HTTPException(status_code=404, detail="Reservation not found")
+        raise HTTPException(status_code=404, detail="予約が見つかりません")
     
     db.delete(db_reservation)
     db.commit()

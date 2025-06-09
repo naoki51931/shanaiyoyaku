@@ -88,6 +88,19 @@ export default function SignUp(props) {
     const finishTime = new Date(data.get('finish_time'));
     const reserveDay = new Date(data.get('reserve_day'));
 
+    // // 日時形式でない場合、'00:00' を補完して修正する処理
+    // if (isNaN(startTime.getTime())) {
+    //   const correctedStartTime = new Date(data.get('start_time') + "T00:00");
+    //   startTime.setTime(correctedStartTime.getTime());
+    // }
+    // if (isNaN(finishTime.getTime())) {
+    //   const correctedFinishTime = new Date(data.get('finish_time') + "T00:00");
+    //   finishTime.setTime(correctedFinishTime.getTime());
+    // }
+    // if (isNaN(reserveDay.getTime())) {
+    //   const correctedReserveDay = new Date(data.get('reserve_day') + "T00:00");
+    //   reserveDay.setTime(correctedReserveDay.getTime());
+    // }
 
     console.log(loginUserIsApproval);
     const Approval_level = 2;
@@ -96,7 +109,6 @@ export default function SignUp(props) {
       alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
       return; // ユーザー作成をキャンセル
     }
-
 
     console.log({
       reserve_id: data.get('reserve_id'),
