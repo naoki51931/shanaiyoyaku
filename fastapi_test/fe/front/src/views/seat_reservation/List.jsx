@@ -114,8 +114,8 @@ export default function List(props) {
                         <p>{v.person_name}</p>
                         <p>{v.seat_name}</p>
                         <p>{v.todo_content}</p>
-                        <p>{formatTime(v.start_time)} - {formatTime(v.finish_time)}</p> {/* 時間のみ表示 */}
                         <p>{formatDate(v.start_time, v.finish_time)}</p> {/* 日付が異なれば表示 */}
+                        <p>{formatTime(v.start_time)} - {formatTime(v.finish_time)}</p> {/* 時間のみ表示 */}
                     </div>
                 ))}
             </div>
