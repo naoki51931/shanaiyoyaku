@@ -16,12 +16,14 @@ export default function List(props) {
     const [reserve_id, setReserve_id] = React.useState("");
     const [todo_content, setTodo_content] = React.useState("");
     const [person_id, setPerson_id] = React.useState("");
+    const [person_name, setPerson_name] = React.useState("");
     const [seat_id, setSeat_id] = React.useState("");
+    const [seat_name, setSeat_name] = React.useState("");
     const [start_time, setStart_time] = React.useState("");
     const [finish_time, setFinish_time] = React.useState("");
     const [reserve_day, setReserve_day] = React.useState("");
 
-    const openEditModal = (id, seat_name, office_id) => {
+    const openEditModal = (id, reserve_id, todo_content, person_id, seat_id, start_time, finish_time, reserve_day) => {
         setId(id);
         setReserve_id(reserve_id);
         setTodo_content(todo_content);
@@ -45,7 +47,9 @@ export default function List(props) {
                     <TableCell align="left">{v.reserve_id}</TableCell>
                     <TableCell align="left">{v.todo_content}</TableCell>
                     <TableCell align="left">{v.person_id}</TableCell>
+                    <TableCell align="left">{v.person_name}</TableCell>
                     <TableCell align="left">{v.seat_id}</TableCell>
+                    <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{v.start_time}</TableCell>
                     <TableCell align="left">{v.finish_time}</TableCell>
                     <TableCell align="left">{v.reserve_day}</TableCell>
@@ -53,7 +57,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.seat_name, v.office_id)}}>
+                                onClick={() => {openEditModal(v.id, v.reserve_id, v.todo_content, v.person_id, v.seat_id, v.start_time, v.finish_time, v.reserve_day)}}>
                             Edit
                         </Button>
                     </TableCell>
@@ -71,7 +75,9 @@ export default function List(props) {
                         <TableCell align="left">座席予約id</TableCell>
                         <TableCell align="left">概要</TableCell>
                         <TableCell align="left">予約者id</TableCell>
+                        <TableCell align="left">予約者名</TableCell>
                         <TableCell align="left">予約座席id</TableCell>
+                        <TableCell align="left">予約座席名</TableCell>
                         <TableCell align="left">開始時間</TableCell>
                         <TableCell align="left">終了時間</TableCell>
                         <TableCell align="left">予約日</TableCell>

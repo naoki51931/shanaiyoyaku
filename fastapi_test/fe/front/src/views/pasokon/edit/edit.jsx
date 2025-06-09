@@ -37,6 +37,7 @@ const BASE_URL = "http://localhost:8000";
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
+  const [seats, setSeats] = useState([]);
 
   useEffect(() => {
     axios.get(`${BASE_URL}/office/all/`)
@@ -45,6 +46,16 @@ export default function SignUp(props) {
       })
       .catch((error) => {
         console.error("オフィス取得エラー:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/seat/all/') // ← オフィス一覧を取得するエンドポイント
+      .then((res) => {
+        setSeats(res.data);
+      })
+      .catch((error) => {
+        console.error('シート情報の取得に失敗:', error);
       });
   }, []);
 
@@ -73,8 +84,8 @@ export default function SignUp(props) {
 
     console.log({
       pasokon_name: data.get('pasokon_name'),
-      pasokon_id: data.get('office_id'),
-      id: props.id
+      office_id: data.get('office_id'),
+      seat_id: data.get('seat_id'),
     });
     if (data.get('pasokon_name') === ""){
       alert("パソコン名を入力して下さい。")
@@ -84,9 +95,14 @@ export default function SignUp(props) {
       alert("事務所名を選択して下さい。")
       return
     }
+    if (data.get('seat_name') === ""){
+      alert("座席名を選択して下さい。")
+      return
+    }
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       office_id: data.get('office_id'),
+      seat_id: data.get('seat_id'),
     };    
   
     axios.put(BASE_URL + `/pasokon/${props.id}`, pasokon, {
@@ -167,6 +183,27 @@ export default function SignUp(props) {
                     {offices.map((office) => (
                       <MenuItem key={office.id} value={office.id}>
                         {office.office_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="seat-select-label">座席</InputLabel>
+                  <Select
+                    labelId="seat-select-label"
+                    id="seat_id"
+                    name="seat_id"
+                    value={props.seat_id ?? ''}
+                    label="座席"
+                    onChange={(event) => props.setSeat_id && props.setSeat_id(event.target.value)}
+                  >
+                    {/* 空の状態の場合のデフォルト表示 */}
+                    <MenuItem value="">オフィスを選択してください</MenuItem>
+                    {seats.map((seat) => (
+                      <MenuItem key={seat.id} value={seat.id}>
+                        {seat.seat_name}
                       </MenuItem>
                     ))}
                   </Select>

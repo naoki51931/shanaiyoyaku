@@ -21,7 +21,7 @@ export default function List(props) {
     const [seat_id, setSeat_id] = React.useState("");
     const [seat_name, setSeat_name] = React.useState("");
 
-    const openEditModal = (id, pasokon_name, pasokon_id) => {
+    const openEditModal = (id, pasokon_name, pasokon_id, office_id, office_name, seat_id, seat_name) => {
         setId(id);
         setPasokon_name(pasokon_name);
         setOffice_id(office_id);
@@ -49,7 +49,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.pasokon_id)}}>
+                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.pasokon_id, v.office_id, v.office_name, v.seat_id, v.seat_name)}}>
                             Edit
                         </Button>
                     </TableCell>

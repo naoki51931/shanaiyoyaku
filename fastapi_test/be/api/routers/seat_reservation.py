@@ -20,7 +20,25 @@ def get_all_reservations(db: Session = Depends(get_db)):
             joinedload(DBSeatReservation.user),
             joinedload(DBSeatReservation.seat_regist)
         ).all()
-        return reservations
+        # 必要に応じて、person_name と seat_name を SeatReservationResponse 形式で追加
+        response = []
+        for reservation in reservations:
+            response.append({
+                "id": reservation.id,
+                "reserve_id": reservation.reserve_id,
+                "todo_content": reservation.todo_content,
+                "person_id": reservation.person_id,
+                "person_name": reservation.user.kanji_name,  # ユーザーの名前
+                "seat_id": reservation.seat_id,
+                "seat_name": reservation.seat_regist.seat_name,  # 座席の名前
+                "start_time": reservation.start_time,
+                "finish_time": reservation.finish_time,
+                "reserve_day": reservation.reserve_day,
+                "created_at": reservation.created_at,
+                "updated_at": reservation.updated_at,
+            })
+        
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

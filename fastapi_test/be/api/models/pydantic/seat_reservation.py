@@ -29,7 +29,9 @@ class SeatReservationResponse(BaseModel):
     reserve_id: Optional[int] = None
     todo_content: Optional[str] = None
     person_id: Optional[int] = None
+    person_name: Optional[str] = None  # person_nameを追加
     seat_id: Optional[int] = None
+    seat_name: Optional[str] = None  # seat_nameを追加
     start_time: datetime | None = None
     finish_time: datetime | None = None
     reserve_day: datetime | None = None
