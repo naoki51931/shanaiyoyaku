@@ -169,7 +169,7 @@ export default function SignUp(props) {
       reserve_day: data.get('reserve_day'),
     };   
   
-    axios.put(BASE_URL + `/seat/${props.id}`, seat_reservation, {
+    axios.put(BASE_URL + `/seat_reservation/${props.id}`, seat_reservation, {
         headers: {
             'Content-Type': 'application/json'
         }
@@ -188,7 +188,7 @@ export default function SignUp(props) {
     });
     const params = new URLSearchParams();
     params.append('id', props.id);
-    axios.delete(BASE_URL + `/seat/${props.id}`, params)
+    axios.delete(BASE_URL + `/seat_reservation/${props.id}`, params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);
