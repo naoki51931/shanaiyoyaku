@@ -41,9 +41,7 @@ export default function List(props) {
                 <TableRow key={v.id}>
                     <TableCell align="left">{v.id}</TableCell>
                     <TableCell align="left">{v.pasokon_name}</TableCell>
-                    <TableCell align="left">{v.office_id}</TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
-                    <TableCell align="left">{v.seat_id}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
@@ -65,9 +63,7 @@ export default function List(props) {
                     <TableRow>
                         <TableCell align="left">id</TableCell>
                         <TableCell align="left">パソコン名</TableCell>
-                        <TableCell align="left">事業所ID</TableCell>
                         <TableCell align="left">事業所名</TableCell>
-                        <TableCell align="left">座席ID</TableCell>
                         <TableCell align="left">座席名</TableCell>
                         <TableCell align="left">作成日時</TableCell>
                         <TableCell align="left">更新日時</TableCell>

@@ -68,7 +68,7 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
         return db_reservation
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Reservation ID already exists")
+        raise HTTPException(status_code=400, detail="予約IDが既に存在しています")
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
