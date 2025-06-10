@@ -21,15 +21,11 @@ class PasokonSearch(BaseModel):
 
 @router.post("/pasokon/search/", response_model=list[PasokonResponse])
 async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(get_db)):
-    """
-    pasokon_name、pasokon_name のいずれかにキーワードが含まれる座席を検索する
-    """
     query = pasokon_search.query.strip()
 
     db_pasokons = (
         db.query(DBPasokon)
-        .join(DBOffice)
-        .options(joinedload(DBPasokon.office_in_pasokon))
+        .join(DBOffice, DBPasokon.office_id == DBOffice.id)
         .filter(
             or_(
                 DBPasokon.office_id.ilike(f"%{query}%"),
@@ -69,11 +65,10 @@ async def create_pasokon(pasokon: PasokonCreate, db: Session = Depends(get_db)):
         return db_pasokon  
     except IntegrityError:
         db.rollback()
-        return {
-            "status": False,
-            "message": "この事業所名は既に登録されています",
-            "data": None,
-        }
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="この事業所名は既に登録されています"
+        )
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
@@ -96,7 +91,7 @@ def read_pasokon_all(db: Session = Depends(get_db)):
             }
             for pasokon in pasokons_data
         ]
-        return JSONResponse(content=results)
+        return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

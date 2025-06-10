@@ -35,15 +35,16 @@ CREATE TABLE `seat_regist` (
 CREATE TABLE `pasokon` (
     id INT NOT NULL AUTO_INCREMENT,
     pasokon_name VARCHAR(30) UNIQUE NOT NULL,
-    in_active INT,
-    office_id INT UNIQUE NOT NULL,
-    seat_id INT UNIQUE NOT NULL,
+    in_active INT DEFAULT 1,  -- Optional: 'in_active'にデフォルト値を設定（例：1をデフォルト）
+    office_id INT NOT NULL,
+    seat_id INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (office_id) REFERENCES office(id),
     FOREIGN KEY (seat_id) REFERENCES seat_regist(id),
     PRIMARY KEY (id)
 );
+
 
 CREATE TABLE `seat_reservation` (
     id INT NOT NULL AUTO_INCREMENT,
