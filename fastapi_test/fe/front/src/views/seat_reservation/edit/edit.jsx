@@ -39,6 +39,7 @@ export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [users, setUsers] = useState([]);
   const [seats, setSeats] = useState([]);
+  const [selectedOfficeId, setSelectedOfficeId] = useState(props.office_id ?? '');
 
   useEffect(() => {
     axios.get(`${BASE_URL}/office/all/`)
@@ -69,6 +70,11 @@ export default function SignUp(props) {
         console.error('予約シート情報の取得に失敗:', error);
       });
   }, []);
+  useEffect(() => {
+    if (props.office_id) {
+      setSelectedOfficeId(props.office_id);
+    }
+  }, [props.office_id]);
 
   const handleSubmit = (event) => {
 
@@ -280,9 +286,13 @@ export default function SignUp(props) {
                     name="office_id"
                     value={props.office_id ?? ''}
                     label="事務所"
-                    onChange={(event) => props.setOffice_id(event.target.value)}
+                    onChange={(event) => {
+                      const selected = event.target.value;
+                      setSelectedOfficeId(selected);
+                      props.setOffice_id(selected);
+                      props.setSeat_id(''); // シートをリセット（事務所変更時に不要なデータを避ける）
+                    }}
                   >
-                    {/* 空の状態の場合のデフォルト表示 */}
                     <MenuItem value="">事務所を選択してください</MenuItem>
                     {offices.map((office) => (
                       <MenuItem key={office.id} value={office.id}>
@@ -303,13 +313,14 @@ export default function SignUp(props) {
                     label="予約シート"
                     onChange={(event) => props.setSeat_id(event.target.value)}
                   >
-                    {/* 空の状態の場合のデフォルト表示 */}
                     <MenuItem value="">予約シートを選択してください</MenuItem>
-                    {seats.map((seat) => (
-                      <MenuItem key={seat.id} value={seat.id}>
-                        {seat.seat_name}
-                      </MenuItem>
-                    ))}
+                    {seats
+                      .filter(seat => seat.office_id === parseInt(selectedOfficeId)) // 選択中の事務所に一致するシートのみ表示
+                      .map((seat) => (
+                        <MenuItem key={seat.id} value={seat.id}>
+                          {seat.seat_name}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -347,6 +358,7 @@ export default function SignUp(props) {
                 <TextField
                   required
                   fullWidth
+                  title="予約日は開始時間と同じ日にしてください"
                   label="予約日時"
                   type="datetime-local"
                   id="reserve_day"

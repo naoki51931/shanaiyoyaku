@@ -14,3 +14,5 @@ class Office(Base):
     seats = relationship("SeatRegist", back_populates="office")
 
     pasokon_in_office = relationship("Pasokon", back_populates="office_in_pasokon")
+
+    seat_reservations = relationship("SeatReservation", back_populates="office")

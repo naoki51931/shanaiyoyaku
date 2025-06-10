@@ -36,6 +36,7 @@ export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [users, setUsers] = useState([]);
   const [seats, setSeats] = useState([]);
+  const [selectedOfficeId, setSelectedOfficeId] = useState('');
 
   useEffect(() => {
     axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
@@ -249,7 +250,11 @@ export default function SignUp(props) {
                     name="office_id"
                     value={props.office_id ?? ''}
                     label="事務所"
-                    onChange={(event) => props.setOffice_id && props.setOffice_id(event.target.value)}
+                    onChange={(event) => {
+                      const selectedId = event.target.value;
+                      setSelectedOfficeId(selectedId);  // 追加
+                      props.setOffice_id && props.setOffice_id(selectedId);  // 既存の変更処理
+                    }}
                   >
                     {/* 空の状態の場合のデフォルト表示 */}
                     <MenuItem value="">事務所を選択してください</MenuItem>
@@ -272,13 +277,14 @@ export default function SignUp(props) {
                     label="予約シート"
                     onChange={(event) => props.setSeat_id && props.setSeat_id(event.target.value)}
                   >
-                    {/* 空の状態の場合のデフォルト表示 */}
                     <MenuItem value="">予約シートを選択してください</MenuItem>
-                    {seats.map((seat) => (
-                      <MenuItem key={seat.id} value={seat.id}>
-                        {seat.seat_name}
-                      </MenuItem>
-                    ))}
+                    {seats
+                      .filter(seat => seat.office_id === parseInt(selectedOfficeId)) // 事務所に対応したシートだけ表示
+                      .map(seat => (
+                        <MenuItem key={seat.id} value={seat.id}>
+                          {seat.seat_name}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -316,6 +322,7 @@ export default function SignUp(props) {
                 <TextField
                   required
                   fullWidth
+                  title="予約日は開始時間と同じ日にしてください"
                   label="予約日時"
                   type="datetime-local"
                   id="reserve_day"

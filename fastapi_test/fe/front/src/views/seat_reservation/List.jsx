@@ -83,6 +83,8 @@ export default function List(props) {
                     <TableCell align="left">{v.todo_content}</TableCell>
                     <TableCell align="left">{v.person_id}</TableCell>
                     <TableCell align="left">{v.person_name}</TableCell>
+                    <TableCell align="left">{v.office_id}</TableCell>
+                    <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_id}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{formatTime(v.start_time)}</TableCell> {/* 時間のみ表示 */}
@@ -92,7 +94,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.reserve_id, v.todo_content, v.person_id, v.seat_id, v.start_time, v.finish_time, v.reserve_day)}}>
+                                onClick={() => {openEditModal(v.id, v.reserve_id, v.todo_content, v.person_id, v.office_id, v.seat_id, v.start_time, v.finish_time, v.reserve_day)}}>
                             Edit
                         </Button>
                     </TableCell>
@@ -110,7 +112,7 @@ export default function List(props) {
                     <div 
                         key={v.id} 
                         style={{ border: '1px solid gray', padding: '10px', textAlign: 'center', cursor: 'pointer' }} 
-                        onClick={() => openEditModal(v.id, v.reserve_id, v.todo_content, v.person_id, v.seat_id, v.start_time, v.finish_time, v.reserve_day)}
+                        onClick={() => openEditModal(v.id, v.reserve_id, v.todo_content, v.person_id, v.office_id, v.seat_id, v.start_time, v.finish_time, v.reserve_day)}
                     >
                         <h4>{new Date(v.reserve_day).toLocaleDateString()}</h4>
                         <p>{v.reserve_id}</p>
