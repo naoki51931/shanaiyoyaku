@@ -16,14 +16,16 @@ export default function List(props) {
     const [editModalIsOpen, setEditModalIsOpen] = React.useState(false);
     const [id, setId] = React.useState("");
     const [pasokon_name, setPasokon_name] = React.useState("");
+    const [in_active, setIn_active] = React.useState("");
     const [office_id, setOffice_id] = React.useState("");
     const [office_name, setOffice_name] = React.useState("");
     const [seat_id, setSeat_id] = React.useState("");
     const [seat_name, setSeat_name] = React.useState("");
 
-    const openEditModal = (id, pasokon_name, pasokon_id, office_id, office_name, seat_id, seat_name) => {
+    const openEditModal = (id, pasokon_name, in_active, office_id, office_name, seat_id, seat_name) => {
         setId(id);
         setPasokon_name(pasokon_name);
+        setIn_active(in_active);
         setOffice_id(office_id);
         setOffice_name(office_name);
         setSeat_id(seat_id);
@@ -41,6 +43,17 @@ export default function List(props) {
                 <TableRow key={v.id}>
                     <TableCell align="left">{v.id}</TableCell>
                     <TableCell align="left">{v.pasokon_name}</TableCell>
+                    <TableCell align="left">
+                    {v.in_active === null || v.in_active === 0
+                        ? "不可"
+                        : v.in_active === 1
+                        ? "予約中"
+                        : v.in_active === 2
+                        ? "使用可"
+                        : v.in_active === 3
+                        ? "破損"
+                        : "不明"}
+                    </TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
@@ -63,6 +76,7 @@ export default function List(props) {
                     <TableRow>
                         <TableCell align="left">id</TableCell>
                         <TableCell align="left">パソコン名</TableCell>
+                        <TableCell align="left">使用可不可</TableCell>
                         <TableCell align="left">事業所名</TableCell>
                         <TableCell align="left">座席名</TableCell>
                         <TableCell align="left">作成日時</TableCell>
@@ -91,7 +105,7 @@ export default function List(props) {
                 >
                     <Edit
                         setEditModalIsOpen={setEditModalIsOpen}
-                        id={id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} office_id={office_id} setOffice_id={setOffice_id} office_name={office_name} setOffice_name={setOffice_name} seat_id={seat_id} setSeat_id={setSeat_id} seat_name={seat_name} setSeat_name={setSeat_name}
+                        id={id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} in_active={in_active} setIn_active={setIn_active} office_id={office_id} setOffice_id={setOffice_id} office_name={office_name} setOffice_name={setOffice_name} seat_id={seat_id} setSeat_id={setSeat_id} seat_name={seat_name} setSeat_name={setSeat_name}
                     />
                 </Modal>
             </div>

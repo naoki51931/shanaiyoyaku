@@ -7,6 +7,7 @@ class Pasokon(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     pasokon_name = Column(String(30), unique=True, nullable=False)
+    in_active = Column(Integer, nullable=True)
     office_id = Column(Integer, ForeignKey("office.id"), nullable=False)
     seat_id = Column(Integer,  ForeignKey("seat_regist.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

@@ -90,12 +90,17 @@ export default function SignUp(props) {
 
     console.log({
       pasokon_name: data.get('pasokon_name'),
+      in_active: data.get('in_active'),
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
     });
     console.log('props.setIsOpen:', props.setIsOpen);
     if (data.get('pasokon_name') === ""){
       alert("パソコン名を入力して下さい。")
+      return
+    }
+    if (data.get('in_active') === ""){
+      alert("使用可不可を入力して下さい。")
       return
     }
     if (data.get('office_name') === ""){
@@ -108,6 +113,7 @@ export default function SignUp(props) {
     }
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
+      in_active: data.get('in_active'),
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
     };
@@ -158,6 +164,23 @@ export default function SignUp(props) {
                   value={props.pasokon_name ?? ''}
                   onChange={(event) => props.setPasokon_name && props.setPasokon_name(event.target.value)}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="in-active-select-label">使用可不可</InputLabel>
+                  <Select
+                    labelId="in-active-select-label"
+                    id="in_active"
+                    name="in_active"
+                    value={props.in_active ?? ''}
+                    label="使用可不可"
+                    onChange={(event) => props.setIn_active && props.setIn_active(event.target.value)}
+                  >
+                    <MenuItem value="">選択してください</MenuItem>
+                    <MenuItem value="使用可">使用可</MenuItem>
+                    <MenuItem value="使用不可">使用不可</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>

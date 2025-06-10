@@ -46,6 +46,7 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
         {
             "id": pasokon.id,
             "pasokon_name": pasokon.pasokon_name,
+            "in_active": pasokon.in_active,
             "office_id": pasokon.office_id,
             "office_name": pasokon.office_in_pasokon.office_name if pasokon.office_in_pasokon else None,
             "seat_id": pasokon.seat_id,
@@ -85,6 +86,7 @@ def read_pasokon_all(db: Session = Depends(get_db)):
             {
                 "id": pasokon.id,
                 "pasokon_name": pasokon.pasokon_name,
+                "in_active": pasokon.in_active,
                 "office_id": pasokon.office_id,
                 "office_name": pasokon.office_in_pasokon.office_name if pasokon.office_in_pasokon else None,
                 "seat_id": pasokon.seat_id,

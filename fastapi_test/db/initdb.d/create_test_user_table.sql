@@ -35,6 +35,7 @@ CREATE TABLE `seat_regist` (
 CREATE TABLE `pasokon` (
     id INT NOT NULL AUTO_INCREMENT,
     pasokon_name VARCHAR(30) UNIQUE NOT NULL,
+    in_active INT,
     office_id INT UNIQUE NOT NULL,
     seat_id INT UNIQUE NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
