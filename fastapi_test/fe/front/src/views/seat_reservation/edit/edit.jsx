@@ -295,8 +295,8 @@ export default function SignUp(props) {
                   >
                     <MenuItem value="">事務所を選択してください</MenuItem>
                     {offices.map((office) => (
-                      <MenuItem key={office.id} value={office.id}>
-                        {office.office_name}
+                      <MenuItem key={office.id} value={String(office.id)}>
+                      {office.office_name}
                       </MenuItem>
                     ))}
                   </Select>

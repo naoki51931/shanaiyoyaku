@@ -36,7 +36,7 @@ export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [users, setUsers] = useState([]);
   const [seats, setSeats] = useState([]);
-  const [selectedOfficeId, setSelectedOfficeId] = useState('');
+  const [selectedOfficeId, setSelectedOfficeId] = useState(null);
 
   useEffect(() => {
     axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
@@ -104,6 +104,7 @@ export default function SignUp(props) {
       finish_time: data.get('finish_time'),
       reserve_day: data.get('reserve_day'),
     });
+    console.log(typeof props.office_id);
     console.log('props.setIsOpen:', props.setIsOpen);
     if (data.get('reserve_id') === ""){
       alert("予約IDを入力して下さい。")
@@ -248,18 +249,18 @@ export default function SignUp(props) {
                     labelId="office-select-label"
                     id="office_id"
                     name="office_id"
-                    value={props.office_id ?? ''}
+                    value={props.office_id !== undefined ? String(props.office_id) : ''} // ← undefined対策
                     label="事務所"
                     onChange={(event) => {
                       const selectedId = event.target.value;
-                      setSelectedOfficeId(selectedId);  // 追加
-                      props.setOffice_id && props.setOffice_id(selectedId);  // 既存の変更処理
+                      setSelectedOfficeId(selectedId);
+                      props.setOffice_id && props.setOffice_id(selectedId);
                     }}
                   >
                     {/* 空の状態の場合のデフォルト表示 */}
                     <MenuItem value="">事務所を選択してください</MenuItem>
                     {offices.map((office) => (
-                      <MenuItem key={office.id} value={office.id}>
+                      <MenuItem key={office.id} value={String(office.id)}>
                         {office.office_name}
                       </MenuItem>
                     ))}
