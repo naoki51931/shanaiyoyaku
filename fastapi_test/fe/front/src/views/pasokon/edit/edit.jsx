@@ -185,23 +185,23 @@ export default function SignUp(props) {
                 />
                 </Grid>
                 <Grid item xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel id="in-active-select-label">使用可不可</InputLabel>
-                  <Select
-                    labelId="in-active-select-label"
-                    id="in_active"
-                    name="in_active"
-                    // nullのときは0を代入して「不可」と表示させる
-                    value={props.in_active === null || props.in_active === undefined ? 0 : props.in_active}
-                    label="使用可不可"
-                    onChange={(event) => props.setIn_active(parseInt(event.target.value, 10))}
-                  >
-                    <MenuItem value={0}>不可</MenuItem>
-                    <MenuItem value={1}>予約中</MenuItem>
-                    <MenuItem value={2}>使用可</MenuItem>
-                    <MenuItem value={3}>破損</MenuItem>
-                  </Select>
-                </FormControl>
+                  <FormControl fullWidth required>
+                    <InputLabel id="in-active-select-label">使用可不可</InputLabel>
+                    <Select
+                      labelId="in-active-select-label"
+                      id="in_active"
+                      name="in_active"
+                      value={props.in_active ?? ""}
+                      label="使用可不可"
+                      onChange={(event) => props.setIn_active(event.target.value)}
+                    >
+                      <MenuItem value="">選択してください</MenuItem>
+                      <MenuItem value={0}>不可</MenuItem>
+                      <MenuItem value={1}>予約中</MenuItem>
+                      <MenuItem value={2}>使用可</MenuItem>
+                      <MenuItem value={3}>破損</MenuItem>
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                 <FormControl fullWidth required>

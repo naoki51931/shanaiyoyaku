@@ -172,13 +172,15 @@ export default function SignUp(props) {
                     labelId="in-active-select-label"
                     id="in_active"
                     name="in_active"
-                    value={props.in_active ?? ''}
+                    // nullのときは0を代入して「不可」と表示させる
+                    value={props.in_active === null || props.in_active === undefined ? 0 : props.in_active}
                     label="使用可不可"
-                    onChange={(event) => props.setIn_active && props.setIn_active(event.target.value)}
+                    onChange={(event) =>  props.setIn_active && props.setIn_active(parseInt(event.target.value, 10))}
                   >
-                    <MenuItem value="">選択してください</MenuItem>
-                    <MenuItem value="使用可">使用可</MenuItem>
-                    <MenuItem value="使用不可">使用不可</MenuItem>
+                    <MenuItem value={0}>不可</MenuItem>
+                    <MenuItem value={1}>予約中</MenuItem>
+                    <MenuItem value={2}>使用可</MenuItem>
+                    <MenuItem value={3}>破損</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
