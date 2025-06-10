@@ -21,6 +21,8 @@ export default function List(props) {
     const [todo_content, setTodo_content] = React.useState("");
     const [person_id, setPerson_id] = React.useState("");
     const [person_name, setPerson_name] = React.useState("");
+    const [office_id, setOffice_id] = React.useState("");
+    const [office_name, setOffice_name] = React.useState("");
     const [seat_id, setSeat_id] = React.useState("");
     const [seat_name, setSeat_name] = React.useState("");
     const [start_time, setStart_time] = React.useState("");
@@ -29,11 +31,12 @@ export default function List(props) {
 
     const navigate = useNavigate(); // useNavigateでリダイレクト
 
-    const openEditModal = (id, reserve_id, todo_content, person_id, seat_id, start_time, finish_time, reserve_day) => {
+    const openEditModal = (id, reserve_id, todo_content, person_id, office_id, seat_id, start_time, finish_time, reserve_day) => {
         setId(id);
         setReserve_id(reserve_id);
         setTodo_content(todo_content);
         setPerson_id(person_id);
+        setOffice_id(office_id);
         setSeat_id(seat_id);
         setStart_time(start_time);
         setFinish_time(finish_time);
@@ -152,6 +155,8 @@ export default function List(props) {
                                 <TableCell align="left">概要</TableCell>
                                 <TableCell align="left">予約者id</TableCell>
                                 <TableCell align="left">予約者名</TableCell>
+                                <TableCell align="left">事務所id</TableCell>
+                                <TableCell align="left">事務所名</TableCell>
                                 <TableCell align="left">予約座席id</TableCell>
                                 <TableCell align="left">予約座席名</TableCell>
                                 <TableCell align="left">開始時間</TableCell>
@@ -192,6 +197,7 @@ export default function List(props) {
                         id={id} reserve_id={reserve_id} setReserve_id={setReserve_id}
                         todo_content={todo_content} setTodo_content={setTodo_content}
                         person_id={person_id} setPerson_id={setPerson_id}
+                        office_id={office_id} setOffice_id={setOffice_id}
                         seat_id={seat_id} setSeat_id={setSeat_id}
                         start_time={start_time} setStart_time={setStart_time}
                         finish_time={finish_time} setFinish_time={setFinish_time}

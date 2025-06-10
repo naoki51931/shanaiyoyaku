@@ -108,17 +108,15 @@ async def update_office(office_id: int, office_update: OfficeUpdate, db: Session
 
         db.commit()
     except IntegrityError:
-        return {
-            "status": False,
-            "message": "この事業所名は既に登録されています",
-            "data": None,
-        }
+        db.rollback()  # ← エラー時は明示的にロールバックも入れるべき
+        raise HTTPException(status_code=400, detail="この事業所名は既に登録されています")
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
-    finally:
+    else:
         db.refresh(db_office)
         return db_office
+
 
 @router.delete("/office/{office_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_office(office_id: int, db: Session = Depends(get_db)):

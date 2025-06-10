@@ -114,6 +114,7 @@ export default function SignUp(props) {
       reserve_id: data.get('reserve_id'),
       todo_content: data.get('todo_content'),
       person_id: data.get('person_id'),
+      office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
       start_time: data.get('start_time'),
       finish_time: data.get('finish_time'),
@@ -129,6 +130,10 @@ export default function SignUp(props) {
     }
     if (data.get('person_id') === ""){
       alert("人物IDを選択して下さい。")
+      return
+    }
+    if (data.get('office_id') === ""){
+      alert("事業所IDを選択して下さい。")
       return
     }
     if (data.get('seat_id') === ""){
@@ -163,6 +168,7 @@ export default function SignUp(props) {
       reserve_id: data.get('reserve_id'),
       todo_content: data.get('todo_content'),
       person_id: data.get('person_id'),
+      office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
       start_time: data.get('start_time'),
       finish_time: data.get('finish_time'),
@@ -260,6 +266,27 @@ export default function SignUp(props) {
                     {users.map((user) => (
                       <MenuItem key={user.id} value={user.id}>
                         {user.kanji_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="office-select-label">事務所</InputLabel>
+                  <Select
+                    labelId="office-select-label"
+                    id="office_id"
+                    name="office_id"
+                    value={props.office_id ?? ''}
+                    label="事務所"
+                    onChange={(event) => props.setOffice_id(event.target.value)}
+                  >
+                    {/* 空の状態の場合のデフォルト表示 */}
+                    <MenuItem value="">事務所を選択してください</MenuItem>
+                    {offices.map((office) => (
+                      <MenuItem key={office.id} value={office.id}>
+                        {office.office_name}
                       </MenuItem>
                     ))}
                   </Select>

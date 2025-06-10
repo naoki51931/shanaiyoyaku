@@ -35,6 +35,7 @@ const defaultTheme = createTheme();
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [seats, setSeats] = useState([]);
+  const [filteredSeats, setFilteredSeats] = useState([]);
 
   useEffect(() => {
     axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
@@ -47,7 +48,7 @@ export default function SignUp(props) {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/seat/all/') // ← オフィス一覧を取得するエンドポイント
+    axios.get('http://localhost:8000/seat/all/') // ← 座席一覧を取得するエンドポイント
       .then((res) => {
         setSeats(res.data);
       })
@@ -55,6 +56,15 @@ export default function SignUp(props) {
         console.error('シート情報の取得に失敗:', error);
       });
   }, []);
+
+  useEffect(() => {
+    if (props.office_id) {
+      const filtered = seats.filter(seat => seat.office_id === props.office_id);
+      setFilteredSeats(filtered);
+    } else {
+      setFilteredSeats([]);
+    }
+  }, [props.office_id, seats]);
 
 
   const handleSubmit = (event) => {
@@ -181,9 +191,8 @@ export default function SignUp(props) {
                     label="座席"
                     onChange={(event) => props.setSeat_id && props.setSeat_id(event.target.value)}
                   >
-                    {/* 空の状態の場合のデフォルト表示 */}
-                    <MenuItem value="">オフィスを選択してください</MenuItem>
-                    {seats.map((seat) => (
+                    <MenuItem value="">座席を選択してください</MenuItem>
+                    {filteredSeats.map((seat) => (
                       <MenuItem key={seat.id} value={seat.id}>
                         {seat.seat_name}
                       </MenuItem>

@@ -73,7 +73,6 @@ export default function SignUp(props) {
     console.log({
       office_name: data.get('office_name'),
       office_id: data.get('office_id'),
-      id: props.id
     });
     if (data.get('office_name') === ""){
       alert("事業所名を入力して下さい。")

@@ -10,6 +10,7 @@ class SeatReservation(Base):
     reserve_id = Column(Integer, unique=True, nullable=False)
     todo_content = Column(String(30), nullable=True)
     person_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    office_id = Column(Integer, ForeignKey("office.id"), nullable=False)
     seat_id = Column(Integer, ForeignKey("seat_regist.id"), nullable=False)
     start_time = Column(DateTime(timezone=True), nullable=False)
     finish_time = Column(DateTime(timezone=True), nullable=False)
@@ -22,3 +23,6 @@ class SeatReservation(Base):
 
      # SeatRegist とのリレーション
     seat_regist = relationship("SeatRegist", back_populates="seat_reserve_id")
+
+    # Office とのリレーション
+    office = relationship("Office", back_populates="seat_reserve_office_id")

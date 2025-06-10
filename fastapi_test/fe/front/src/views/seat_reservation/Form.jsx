@@ -45,6 +45,8 @@ export default function Form(props) {
                                 todo_content: res.data[i].todo_content,
                                 person_id: res.data[i].person_id,
                                 person_name: res.data[i].person_name,
+                                office_id: res.data[i].office_id,
+                                office_name: res.data[i].office_name,
                                 seat_id: res.data[i].seat_id,
                                 seat_name: res.data[i].seat_name,
                                 start_time: res.data[i].start_time,
