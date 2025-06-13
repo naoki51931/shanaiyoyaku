@@ -12,6 +12,7 @@ from routers import seat_regist
 from routers import office
 from routers import pasokon
 from routers import seat_reservation
+from routers import tag
 from auth import router as auth_router  # auth.py をインポート
 
 app = FastAPI()
@@ -48,9 +49,14 @@ async def handler(request:Request, exc:RequestValidationError):
 
     return JSONResponse(content={}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
+@app.exception_handler(Exception)
+async def exception_handler(request, exc):
+    return {"message": str(exc)}
+
 app.include_router(user.router)
 app.include_router(seat_regist.router)
 app.include_router(office.router)
 app.include_router(pasokon.router)
 app.include_router(seat_reservation.router)
+app.include_router(tag.router)
 app.include_router(auth_router, prefix="/auth")  # 認証用のエンドポイントを登録

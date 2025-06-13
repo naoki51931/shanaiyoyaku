@@ -13,7 +13,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
-
+import Chip from '@mui/material/Chip';  // タグ用のChipコンポーネント
 
 function Copyright(props) {
   return (
@@ -28,17 +28,18 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [seats, setSeats] = useState([]);
   const [filteredSeats, setFilteredSeats] = useState([]);
+  const [tags, setTags] = useState([]); // タグの状態を管理
+  const [softName, setSoftName] = useState(''); // ソフト名の入力状態
+  const [availableTags, setAvailableTags] = useState([]); // 既存のタグを管理
 
   useEffect(() => {
-    axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
+    axios.get('http://localhost:8000/office/all/')
       .then((res) => {
         setOffices(res.data);
       })
@@ -48,12 +49,22 @@ export default function SignUp(props) {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/seat/all/') // ← 座席一覧を取得するエンドポイント
+    axios.get('http://localhost:8000/seat/all/')
       .then((res) => {
         setSeats(res.data);
       })
       .catch((error) => {
         console.error('シート情報の取得に失敗:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/tags/')
+      .then((res) => {
+        setAvailableTags(res.data);  // 既存のタグをセット
+      })
+      .catch((error) => {
+        console.error('タグ情報の取得に失敗:', error);
       });
   }, []);
 
@@ -66,70 +77,69 @@ export default function SignUp(props) {
     }
   }, [props.office_id, seats]);
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === 'Tab') {
+      event.preventDefault(); // タブキーでフォーカスが移動しないようにする
+      if (softName && !tags.includes(softName)) {
+        setTags([...tags, softName]);
+        setSoftName(''); // 入力フィールドをリセット
+        // 新しいタグがあれば、バックエンドに追加する
+        axios.post('http://localhost:8000/tags/', { tag_name: softName })
+          .then(() => {
+            // タグが追加された後、新しいタグリストを再取得
+            axios.get('http://localhost:8000/tags/')
+              .then((res) => setAvailableTags(res.data));
+          })
+          .catch((error) => {
+            console.error('タグの追加に失敗:', error);
+          });
+      }
+    }
+  };
+
+  const handleTagDelete = (index) => {
+    const newTags = tags.filter((_, tagIndex) => tagIndex !== index);
+    setTags(newTags);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    
     const isLoggedIn = Boolean(localStorage.getItem('token'));
     const token = isLoggedIn ? localStorage.getItem('token') : null;
     const decodedToken = token ? jwtDecode(token) : null;
     const loginUserPosition = decodedToken?.position || 'C'; // ログインユーザーの役職を取得
 
-
     const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
 
-    console.log(loginUserIsApproval);
     const Approval_level = 2;
-    // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
     if (loginUserIsApproval !== Approval_level) {
       alert("パソコン登録には管理者及び上位ユーザーの承認が必要です。");
-      return; // パソコン登録をキャンセル
+      return;
     }
 
-    console.log({
-      pasokon_name: data.get('pasokon_name'),
-      in_active: data.get('in_active'),
-      office_id: data.get('office_id'),
-      seat_id: data.get('seat_id'),
-    });
-    console.log('props.setIsOpen:', props.setIsOpen);
-    if (data.get('pasokon_name') === ""){
-      alert("パソコン名を入力して下さい。")
-      return
-    }
-    if (data.get('in_active') === ""){
-      alert("使用可不可を入力して下さい。")
-      return
-    }
-    if (data.get('office_name') === ""){
-      alert("事務所名を選択して下さい。")
-      return
-    }
-    if (data.get('seat_name') === ""){
-      alert("座席名を選択して下さい。")
-      return
-    }
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       in_active: data.get('in_active'),
+      soft_id: tags.join(','), // タグをカンマ区切りで保存
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
     };
+
     axios.post('http://localhost:8000/pasokon/new/', pasokon, {
       headers: {
-          'Content-Type': 'application/json'
+        'Content-Type': 'application/json'
       },
       withCredentials: true  // 追加（必要なら）
     })
-        .then(function (res) {
-            console.log(res)
-        })
-        .catch(function (error) {
-            console.log("error", error);
-            alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
-        });
+      .then(function (res) {
+        console.log(res);
+      })
+      .catch(function (error) {
+        console.log("error", error);
+        alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
+      });
   };
 
   return (
@@ -172,10 +182,9 @@ export default function SignUp(props) {
                     labelId="in-active-select-label"
                     id="in_active"
                     name="in_active"
-                    // nullのときは0を代入して「不可」と表示させる
                     value={props.in_active === null || props.in_active === undefined ? 0 : props.in_active}
                     label="使用可不可"
-                    onChange={(event) =>  props.setIn_active && props.setIn_active(parseInt(event.target.value, 10))}
+                    onChange={(event) => props.setIn_active && props.setIn_active(parseInt(event.target.value, 10))}
                   >
                     <MenuItem value={0}>不可</MenuItem>
                     <MenuItem value={1}>予約中</MenuItem>
@@ -183,6 +192,31 @@ export default function SignUp(props) {
                     <MenuItem value={3}>破損</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  autoComplete="soft_name"
+                  name="soft_name"
+                  required
+                  fullWidth
+                  id="soft_name"
+                  label="導入ソフト"
+                  autoFocus
+                  value={softName}
+                  onChange={(event) => setSoftName(event.target.value)}
+                  onKeyDown={handleKeyDown} // タグ追加の処理
+                />
+                <Box sx={{ mt: 2 }}>
+                  {/* タグ表示 */}
+                  {tags.map((tag, index) => (
+                    <Chip
+                      key={index}
+                      label={tag}
+                      onDelete={() => handleTagDelete(index)}
+                      sx={{ margin: 0.5 }}
+                    />
+                  ))}
+                </Box>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
@@ -195,7 +229,6 @@ export default function SignUp(props) {
                     label="事務所"
                     onChange={(event) => props.setOffice_id && props.setOffice_id(event.target.value)}
                   >
-                    {/* 空の状態の場合のデフォルト表示 */}
                     <MenuItem value="">オフィスを選択してください</MenuItem>
                     {offices.map((office) => (
                       <MenuItem key={office.id} value={office.id}>
@@ -225,12 +258,6 @@ export default function SignUp(props) {
                   </Select>
                 </FormControl>
               </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
             </Grid>
             <Button
               type="submit"
@@ -240,13 +267,6 @@ export default function SignUp(props) {
             >
               Create
             </Button>
-            {/* <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid> */}
           </Box>
         </Box>
         <Copyright sx={{ mt: 5 }} />

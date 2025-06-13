@@ -32,10 +32,19 @@ CREATE TABLE `seat_regist` (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE tags (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE `pasokon` (
     id INT NOT NULL AUTO_INCREMENT,
     pasokon_name VARCHAR(30) UNIQUE NOT NULL,
     in_active INT DEFAULT 1,  -- Optional: 'in_active'にデフォルト値を設定（例：1をデフォルト）
+    soft_id VARCHAR(30) NOT NULL,
     office_id INT NOT NULL,
     seat_id INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -61,4 +70,14 @@ CREATE TABLE `seat_reservation` (
     FOREIGN KEY (person_id) REFERENCES user(id),
     FOREIGN KEY (seat_id) REFERENCES seat_regist(id),
     PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE pasokon_tags (
+    pasokon_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    PRIMARY KEY (pasokon_id, tag_id),
+    FOREIGN KEY (pasokon_id) REFERENCES pasokon(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
