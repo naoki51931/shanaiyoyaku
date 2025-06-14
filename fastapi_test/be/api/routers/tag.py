@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from models.sqlalchemy.tags import Tag  # Tagモデルをインポート
+from models.sqlalchemy.tag import Tag  # Tagモデルをインポート
 from database.database import get_db  # データベースセッションを取得する関数
 from models.pydantic.tag import TagCreate, TagUpdate, TagResponse  # Pydanticスキーマ
 from sqlalchemy.exc import SQLAlchemyError

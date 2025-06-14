@@ -2,7 +2,7 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, f
 from sqlalchemy.orm import relationship
 from database.database import Base
 from models.sqlalchemy.pasokon_tags import PasokonTag  # 中間テーブルをインポート
-from models.sqlalchemy.tags import Tag  # Tagクラスのインポート
+from models.sqlalchemy.tag import Tag  # Tagクラスのインポート
 
 
 class Pasokon(Base):
