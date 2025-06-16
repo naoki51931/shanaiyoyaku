@@ -65,7 +65,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.pasokon_id, v.office_id, v.office_name, v.seat_id, v.seat_name)}}>
+                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.in_active, v.soft_id, v.soft_name, v.office_id, v.office_name, v.seat_id, v.seat_name)}}>
                             Edit
                         </Button>
                     </TableCell>

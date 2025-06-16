@@ -50,6 +50,11 @@ export default function SignUp(props) {
       alert('選択した役職は変更できません。未承認ユーザーとして設定されました。');
     }
 
+    // ログインしていない場合、is_approval を 1 に設定
+    if (!isLoggedIn) {
+      isApprovalValue = '1'; // 未ログインの場合は承認ユーザーを1に設定
+    }
+
     console.log({
       user_name: data.get('user_name'),
       kanji_name: data.get('kanji_name'),
