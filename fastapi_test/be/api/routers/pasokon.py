@@ -11,6 +11,8 @@ from database.database import get_db
 from models.sqlalchemy.pasokon import Pasokon as DBPasokon
 from models.sqlalchemy.office import Office as DBOffice
 from models.pydantic.pasokon import PasokonCreate, PasokonResponse, PasokonUpdate
+from models.sqlalchemy.tag import Tag
+from models.sqlalchemy import pasokon
 
 router = APIRouter()
 
@@ -58,16 +60,39 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
 @router.post("/pasokon/new/", response_model=PasokonResponse)
 async def create_pasokon(pasokon: PasokonCreate, db: Session = Depends(get_db)):
     try:
-        db_pasokon = DBPasokon(**pasokon.dict())
+        # タグ名を受け取って、Tagオブジェクトを取得または新規作成
+        tags = []
+        for tag_name in pasokon.soft_names:
+            existing_tag = db.query(Tag).filter(Tag.name == tag_name).first()
+            if existing_tag:
+                tags.append(existing_tag)  # 既存タグを使用
+            else:
+                new_tag = Tag(name=tag_name)  # 新しいタグを作成
+                db.add(new_tag)
+                db.commit()
+                db.refresh(new_tag)
+                tags.append(new_tag)  # 新しいタグを追加
+
+        # Pasokon作成
+        db_pasokon = DBPasokon(
+            pasokon_name=pasokon.pasokon_name,
+            in_active=pasokon.in_active,
+            office_id=pasokon.office_id,
+            seat_id=pasokon.seat_id,
+            tags=tags  # タグを関連付け
+        )
+
         db.add(db_pasokon)
         db.commit()
         db.refresh(db_pasokon)
-        return db_pasokon  
+
+        return db_pasokon
+
     except IntegrityError:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="この事業所名は既に登録されています"
+            detail="このパソコン名は既に登録されています"
         )
     except SQLAlchemyError as e:
         db.rollback()
@@ -109,8 +134,12 @@ async def update_pasokon(pasokon_id: int, pasokon_update: PasokonUpdate, db: Ses
         if db_pasokon is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pasokon not found")
 
-        for key, value in pasokon_update.dict(exclude_unset=True).items():
-            setattr(db_pasokon, key, value)
+         # タグIDを使用して、タグをリストとして関連付け
+        tags = db.query(Tag).filter(Tag.id.in_(pasokon.soft_ids)).all()
+        db_pasokon.tags = tags  # パソコンとタグの関連付け
+
+        db_pasokon.pasokon_name = pasokon.pasokon_name
+        db_pasokon.in_active = pasokon.in_active
 
         db.commit()
     except IntegrityError:

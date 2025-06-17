@@ -13,4 +13,4 @@ class Tag(Base):
 
     # PasokonTag 中間テーブルとの関連を定義
     pasokon_tags = relationship("PasokonTag", back_populates="tag")
-    pasokons = relationship("Pasokon", secondary=PasokonTag.__tablename__, back_populates="tags")
+    pasokons = relationship("Pasokon", secondary=PasokonTag.__tablename__, overlaps="pasokon_tags,tag")

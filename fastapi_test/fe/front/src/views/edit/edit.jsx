@@ -49,10 +49,12 @@ export default function SignUp(props) {
       return; // ユーザー作成をキャンセル
     }
 
+    const isLoggedIn = Boolean(localStorage.getItem('token'));
     const loginUserPosition = decodedToken?.position; // ログインユーザーの役職
     const loginUserIsSuperuser = decodedToken?.is_superuser; // ログインユーザーが管理者かどうか
 
     const targetUserPosition = data.get('position'); // 変更対象の役職
+    let isApprovalValue = data.get('is_approval');
 
     // 役職制御ロジック
     const positionHierarchy = ['C', 'B', 'A'];

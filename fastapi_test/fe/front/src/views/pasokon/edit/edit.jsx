@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
+import { jwtDecode } from "jwt-decode";
 import { Select, MenuItem, InputLabel, FormControl, Chip } from '@mui/material';
 
 function Copyright(props) {
@@ -37,6 +37,8 @@ export default function SignUp(props) {
   const [tags, setTags] = useState([]); // ソフト名（タグ）を管理
   const [softName, setSoftName] = useState(''); // ソフト名入力フィールドの管理
   const [availableTags, setAvailableTags] = useState([]); // 既存のタグを管理
+  const [softId, setSoftId] = useState(null); // ソフトIDを管理
+  const [selectedTag, setSelectedTag] = useState(''); // 追加されたタグを選択する状態
 
   useEffect(() => {
     axios.get(`${BASE_URL}/office/all/`)
@@ -68,6 +70,16 @@ export default function SignUp(props) {
   }, [props.office_id, seats]);
 
   useEffect(() => {
+    axios.get(`${BASE_URL}/tags/`)  // 既存タグを取得
+      .then((res) => {
+        setAvailableTags(res.data);
+      })
+      .catch((error) => {
+        console.error('タグ情報の取得に失敗:', error);
+      });
+  }, []);
+
+  useEffect(() => {
     // 編集時に初期タグをセット
     if (props.soft_id) {
       const initialTags = props.soft_id.split(','); // カンマ区切りでタグをセット
@@ -75,10 +87,31 @@ export default function SignUp(props) {
     }
   }, [props.soft_id]);
 
+  // ソフト名の変更時にIDを取得する処理
+  const handleSoftNameChange = (event) => {
+    const value = event.target.value;
+    setSoftName(value);
+
+    // ソフト名が変更されるたびにIDを取得する
+    if (value) {
+      axios.get(`${BASE_URL}/tags/search?name=${value}`)
+        .then((res) => {
+          if (res.data && res.data.id) {
+            setSoftId(res.data.id); // ソフト名に対応するIDを取得して設定
+          } else {
+            setSoftId(null); // 一致しない場合はIDをnullに設定
+          }
+        })
+        .catch((error) => {
+          console.error('ソフト名検索エラー:', error);
+        });
+    }
+  };
+
+  // エンターキーまたはタブキーでタグを追加
   const handleKeyDown = (event) => {
-    // エンターキーまたはタブキーが押された場合にタグを追加
     if (event.key === 'Enter' || event.key === 'Tab') {
-      event.preventDefault(); // タブキーでフォーカスが移動しないようにする
+      event.preventDefault(); // フォーカスが移動しないようにする
       if (softName && !tags.includes(softName)) {
         setTags([...tags, softName]);
         setSoftName(''); // ソフト名入力フィールドをリセット
@@ -93,6 +126,14 @@ export default function SignUp(props) {
             console.error('タグの追加に失敗:', error);
           });
       }
+    }
+  };
+
+  // タグの選択
+  const handleTagSelect = (event) => {
+    const selected = event.target.value;
+    if (selected && !tags.includes(selected)) {
+      setTags([...tags, selected]); // 新しいタグを追加
     }
   };
 
@@ -121,7 +162,7 @@ export default function SignUp(props) {
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       in_active: data.get('in_active'),
-      soft_id: tags.join(','), // タグをカンマ区切りで保存
+      soft_id: tags.map(tag => parseInt(tag)),  // タグを整数型のリストに変換
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
     };
@@ -217,8 +258,8 @@ export default function SignUp(props) {
                   id="soft_name"
                   label="導入ソフト"
                   value={softName}
-                  onChange={(event) => setSoftName(event.target.value)}
-                  onKeyDown={handleKeyDown} // タグ追加の処理
+                  onChange={handleSoftNameChange} // ソフト名変更時にIDを取得
+                  onKeyDown={handleKeyDown} // エンターまたはタブキーでタグ追加
                 />
                 <Box sx={{ mt: 2 }}>
                   {/* タグ表示 */}
@@ -231,6 +272,22 @@ export default function SignUp(props) {
                     />
                   ))}
                 </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>タグ選択</InputLabel>
+                  <Select
+                    value={selectedTag}
+                    onChange={handleTagSelect}  // 既存タグを選択
+                  >
+                    <MenuItem value="">タグを選択</MenuItem>
+                    {availableTags.map((tag) => (
+                      <MenuItem key={tag.id} value={tag.name}>
+                        {tag.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>

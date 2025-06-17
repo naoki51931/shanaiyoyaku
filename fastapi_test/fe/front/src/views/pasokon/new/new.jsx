@@ -29,17 +29,18 @@ function Copyright(props) {
 }
 
 const defaultTheme = createTheme();
+const BASE_URL = "http://localhost:8000";
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [seats, setSeats] = useState([]);
   const [filteredSeats, setFilteredSeats] = useState([]);
-  const [tags, setTags] = useState([]); // タグの状態を管理
+  const [tags, setTags] = useState([]); // タグのID（整数型）のリスト
   const [softName, setSoftName] = useState(''); // ソフト名の入力状態
   const [availableTags, setAvailableTags] = useState([]); // 既存のタグを管理
 
   useEffect(() => {
-    axios.get('http://localhost:8000/office/all/')
+    axios.get(`${BASE_URL}/office/all/`)
       .then((res) => {
         setOffices(res.data);
       })
@@ -49,7 +50,7 @@ export default function SignUp(props) {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/seat/all/')
+    axios.get(`${BASE_URL}/seat/all/`)
       .then((res) => {
         setSeats(res.data);
       })
@@ -59,9 +60,9 @@ export default function SignUp(props) {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/tags/')
+    axios.get(`${BASE_URL}/tags/`)  // 既存タグを取得
       .then((res) => {
-        setAvailableTags(res.data);  // 既存のタグをセット
+        setAvailableTags(res.data);
       })
       .catch((error) => {
         console.error('タグ情報の取得に失敗:', error);
@@ -81,13 +82,15 @@ export default function SignUp(props) {
     if (event.key === 'Enter' || event.key === 'Tab') {
       event.preventDefault(); // タブキーでフォーカスが移動しないようにする
       if (softName && !tags.includes(softName)) {
-        setTags([...tags, softName]);
-        setSoftName(''); // 入力フィールドをリセット
-        // 新しいタグがあれば、バックエンドに追加する
-        axios.post('http://localhost:8000/tags/', { tag_name: softName })
-          .then(() => {
-            // タグが追加された後、新しいタグリストを再取得
-            axios.get('http://localhost:8000/tags/')
+        // ソフト名で新しいタグを追加
+        axios.post(`${BASE_URL}/tags/`, { tag_name: softName })
+          .then((res) => {
+            // 新しいタグIDを取得
+            const newTagId = res.data.id;
+            setTags([...tags, newTagId]); // 新しいタグのIDを追加
+            setSoftName(''); // 入力フィールドをリセット
+            // 新しいタグが追加された後、新しいタグリストを再取得
+            axios.get(`${BASE_URL}/tags/`)
               .then((res) => setAvailableTags(res.data));
           })
           .catch((error) => {
@@ -102,32 +105,39 @@ export default function SignUp(props) {
     setTags(newTags);
   };
 
+  const handleTagSelect = (event) => {
+    const selectedTagId = event.target.value;
+    if (selectedTagId && !tags.includes(selectedTagId)) {
+      setTags([...tags, selectedTagId]); // 既存タグIDを追加
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    const isLoggedIn = Boolean(localStorage.getItem('token'));
-    const token = isLoggedIn ? localStorage.getItem('token') : null;
-    const decodedToken = token ? jwtDecode(token) : null;
-    const loginUserPosition = decodedToken?.position || 'C'; // ログインユーザーの役職を取得
-
-    const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
+    const token = localStorage.getItem('token');
+    if (typeof token !== 'string') {
+      console.error("Invalid token:", token);
+    }
+    const decodedToken = jwtDecode(token);
+    const loginUserIsApproval = decodedToken?.is_approval;
 
     const Approval_level = 2;
     if (loginUserIsApproval !== Approval_level) {
-      alert("パソコン登録には管理者及び上位ユーザーの承認が必要です。");
+      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
       return;
     }
 
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       in_active: data.get('in_active'),
-      soft_id: tags.join(','), // タグをカンマ区切りで保存
+      soft_id: tags, // タグIDのリストをそのまま送信
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
     };
 
-    axios.post('http://localhost:8000/pasokon/new/', pasokon, {
+    axios.post(`${BASE_URL}/pasokon/new/`, pasokon, {
       headers: {
         'Content-Type': 'application/json'
       },
@@ -201,22 +211,38 @@ export default function SignUp(props) {
                   fullWidth
                   id="soft_name"
                   label="導入ソフト"
-                  autoFocus
                   value={softName}
                   onChange={(event) => setSoftName(event.target.value)}
                   onKeyDown={handleKeyDown} // タグ追加の処理
                 />
                 <Box sx={{ mt: 2 }}>
-                  {/* タグ表示 */}
-                  {tags.map((tag, index) => (
+                  {/* テキスト入力と選択されたタグ表示 */}
+                  {tags.map((tagId, index) => (
                     <Chip
                       key={index}
-                      label={tag}
+                      label={tagId}  // タグIDを表示（タグ名ではなくID）
                       onDelete={() => handleTagDelete(index)}
                       sx={{ margin: 0.5 }}
                     />
                   ))}
                 </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="tag-select-label">タグ選択</InputLabel>
+                  <Select
+                    labelId="tag-select-label"
+                    value=""
+                    onChange={handleTagSelect}  // 既存タグを選択
+                  >
+                    <MenuItem value="">タグを選択</MenuItem>
+                    {availableTags.map((tag) => (
+                      <MenuItem key={tag.id} value={tag.id}>
+                        {tag.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
