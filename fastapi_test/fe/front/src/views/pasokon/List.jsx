@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,16 +13,28 @@ import Modal from "react-modal";
 import axios from 'axios';
 
 export default function List(props) {
-    const [editModalIsOpen, setEditModalIsOpen] = React.useState(false);
-    const [id, setId] = React.useState("");
-    const [pasokon_name, setPasokon_name] = React.useState("");
-    const [in_active, setIn_active] = React.useState("");
-    const [soft_id, setSoft_id] = React.useState("");
-    const [soft_name, setSoft_name] = React.useState("");
-    const [office_id, setOffice_id] = React.useState("");
-    const [office_name, setOffice_name] = React.useState("");
-    const [seat_id, setSeat_id] = React.useState("");
-    const [seat_name, setSeat_name] = React.useState("");
+    const [editModalIsOpen, setEditModalIsOpen] = useState(false);
+    const [id, setId] = useState("");
+    const [pasokon_name, setPasokon_name] = useState("");
+    const [in_active, setIn_active] = useState("");
+    const [soft_id, setSoft_id] = useState("");
+    const [soft_name, setSoft_name] = useState("");
+    const [office_id, setOffice_id] = useState("");
+    const [office_name, setOffice_name] = useState("");
+    const [seat_id, setSeat_id] = useState("");
+    const [seat_name, setSeat_name] = useState("");
+    const [availableTags, setAvailableTags] = useState([]);
+
+    // ソフトIDに対応するソフト名を取得
+    useEffect(() => {
+        axios.get('http://localhost:8000/tags/')  // ソフト名のリストを取得
+            .then((res) => {
+                setAvailableTags(res.data);
+            })
+            .catch((error) => {
+                console.error('タグ情報の取得に失敗:', error);
+            });
+    }, []);
 
     const openEditModal = (id, pasokon_name, in_active, soft_id, soft_name, office_id, office_name, seat_id, seat_name) => {
         setId(id);
@@ -41,6 +53,12 @@ export default function List(props) {
         setEditModalIsOpen(false);
     }
 
+    // ソフトIDをソフト名に変換するヘルパー関数
+    const getSoftNameFromId = (id) => {
+        const tag = availableTags.find(tag => tag.id === id);
+        return tag ? tag.name : "不明";
+    };
+
     const tableBody = props !== undefined && props.displayFlag ? (
         <TableBody>
             {props.searchResult.map((v) => 
@@ -58,7 +76,7 @@ export default function List(props) {
                         ? "破損"
                         : "不明"}
                     </TableCell>
-                    <TableCell align="left">{v.soft_id}</TableCell>
+                    <TableCell align="left">{getSoftNameFromId(v.soft_id)}</TableCell> {/* ソフトIDをソフト名に変換 */}
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>

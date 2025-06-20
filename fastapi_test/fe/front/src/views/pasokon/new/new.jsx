@@ -62,7 +62,7 @@ export default function SignUp(props) {
   useEffect(() => {
     axios.get(`${BASE_URL}/tags/`)  // 既存タグを取得
       .then((res) => {
-        setAvailableTags(res.data);
+        setAvailableTags(res.data); // 既存のタグリストを設定
       })
       .catch((error) => {
         console.error('タグ情報の取得に失敗:', error);
@@ -83,11 +83,16 @@ export default function SignUp(props) {
       event.preventDefault(); // タブキーでフォーカスが移動しないようにする
       if (softName && !tags.includes(softName)) {
         // ソフト名で新しいタグを追加
-        axios.post(`${BASE_URL}/tags/`, { tag_name: softName })
+        axios.post(`${BASE_URL}/tags/`, { name: softName })
           .then((res) => {
             // 新しいタグIDを取得
             const newTagId = res.data.id;
-            setTags([...tags, newTagId]); // 新しいタグのIDを追加
+            
+            // 新しいタグIDがnullまたはundefinedでない場合のみ追加
+            if (newTagId && !tags.includes(newTagId)) {
+              setTags([...tags, newTagId]); // 新しいタグのIDを追加
+            }
+
             setSoftName(''); // 入力フィールドをリセット
             // 新しいタグが追加された後、新しいタグリストを再取得
             axios.get(`${BASE_URL}/tags/`)
@@ -100,6 +105,7 @@ export default function SignUp(props) {
     }
   };
 
+
   const handleTagDelete = (index) => {
     const newTags = tags.filter((_, tagIndex) => tagIndex !== index);
     setTags(newTags);
@@ -107,10 +113,12 @@ export default function SignUp(props) {
 
   const handleTagSelect = (event) => {
     const selectedTagId = event.target.value;
+    // nullまたはundefinedでない場合のみタグを追加
     if (selectedTagId && !tags.includes(selectedTagId)) {
       setTags([...tags, selectedTagId]); // 既存タグIDを追加
     }
   };
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -129,13 +137,28 @@ export default function SignUp(props) {
       return;
     }
 
+    
+    // soft_names を tags から作成（タグIDではなく、タグ名を使用）
+    const softNamesList = tags.map(tagId => {
+      const tag = availableTags.find(t => t.id === tagId);
+      return tag ? tag.name : null;
+    }).filter(name => name !== null);  // nullのタグ名を除外
+
+    // softIdList を単なる整数のリストとして格納
+    const softIdList = tags;  // 既にタグIDのリストとして格納されているのでそのまま使用
+
+
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       in_active: data.get('in_active'),
-      soft_id: tags, // タグIDのリストをそのまま送信
+      soft_ids: softIdList, // タグIDのリストを送信
+      soft_names: softNamesList, // タグ名のリストを送信
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
     };
+
+    console.log(tags);
+    console.log(pasokon);
 
     axios.post(`${BASE_URL}/pasokon/new/`, pasokon, {
       headers: {
@@ -217,14 +240,18 @@ export default function SignUp(props) {
                 />
                 <Box sx={{ mt: 2 }}>
                   {/* テキスト入力と選択されたタグ表示 */}
-                  {tags.map((tagId, index) => (
-                    <Chip
-                      key={index}
-                      label={tagId}  // タグIDを表示（タグ名ではなくID）
-                      onDelete={() => handleTagDelete(index)}
-                      sx={{ margin: 0.5 }}
-                    />
-                  ))}
+                  {tags.map((tagId, index) => {
+                    if (!tagId) return null;  // tagIdがnullまたはundefinedの場合はスキップ
+                    const tag = availableTags.find(t => t.id === tagId);
+                    return tag ? (
+                      <Chip
+                        key={index}
+                        label={tag.name}  // タグ名を表示
+                        onDelete={() => handleTagDelete(index)}
+                        sx={{ margin: 0.5 }}
+                      />
+                    ) : null;
+                  })}
                 </Box>
               </Grid>
               <Grid item xs={12}>
@@ -238,7 +265,7 @@ export default function SignUp(props) {
                     <MenuItem value="">タグを選択</MenuItem>
                     {availableTags.map((tag) => (
                       <MenuItem key={tag.id} value={tag.id}>
-                        {tag.name}
+                        {tag.name} {/* タグ名を表示 */}
                       </MenuItem>
                     ))}
                   </Select>

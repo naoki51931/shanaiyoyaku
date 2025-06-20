@@ -4,14 +4,12 @@ from database.database import Base
 from models.sqlalchemy.pasokon_tags import PasokonTag  # 中間テーブルをインポート
 from models.sqlalchemy.tag import Tag  # Tagクラスのインポート
 
-
 class Pasokon(Base):
-    __tablename__ = "pasokon" # これを追加
+    __tablename__ = "pasokon"  # これを追加
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     pasokon_name = Column(String(30), unique=True, nullable=False)
     in_active = Column(Integer, nullable=True)
-    soft_id = Column(String(30), ForeignKey("tags.id"), nullable=False)
     office_id = Column(Integer, ForeignKey("office.id"), nullable=False)
     seat_id = Column(Integer,  ForeignKey("seat_regist.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -20,6 +18,7 @@ class Pasokon(Base):
     # Office とのリレーション
     office_in_pasokon = relationship("Office", back_populates="pasokon_in_office")
     seat_in_pasokon = relationship("SeatRegist", back_populates="pasokon_seats")
+
     # タグとのリレーションシップを定義
-    pasokon_tags = relationship("PasokonTag", back_populates="pasokon")
-    tags = relationship("Tag", secondary=PasokonTag.__tablename__, overlaps="pasokon,pasokon_tags")
+    pasokon_tags = relationship("PasokonTag", back_populates="pasokon")  # 中間テーブルとのリレーション
+    tags = relationship("Tag", secondary="pasokon_tags", back_populates="pasokons")  # Pasokon と Tag の多対多リレーション

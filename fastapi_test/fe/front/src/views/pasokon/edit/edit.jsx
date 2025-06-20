@@ -116,7 +116,7 @@ export default function SignUp(props) {
         setTags([...tags, softName]);
         setSoftName(''); // ソフト名入力フィールドをリセット
         // 新しいタグがあれば、バックエンドに追加する
-        axios.post('http://localhost:8000/tags/', { tag_name: softName })
+        axios.post('http://localhost:8000/tags/', { name: softName })
           .then(() => {
             // タグが追加された後、新しいタグリストを再取得
             axios.get('http://localhost:8000/tags/')
@@ -159,10 +159,22 @@ export default function SignUp(props) {
       return;
     }
 
+    
+    // soft_names を tags から作成（タグIDではなく、タグ名を使用）
+    const softNamesList = tags.map(tagId => {
+      const tag = availableTags.find(t => t.id === tagId);
+      return tag ? tag.name : null;
+    }).filter(name => name !== null);  // nullのタグ名を除外
+
+    // softIdList を単なる整数のリストとして格納
+    const softIdList = tags;  // 既にタグIDのリストとして格納されているのでそのまま使用
+
+
     const pasokon = {
       pasokon_name: data.get('pasokon_name'),
       in_active: data.get('in_active'),
-      soft_id: tags.map(tag => parseInt(tag)),  // タグを整数型のリストに変換
+      soft_ids: softIdList, // タグIDのリストを送信
+      soft_names: softNamesList, // タグ名のリストを送信
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
     };
