@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -11,13 +11,17 @@ from models.sqlalchemy.office import Office as DBOffice
 from models.pydantic.pasokon import PasokonCreate, PasokonResponse, PasokonUpdate
 from models.sqlalchemy.seat_regist import SeatRegist as DBSeatRegist
 
-
 router = APIRouter()
 
-# Pasokon作成リクエスト用のPydanticモデル
+# ------------------------------------------------------------------
+# 検索用モデル
+# ------------------------------------------------------------------
 class PasokonSearch(BaseModel):
     query: str
 
+# ------------------------------------------------------------------
+# 検索エンドポイント
+# ------------------------------------------------------------------
 @router.post("/pasokon/search/", response_model=list[PasokonResponse])
 async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(get_db)):
     query = pasokon_search.query.strip()
@@ -35,149 +39,163 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
     )
 
     if not db_pasokons:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matching pasokons found")
+        raise HTTPException(404, "No matching pasokons found")
 
-    results = [
+    return [
         {
-            "id": pasokon.id,
-            "pasokon_name": pasokon.pasokon_name,
-            "in_active": pasokon.in_active,
-            "office_id": pasokon.office_id,
-            "office_name": pasokon.office_in_pasokon.office_name if pasokon.office_in_pasokon else None,
-            "seat_id": pasokon.seat_id,
-            "seat_name": pasokon.seat_in_pasokon.seat_name if pasokon.seat_in_pasokon else None,
-            "created_at": pasokon.created_at,
-            "updated_at": pasokon.updated_at,
-            "soft_ids": [tag.id for tag in pasokon.tags],  # soft_idsを追加
-            "soft_names": [tag.name for tag in pasokon.tags],  # soft_namesを追加
+            "id": p.id,
+            "pasokon_name": p.pasokon_name,
+            "in_active": p.in_active,
+            "office_id": p.office_id,
+            "office_name": p.office_in_pasokon.office_name if p.office_in_pasokon else None,
+            "seat_id": p.seat_id,
+            "seat_name": p.seat_in_pasokon.seat_name if p.seat_in_pasokon else None,
+            "created_at": p.created_at,
+            "updated_at": p.updated_at,
+            "soft_ids": [t.id for t in p.tags],
+            "soft_names": [t.name for t in p.tags],
         }
-        for pasokon in db_pasokons
+        for p in db_pasokons
     ]
 
-    return results
-
+# ------------------------------------------------------------------
+# 新規作成
+# ------------------------------------------------------------------
 @router.post("/pasokon/new/", response_model=PasokonResponse)
 async def create_pasokon(pasokon: PasokonCreate, db: Session = Depends(get_db)):
     try:
-        # soft_names が None の場合は空リストとして扱う
-        soft_names = pasokon.soft_names if pasokon.soft_names else []
+        # ---------- タグ準備 ----------
+        tag_objs = []
+        for name in pasokon.soft_names or []:
+            tag = db.query(Tag).filter(Tag.name == name).first()
+            if not tag:
+                tag = Tag(name=name)
+                db.add(tag)
+                db.flush()  # id 取得
+            tag_objs.append(tag)
 
-        # タグ名を受け取って、Tagオブジェクトを取得または新規作成
-        tags = []
-        for tag_name in soft_names:
-            existing_tag = db.query(Tag).filter(Tag.name == tag_name).first()
-            if existing_tag:
-                tags.append(existing_tag)  # 既存タグを使用
-            else:
-                new_tag = Tag(name=tag_name)  # 新しいタグを作成
-                db.add(new_tag)
-                db.commit()
-                db.refresh(new_tag)
-                tags.append(new_tag)  # 新しいタグをリストに追加する
+        # ---------- 外部キー存在チェック ----------
+        office = db.query(DBOffice).filter(DBOffice.id == pasokon.office_id).first()
+        if not office:
+            raise HTTPException(404, "Office not found")
 
-        # Pasokon作成
+        seat = db.query(DBSeatRegist).filter(DBSeatRegist.id == pasokon.seat_id).first()
+        if not seat:
+            raise HTTPException(404, "Seat not found")
+
+        # ---------- 重複チェック ----------
+        if db.query(DBPasokon).filter(DBPasokon.pasokon_name == pasokon.pasokon_name).first():
+            raise HTTPException(409, "pasokon_name already exists")
+
+        # ---------- Pasokon 作成 ----------
         db_pasokon = DBPasokon(
             pasokon_name=pasokon.pasokon_name,
             in_active=pasokon.in_active,
-            # ソフト名をタグIDのリストに変換
-            soft_ids=[tag.id for tag in tags],  # タグIDをリストとして格納
-            soft_names=[tag.name for tag in tags],  # タグ名をリストとして格納
             office_id=pasokon.office_id,
             seat_id=pasokon.seat_id,
         )
+        db_pasokon.tags = tag_objs
 
         db.add(db_pasokon)
         db.commit()
         db.refresh(db_pasokon)
-
         return db_pasokon
 
+    except IntegrityError as e:
+        db.rollback()
+        # 万一のユニーク制約違反 (念のため)
+        raise HTTPException(409, "Duplicate pasokon_name") from e
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database error occurred") from e
+        raise HTTPException(400, "Database error") from e
 
+# ------------------------------------------------------------------
+# 一覧取得
+# ------------------------------------------------------------------
 @router.get("/pasokon/all/")
 def read_pasokon_all(db: Session = Depends(get_db)):
-    try:
-        pasokons_data = db.query(DBPasokon).all()
-        results = [
-            {
-                "id": pasokon.id,
-                "pasokon_name": pasokon.pasokon_name,
-                "in_active": pasokon.in_active,
-                "office_id": pasokon.office_id,
-                "office_name": pasokon.office_in_pasokon.office_name if pasokon.office_in_pasokon else None,
-                "seat_id": pasokon.seat_id,
-                "seat_name": pasokon.seat_in_pasokon.seat_name if pasokon.seat_in_pasokon else None,
-                "soft_ids": [tag.id for tag in pasokon.tags],  # ここでsoft_idsを追加
-                "soft_names": [tag.name for tag in pasokon.tags],  # ここでsoft_namesを追加
-                "created_at": pasokon.created_at.isoformat() if pasokon.created_at else None,
-                "updated_at": pasokon.updated_at.isoformat() if pasokon.updated_at else None,
-            }
-            for pasokon in pasokons_data
-        ]
-        return results
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
+    pasokons = db.query(DBPasokon).all()
+    return [
+        {
+            "id": p.id,
+            "pasokon_name": p.pasokon_name,
+            "in_active": p.in_active,
+            "office_id": p.office_id,
+            "office_name": p.office_in_pasokon.office_name if p.office_in_pasokon else None,
+            "seat_id": p.seat_id,
+            "seat_name": p.seat_in_pasokon.seat_name if p.seat_in_pasokon else None,
+            "soft_ids": [t.id for t in p.tags],
+            "soft_names": [t.name for t in p.tags],
+            "created_at": p.created_at.isoformat() if p.created_at else None,
+            "updated_at": p.updated_at.isoformat() if p.updated_at else None,
+        }
+        for p in pasokons
+    ]
 
+# ------------------------------------------------------------------
+# 個別取得
+# ------------------------------------------------------------------
 @router.get("/pasokon/{pasokon_id}", response_model=PasokonResponse)
 def read_pasokon_by_id(pasokon_id: int, db: Session = Depends(get_db)):
     db_pasokon = db.query(DBPasokon).filter(DBPasokon.id == pasokon_id).first()
-    if db_pasokon is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pasokon not found")
+    if not db_pasokon:
+        raise HTTPException(404, "Pasokon not found")
     return db_pasokon
 
+# ------------------------------------------------------------------
+# 更新
+# ------------------------------------------------------------------
 @router.put("/pasokon/{pasokon_id}", response_model=PasokonResponse)
 async def update_pasokon(pasokon_id: int, pasokon_update: PasokonUpdate, db: Session = Depends(get_db)):
+    db_pasokon = db.query(DBPasokon).filter(DBPasokon.id == pasokon_id).first()
+    if not db_pasokon:
+        raise HTTPException(404, "Pasokon not found")
+
+    # タグ再構築
+    tags = db.query(Tag).filter(Tag.id.in_(pasokon_update.soft_ids)).all()
+    if len(tags) != len(pasokon_update.soft_ids):
+        raise HTTPException(404, "One or more tags not found")
+    db_pasokon.tags = tags
+
+    # 外部キー存在確認
+    office = db.query(DBOffice).filter(DBOffice.id == pasokon_update.office_id).first()
+    if not office:
+        raise HTTPException(404, "Office not found")
+    seat = db.query(DBSeatRegist).filter(DBSeatRegist.id == pasokon_update.seat_id).first()
+    if not seat:
+        raise HTTPException(404, "Seat not found")
+
+    # 重複名チェック（自分以外）
+    dup = (
+        db.query(DBPasokon)
+        .filter(DBPasokon.pasokon_name == pasokon_update.pasokon_name, DBPasokon.id != pasokon_id)
+        .first()
+    )
+    if dup:
+        raise HTTPException(409, "pasokon_name already exists")
+
+    # 値を反映
+    db_pasokon.pasokon_name = pasokon_update.pasokon_name
+    db_pasokon.in_active = pasokon_update.in_active
+    db_pasokon.office_id = pasokon_update.office_id
+    db_pasokon.seat_id = pasokon_update.seat_id
+
     try:
-        # パソコンIDを使ってデータベースからパソコン情報を取得
-        db_pasokon = db.query(DBPasokon).filter(DBPasokon.id == pasokon_id).first()
-
-        # パソコンが見つからない場合はエラー
-        if db_pasokon is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pasokon not found")
-
-        # タグIDを使って、関連するタグをデータベースから取得
-        tags = db.query(Tag).filter(Tag.id.in_(pasokon_update.soft_ids)).all()
-
-        # タグが見つからない場合はエラー
-        if len(tags) != len(pasokon_update.soft_ids):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="One or more tags not found")
-
-        # パソコンとタグを関連付け
-        db_pasokon.tags = tags
-
-        # 事務所と座席の情報を更新
-        office = db.query(DBOffice).filter(DBOffice.id == pasokon_update.office_id).first()
-        if office is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Office not found")
-        
-        seat = db.query(DBSeatRegist).filter(DBSeatRegist.id == pasokon_update.seat_id).first()
-        if seat is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Seat not found")
-        
-        db_pasokon.office_id = pasokon_update.office_id
-        db_pasokon.seat_id = pasokon_update.seat_id
-
-        # パソコンの他のフィールドを更新
-        db_pasokon.pasokon_name = pasokon_update.pasokon_name
-        db_pasokon.in_active = pasokon_update.in_active
-
-        # 変更をコミット
         db.commit()
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database error occurred") from e
-    finally:
-        # パソコン情報をリフレッシュして最新の状態を取得
         db.refresh(db_pasokon)
         return db_pasokon
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(400, "Database error occurred") from e
 
-@router.delete("/pasokon/{pasokon_id}", status_code=status.HTTP_204_NO_CONTENT)
+# ------------------------------------------------------------------
+# 削除
+# ------------------------------------------------------------------
+@router.delete("/pasokon/{pasokon_id}", status_code=204)
 async def delete_pasokon(pasokon_id: int, db: Session = Depends(get_db)):
     db_pasokon = db.query(DBPasokon).filter(DBPasokon.id == pasokon_id).first()
-    if db_pasokon is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pasokon not found")
+    if not db_pasokon:
+        raise HTTPException(404, "Pasokon not found")
 
     db.delete(db_pasokon)
     db.commit()

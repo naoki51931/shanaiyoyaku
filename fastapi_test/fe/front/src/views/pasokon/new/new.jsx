@@ -1,29 +1,34 @@
-import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-import { useEffect, useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
-import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
-import Chip from '@mui/material/Chip';  // タグ用のChipコンポーネント
+import { useState, useEffect } from "react";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import {
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Chip,
+} from "@mui/material";
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
+      {"Copyright © "}
       <Link color="inherit" href="/">
         Your Website
-      </Link>{' '}
+      </Link>{" "}
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
@@ -31,183 +36,138 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 const BASE_URL = "http://localhost:8000";
 
-export default function SignUp(props) {
+export default function NewPasokon(props) {
+  /* ------------------------------------------------------------------ */
+  /*                           master data                              */
+  /* ------------------------------------------------------------------ */
   const [offices, setOffices] = useState([]);
   const [seats, setSeats] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]); // [{id,name}]
+
+  /* ------------------------------------------------------------------ */
+  /*                           local state                              */
+  /* ------------------------------------------------------------------ */
   const [filteredSeats, setFilteredSeats] = useState([]);
-  const [tags, setTags] = useState([]); // タグのID（整数型）のリスト
-  const [softName, setSoftName] = useState(''); // ソフト名の入力状態
-  const [availableTags, setAvailableTags] = useState([]); // 既存のタグを管理
+  const [tags, setTags] = useState([]);               // [{id,name}] selected for this pasokon
+  const [softName, setSoftName] = useState("");      // typing buffer
+  const [selectedTag, setSelectedTag] = useState(""); // dropdown
 
+  /* ------------------------------------------------------------------ */
+  /*                               fetch                                */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
-    axios.get(`${BASE_URL}/office/all/`)
-      .then((res) => {
-        setOffices(res.data);
-      })
-      .catch((error) => {
-        console.error('オフィス情報の取得に失敗:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    axios.get(`${BASE_URL}/seat/all/`)
-      .then((res) => {
-        setSeats(res.data);
-      })
-      .catch((error) => {
-        console.error('シート情報の取得に失敗:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    axios.get(`${BASE_URL}/tags/`)  // 既存タグを取得
-      .then((res) => {
-        setAvailableTags(res.data); // 既存のタグリストを設定
-      })
-      .catch((error) => {
-        console.error('タグ情報の取得に失敗:', error);
-      });
+    axios.get(`${BASE_URL}/office/all/`).then((res) => setOffices(res.data));
+    axios.get(`${BASE_URL}/seat/all/`).then((res) => setSeats(res.data));
+    axios.get(`${BASE_URL}/tags/`).then((res) => setAvailableTags(res.data));
   }, []);
 
   useEffect(() => {
     if (props.office_id) {
-      const filtered = seats.filter(seat => seat.office_id === props.office_id);
-      setFilteredSeats(filtered);
+      setFilteredSeats(seats.filter((s) => s.office_id === props.office_id));
     } else {
       setFilteredSeats([]);
     }
   }, [props.office_id, seats]);
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter' || event.key === 'Tab') {
-      event.preventDefault(); // タブキーでフォーカスが移動しないようにする
-      if (softName && !tags.includes(softName)) {
-        // ソフト名で新しいタグを追加
-        axios.post(`${BASE_URL}/tags/`, { name: softName })
-          .then((res) => {
-            // 新しいタグIDを取得
-            const newTagId = res.data.id;
-            
-            // 新しいタグIDがnullまたはundefinedでない場合のみ追加
-            if (newTagId && !tags.includes(newTagId)) {
-              setTags([...tags, newTagId]); // 新しいタグのIDを追加
-            }
+  /* ------------------------------------------------------------------ */
+  /*                            tag helpers                             */
+  /* ------------------------------------------------------------------ */
+  const handleKeyDown = async (e) => {
+    if (e.key !== "Enter" && e.key !== "Tab") return;
+    e.preventDefault();
 
-            setSoftName(''); // 入力フィールドをリセット
-            // 新しいタグが追加された後、新しいタグリストを再取得
-            axios.get(`${BASE_URL}/tags/`)
-              .then((res) => setAvailableTags(res.data));
-          })
-          .catch((error) => {
-            console.error('タグの追加に失敗:', error);
-          });
-      }
+    const name = softName.trim();
+    if (!name || tags.some((t) => t.name === name)) return;
+
+    try {
+      const { data: newTag } = await axios.post(`${BASE_URL}/tags/`, { name });
+      setTags((prev) => [...prev, newTag]);
+      setAvailableTags((prev) => [...prev, newTag]);
+      setSoftName("");
+    } catch (err) {
+      console.error("タグの追加に失敗:", err);
     }
   };
 
+  const handleTagSelect = (e) => {
+    const id = e.target.value;
+    setSelectedTag(id);
 
-  const handleTagDelete = (index) => {
-    const newTags = tags.filter((_, tagIndex) => tagIndex !== index);
-    setTags(newTags);
+    if (!id || tags.some((t) => t.id === id)) return;
+    const tagObj = availableTags.find((t) => t.id === id);
+    if (tagObj) setTags((prev) => [...prev, tagObj]);
   };
 
-  const handleTagSelect = (event) => {
-    const selectedTagId = event.target.value;
-    // nullまたはundefinedでない場合のみタグを追加
-    if (selectedTagId && !tags.includes(selectedTagId)) {
-      setTags([...tags, selectedTagId]); // 既存タグIDを追加
-    }
-  };
+  const handleTagDelete = (tagId) => setTags((prev) => prev.filter((t) => t.id !== tagId));
 
+  /* ------------------------------------------------------------------ */
+  /*                             submit                                  */
+  /* ------------------------------------------------------------------ */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const token = localStorage.getItem("token");
+    if (!token) return alert("ログイン情報がありません。");
 
-    const token = localStorage.getItem('token');
-    if (typeof token !== 'string') {
-      console.error("Invalid token:", token);
-    }
-    const decodedToken = jwtDecode(token);
-    const loginUserIsApproval = decodedToken?.is_approval;
-
-    const Approval_level = 2;
-    if (loginUserIsApproval !== Approval_level) {
-      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
-      return;
+    const { is_approval } = jwtDecode(token);
+    if (is_approval !== 2) {
+      return alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
     }
 
-    
-    // soft_names を tags から作成（タグIDではなく、タグ名を使用）
-    const softNamesList = tags.map(tagId => {
-      const tag = availableTags.find(t => t.id === tagId);
-      return tag ? tag.name : null;
-    }).filter(name => name !== null);  // nullのタグ名を除外
-
-    // softIdList を単なる整数のリストとして格納
-    const softIdList = tags;  // 既にタグIDのリストとして格納されているのでそのまま使用
-
-
-    const pasokon = {
-      pasokon_name: data.get('pasokon_name'),
-      in_active: data.get('in_active'),
-      soft_ids: softIdList, // タグIDのリストを送信
-      soft_names: softNamesList, // タグ名のリストを送信
-      office_id: data.get('office_id'),
-      seat_id: data.get('seat_id'),
+    const data = new FormData(e.currentTarget);
+    const payload = {
+      pasokon_name: data.get("pasokon_name"),
+      in_active: data.get("in_active"),
+      soft_ids: tags.map((t) => t.id),
+      soft_names: tags.map((t) => t.name),
+      office_id: data.get("office_id"),
+      seat_id: data.get("seat_id"),
     };
 
-    console.log(tags);
-    console.log(pasokon);
-
-    axios.post(`${BASE_URL}/pasokon/new/`, pasokon, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true  // 追加（必要なら）
-    })
-      .then(function (res) {
-        console.log(res);
-      })
-      .catch(function (error) {
-        console.log("error", error);
-        alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
+    try {
+      await axios.post(`${BASE_URL}/pasokon/new/`, payload, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
       });
+      props.onCreated?.();
+    } catch (err) {
+      console.error("error", err);
+      alert(`エラーが発生しました: ${err.response?.data?.detail ?? "不明なエラー"}`);
+    }
   };
 
+  /* ------------------------------------------------------------------ */
+  /*                                UI                                  */
+  /* ------------------------------------------------------------------ */
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+        <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            New
+            New Pasokon
           </Typography>
+
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
+              {/* パソコン名 */}
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="pasokon_name"
-                  name="pasokon_name"
                   required
                   fullWidth
                   id="pasokon_name"
+                  name="pasokon_name"
                   label="パソコン名"
                   autoFocus
-                  value={props.pasokon_name ?? ''}
-                  onChange={(event) => props.setPasokon_name && props.setPasokon_name(event.target.value)}
+                  value={props.pasokon_name ?? ""}
+                  onChange={(e) => props.setPasokon_name?.(e.target.value)}
                 />
               </Grid>
+
+              {/* 使用可不可 */}
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="in-active-select-label">使用可不可</InputLabel>
@@ -215,9 +175,9 @@ export default function SignUp(props) {
                     labelId="in-active-select-label"
                     id="in_active"
                     name="in_active"
-                    value={props.in_active === null || props.in_active === undefined ? 0 : props.in_active}
                     label="使用可不可"
-                    onChange={(event) => props.setIn_active && props.setIn_active(parseInt(event.target.value, 10))}
+                    value={props.in_active ?? 0}
+                    onChange={(e) => props.setIn_active?.(Number(e.target.value))}
                   >
                     <MenuItem value={0}>不可</MenuItem>
                     <MenuItem value={1}>予約中</MenuItem>
@@ -226,51 +186,51 @@ export default function SignUp(props) {
                   </Select>
                 </FormControl>
               </Grid>
+
+              {/* ソフト入力 */}
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="soft_name"
-                  name="soft_name"
-                  required
                   fullWidth
                   id="soft_name"
-                  label="導入ソフト"
+                  name="soft_name"
+                  label="導入ソフト (Enter/Tab で追加)"
                   value={softName}
-                  onChange={(event) => setSoftName(event.target.value)}
-                  onKeyDown={handleKeyDown} // タグ追加の処理
+                  onChange={(e) => setSoftName(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
                 <Box sx={{ mt: 2 }}>
-                  {/* テキスト入力と選択されたタグ表示 */}
-                  {tags.map((tagId, index) => {
-                    if (!tagId) return null;  // tagIdがnullまたはundefinedの場合はスキップ
-                    const tag = availableTags.find(t => t.id === tagId);
-                    return tag ? (
-                      <Chip
-                        key={index}
-                        label={tag.name}  // タグ名を表示
-                        onDelete={() => handleTagDelete(index)}
-                        sx={{ margin: 0.5 }}
-                      />
-                    ) : null;
-                  })}
+                  {tags.map((tag) => (
+                    <Chip
+                      key={tag.id}
+                      label={tag.name}
+                      onDelete={() => handleTagDelete(tag.id)}
+                      sx={{ m: 0.5 }}
+                    />
+                  ))}
                 </Box>
               </Grid>
+
+              {/* 既存タグ選択 */}
               <Grid item xs={12}>
-                <FormControl fullWidth required>
+                <FormControl fullWidth>
                   <InputLabel id="tag-select-label">タグ選択</InputLabel>
                   <Select
                     labelId="tag-select-label"
-                    value=""
-                    onChange={handleTagSelect}  // 既存タグを選択
+                    value={selectedTag}
+                    label="タグ選択"
+                    onChange={handleTagSelect}
                   >
                     <MenuItem value="">タグを選択</MenuItem>
                     {availableTags.map((tag) => (
                       <MenuItem key={tag.id} value={tag.id}>
-                        {tag.name} {/* タグ名を表示 */}
+                        {tag.name}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
+
+              {/* 事務所 */}
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="office-select-label">事務所</InputLabel>
@@ -278,9 +238,9 @@ export default function SignUp(props) {
                     labelId="office-select-label"
                     id="office_id"
                     name="office_id"
-                    value={props.office_id ?? ''}
                     label="事務所"
-                    onChange={(event) => props.setOffice_id && props.setOffice_id(event.target.value)}
+                    value={props.office_id ?? ""}
+                    onChange={(e) => props.setOffice_id?.(Number(e.target.value))}
                   >
                     <MenuItem value="">オフィスを選択してください</MenuItem>
                     {offices.map((office) => (
@@ -291,6 +251,8 @@ export default function SignUp(props) {
                   </Select>
                 </FormControl>
               </Grid>
+
+              {/* 座席 */}
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="seat-select-label">座席</InputLabel>
@@ -298,9 +260,9 @@ export default function SignUp(props) {
                     labelId="seat-select-label"
                     id="seat_id"
                     name="seat_id"
-                    value={props.seat_id ?? ''}
                     label="座席"
-                    onChange={(event) => props.setSeat_id && props.setSeat_id(event.target.value)}
+                    value={props.seat_id ?? ""}
+                    onChange={(e) => props.setSeat_id?.(Number(e.target.value))}
                   >
                     <MenuItem value="">座席を選択してください</MenuItem>
                     {filteredSeats.map((seat) => (
@@ -312,12 +274,8 @@ export default function SignUp(props) {
                 </FormControl>
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
+
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Create
             </Button>
           </Box>

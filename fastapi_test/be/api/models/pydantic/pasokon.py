@@ -5,10 +5,9 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 class PasokonCreate(BaseModel):
     pasokon_name: Optional[str] = None
     in_active: Optional[int] = None
-    soft_ids: List[int] = []  # 空リストをデフォルト値として設定
-    soft_names: List[str] = []  # 空リストをデフォルト値として設定
-    office_id: Optional[str] = None
-    seat_id: Optional[str] = None
+    soft_names: list[str] = []   # ← 名前だけ受け取り
+    office_id: Optional[int] = None
+    seat_id: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -16,9 +15,8 @@ class PasokonUpdate(BaseModel):
     pasokon_name: Optional[str] = None
     in_active: Optional[int] = None
     soft_ids: List[int] = []  # 空リストをデフォルト値として設定
-    soft_names: List[str] = []  # 空リストをデフォルト値として設定
-    office_id: Optional[str] = None
-    seat_id: Optional[str] = None
+    office_id: Optional[int] = None
+    seat_id: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
 

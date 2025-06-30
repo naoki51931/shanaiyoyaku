@@ -44,7 +44,6 @@ CREATE TABLE `pasokon` (
     id INT NOT NULL AUTO_INCREMENT,
     pasokon_name VARCHAR(30) UNIQUE NOT NULL,
     in_active INT DEFAULT 1,  -- Optional: 'in_active'にデフォルト値を設定（例：1をデフォルト）
-    soft_id VARCHAR(30) NOT NULL,
     office_id INT NOT NULL,
     seat_id INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
