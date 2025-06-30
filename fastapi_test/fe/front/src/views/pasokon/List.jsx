@@ -54,10 +54,10 @@ export default function List(props) {
     }
 
     // ソフトIDをソフト名に変換するヘルパー関数
-    const getSoftNameFromId = (id) => {
-        const tag = availableTags.find(tag => tag.id === id);
-        return tag ? tag.name : "不明";
-    };
+    // const getSoftNameFromId = (id) => {
+    //     const tag = availableTags.find(tag => tag.id === id);
+    //     return tag ? tag.name : "不明";
+    // };
 
     const tableBody = props !== undefined && props.displayFlag ? (
         <TableBody>
@@ -76,14 +76,18 @@ export default function List(props) {
                         ? "破損"
                         : "不明"}
                     </TableCell>
-                    <TableCell align="left">{getSoftNameFromId(v.soft_id)}</TableCell> {/* ソフトIDをソフト名に変換 */}
+                    <TableCell align="left">
+                        {Array.isArray(v.soft_names) && v.soft_names.length
+                        ? v.soft_names.join(', ')
+                        : 'なし'}
+                    </TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.in_active, v.soft_id, v.soft_name, v.office_id, v.office_name, v.seat_id, v.seat_name)}}>
+                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.in_active, v.soft_ids, v.soft_names, v.office_id, v.office_name, v.seat_id, v.seat_name)}}>
                             Edit
                         </Button>
                     </TableCell>

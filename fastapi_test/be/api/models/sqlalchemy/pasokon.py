@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from database.database import Base
 from models.sqlalchemy.pasokon_tags import PasokonTag  # 中間テーブルをインポート
 from models.sqlalchemy.tag import Tag  # Tagクラスのインポート
+from sqlalchemy.ext.hybrid import hybrid_property
 
 class Pasokon(Base):
     __tablename__ = "pasokon"  # これを追加
@@ -22,3 +23,12 @@ class Pasokon(Base):
     # タグとのリレーションシップを定義
     pasokon_tags = relationship("PasokonTag", back_populates="pasokon")  # 中間テーブルとのリレーション
     tags = relationship("Tag", secondary="pasokon_tags", back_populates="pasokons")  # Pasokon と Tag の多対多リレーション
+
+
+    @hybrid_property
+    def soft_ids(self):
+        return [tag.id for tag in self.tags]
+
+    @hybrid_property
+    def soft_names(self):
+        return [tag.name for tag in self.tags]
