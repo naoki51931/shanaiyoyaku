@@ -46,6 +46,7 @@ CREATE TABLE `pasokon` (
     in_active INT DEFAULT 1,  -- Optional: 'in_active'にデフォルト値を設定（例：1をデフォルト）
     office_id INT NOT NULL,
     seat_id INT NOT NULL,
+    performance TEXT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (office_id) REFERENCES office(id),

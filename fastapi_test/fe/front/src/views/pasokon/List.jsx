@@ -17,12 +17,13 @@ export default function List(props) {
     const [id, setId] = useState("");
     const [pasokon_name, setPasokon_name] = useState("");
     const [in_active, setIn_active] = useState("");
-    const [soft_id, setSoft_id] = useState("");
-    const [soft_name, setSoft_name] = useState("");
+    const [soft_ids, setSoft_ids] = useState([]);
+    const [soft_names, setSoft_names] = useState([]);
     const [office_id, setOffice_id] = useState("");
     const [office_name, setOffice_name] = useState("");
     const [seat_id, setSeat_id] = useState("");
     const [seat_name, setSeat_name] = useState("");
+    const [performance, setPerformance] = useState("");
     const [availableTags, setAvailableTags] = useState([]);
 
     // ソフトIDに対応するソフト名を取得
@@ -36,16 +37,17 @@ export default function List(props) {
             });
     }, []);
 
-    const openEditModal = (id, pasokon_name, in_active, soft_id, soft_name, office_id, office_name, seat_id, seat_name) => {
+    const openEditModal = (id, pasokon_name, in_active, soft_ids, soft_names, office_id, office_name, seat_id, seat_name, performance) => {
         setId(id);
         setPasokon_name(pasokon_name);
         setIn_active(in_active);
-        setSoft_id(soft_id);
-        setSoft_name(soft_name);
+        setSoft_ids(soft_ids);
+        setSoft_names(soft_names);
         setOffice_id(office_id);
         setOffice_name(office_name);
         setSeat_id(seat_id);
         setSeat_name(seat_name);
+        setPerformance(performance);
         setEditModalIsOpen(true);
     };
 
@@ -83,11 +85,12 @@ export default function List(props) {
                     </TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
+                    <TableCell align="left">{v.performance}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.in_active, v.soft_ids, v.soft_names, v.office_id, v.office_name, v.seat_id, v.seat_name)}}>
+                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.in_active, v.soft_ids, v.soft_names, v.office_id, v.office_name, v.seat_id, v.seat_name, v.performance)}}>
                             Edit
                         </Button>
                     </TableCell>
@@ -107,6 +110,7 @@ export default function List(props) {
                         <TableCell align="left">導入ソフト</TableCell>
                         <TableCell align="left">事業所名</TableCell>
                         <TableCell align="left">座席名</TableCell>
+                        <TableCell align="left">性能</TableCell>
                         <TableCell align="left">作成日時</TableCell>
                         <TableCell align="left">更新日時</TableCell>
                     </TableRow>
@@ -133,7 +137,7 @@ export default function List(props) {
                 >
                     <Edit
                         setEditModalIsOpen={setEditModalIsOpen}
-                        id={id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} in_active={in_active} setIn_active={setIn_active} soft_id={soft_id} setSoft_id={setSoft_id} soft_name={soft_name} setSoft_name={setSoft_name} office_id={office_id} setOffice_id={setOffice_id} office_name={office_name} setOffice_name={setOffice_name} seat_id={seat_id} setSeat_id={setSeat_id} seat_name={seat_name} setSeat_name={setSeat_name}
+                        id={id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} in_active={in_active} setIn_active={setIn_active} soft_ids={soft_ids} setSoft_ids={setSoft_ids} soft_names={soft_names} setSoft_names={setSoft_names} office_id={office_id} setOffice_id={setOffice_id} office_name={office_name} setOffice_name={setOffice_name} seat_id={seat_id} setSeat_id={setSeat_id} seat_name={seat_name} setSeat_name={setSeat_name} performance={performance} setPerformance={setPerformance}
                     />
                 </Modal>
             </div>

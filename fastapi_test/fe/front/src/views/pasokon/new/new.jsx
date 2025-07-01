@@ -122,6 +122,7 @@ export default function NewPasokon(props) {
       soft_names: tags.map((t) => t.name),
       office_id: data.get("office_id"),
       seat_id: data.get("seat_id"),
+      performance: data.get("performance"),
     };
 
     try {
@@ -272,6 +273,18 @@ export default function NewPasokon(props) {
                     ))}
                   </Select>
                 </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="performance"
+                  name="performance"
+                  label="性能"
+                  autoFocus
+                  value={props.performance ?? ""}
+                  onChange={(e) => props.setPerformance?.(e.target.value)}
+                />
               </Grid>
             </Grid>
 

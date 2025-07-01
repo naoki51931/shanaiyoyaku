@@ -16,12 +16,14 @@ export default function Pasokon() {
   const [flag, setFlag] = useState(false);
   const [pasokon_name, setPasokon_name] = React.useState("");
   const [in_active, setIn_active] = React.useState("");
-  const [soft_id, setSoft_id] = React.useState("");
-  const [soft_name, setSoft_name] = React.useState("");
+  const [soft_ids, setSoft_ids] = React.useState([]);
+  const [soft_names, setSoft_names] = React.useState([]);
   const [office_id, setOffice_id] = React.useState("");
   const [office_name, setOffice_name] = React.useState("");
   const [seat_id, setSeat_id] = React.useState("");
   const [seat_name, setSeat_name] = React.useState("");
+  const [performance, setPerformance] = React.useState("");
+
 
   return (
     <Routes>
@@ -41,10 +43,10 @@ export default function Pasokon() {
             setPasokon_name={setPasokon_name}
             in_active={in_active}
             setIn_active={setIn_active}
-            soft_id={soft_id}
-            setSoft_id={setSoft_id}
-            soft_name={soft_name}
-            setSoft_name={setSoft_name}
+            soft_ids={soft_ids}
+            setSoft_ids={setSoft_ids}
+            soft_names={soft_names}
+            setSoft_names={setSoft_names}
             office_id={office_id}
             setOffice_id={setOffice_id}
             office_name={office_name}
@@ -53,6 +55,8 @@ export default function Pasokon() {
             setSeat_id={setSeat_id}
             seat_name={seat_name}
             setSeat_name={setSeat_name}
+            performance={performance}
+            setPerformance={setPerformance}
           />}
         />
     </Routes>

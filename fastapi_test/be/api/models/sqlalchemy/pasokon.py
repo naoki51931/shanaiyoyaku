@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, func
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text, DateTime, func
 from sqlalchemy.orm import relationship
 from database.database import Base
 from models.sqlalchemy.pasokon_tags import PasokonTag  # 中間テーブルをインポート
@@ -13,6 +13,7 @@ class Pasokon(Base):
     in_active = Column(Integer, nullable=True)
     office_id = Column(Integer, ForeignKey("office.id"), nullable=False)
     seat_id = Column(Integer,  ForeignKey("seat_regist.id"), nullable=False)
+    performance = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 

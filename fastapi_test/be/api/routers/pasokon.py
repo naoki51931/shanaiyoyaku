@@ -50,6 +50,7 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
             "office_name": p.office_in_pasokon.office_name if p.office_in_pasokon else None,
             "seat_id": p.seat_id,
             "seat_name": p.seat_in_pasokon.seat_name if p.seat_in_pasokon else None,
+            "performance": p.performance,
             "created_at": p.created_at,
             "updated_at": p.updated_at,
             "soft_ids": [t.id for t in p.tags],
@@ -93,6 +94,7 @@ async def create_pasokon(pasokon: PasokonCreate, db: Session = Depends(get_db)):
             in_active=pasokon.in_active,
             office_id=pasokon.office_id,
             seat_id=pasokon.seat_id,
+            performance=pasokon.performance,
         )
         db_pasokon.tags = tag_objs
 
@@ -126,6 +128,7 @@ def read_pasokon_all(db: Session = Depends(get_db)):
             "seat_name": p.seat_in_pasokon.seat_name if p.seat_in_pasokon else None,
             "soft_ids": [t.id for t in p.tags],
             "soft_names": [t.name for t in p.tags],
+            "performance": p.performance,
             "created_at": p.created_at.isoformat() if p.created_at else None,
             "updated_at": p.updated_at.isoformat() if p.updated_at else None,
         }
@@ -179,6 +182,7 @@ async def update_pasokon(pasokon_id: int, pasokon_update: PasokonUpdate, db: Ses
     db_pasokon.in_active = pasokon_update.in_active
     db_pasokon.office_id = pasokon_update.office_id
     db_pasokon.seat_id = pasokon_update.seat_id
+    db_pasokon.performance = pasokon_update.performance
 
     try:
         db.commit()
