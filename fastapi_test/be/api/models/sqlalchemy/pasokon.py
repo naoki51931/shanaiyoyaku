@@ -24,6 +24,12 @@ class Pasokon(Base):
     # タグとのリレーションシップを定義
     pasokon_tags = relationship("PasokonTag", back_populates="pasokon")  # 中間テーブルとのリレーション
     tags = relationship("Tag", secondary="pasokon_tags", back_populates="pasokons")  # Pasokon と Tag の多対多リレーション
+    
+    seat_reserve_pasokon = relationship(
+        "SeatReservation",
+        back_populates="pasokon_reserve",
+        cascade="all, delete-orphan"
+    )
 
 
     @hybrid_property

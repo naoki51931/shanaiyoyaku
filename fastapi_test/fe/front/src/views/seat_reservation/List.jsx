@@ -81,11 +81,8 @@ export default function List(props) {
                     <TableCell align="left">{v.id}</TableCell>
                     <TableCell align="left">{v.reserve_id}</TableCell>
                     <TableCell align="left">{v.todo_content}</TableCell>
-                    <TableCell align="left">{v.person_id}</TableCell>
                     <TableCell align="left">{v.person_name}</TableCell>
-                    <TableCell align="left">{v.office_id}</TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
-                    <TableCell align="left">{v.seat_id}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left">{formatTime(v.start_time)}</TableCell> {/* 時間のみ表示 */}
                     <TableCell align="left">{formatTime(v.finish_time)}</TableCell> {/* 時間のみ表示 */}
@@ -155,11 +152,8 @@ export default function List(props) {
                                 <TableCell align="left">id</TableCell>
                                 <TableCell align="left">座席予約id</TableCell>
                                 <TableCell align="left">概要</TableCell>
-                                <TableCell align="left">予約者id</TableCell>
                                 <TableCell align="left">予約者名</TableCell>
-                                <TableCell align="left">事務所id</TableCell>
                                 <TableCell align="left">事務所名</TableCell>
-                                <TableCell align="left">予約座席id</TableCell>
                                 <TableCell align="left">予約座席名</TableCell>
                                 <TableCell align="left">開始時間</TableCell>
                                 <TableCell align="left">終了時間</TableCell>

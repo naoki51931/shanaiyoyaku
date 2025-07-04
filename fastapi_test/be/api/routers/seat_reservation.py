@@ -23,7 +23,8 @@ def get_all_reservations(db: Session = Depends(get_db)):
         reservations = db.query(DBSeatReservation).options(
             joinedload(DBSeatReservation.user),
             joinedload(DBSeatReservation.office),
-            joinedload(DBSeatReservation.seat_regist)
+            joinedload(DBSeatReservation.seat_regist),
+            joinedload(DBSeatReservation.pasokon_reserve)
         ).all()
         
         response = []
@@ -38,6 +39,8 @@ def get_all_reservations(db: Session = Depends(get_db)):
                 "office_name": reservation.office.office_name if reservation.office else "不明",  # ユーザーが存在しない場合にデフォルト値
                 "seat_id": reservation.seat_id,
                 "seat_name": reservation.seat_regist.seat_name if reservation.seat_regist else "不明",  # 座席が存在しない場合にデフォルト値
+                "pasokon_id": reservation.pasokon_id,
+                "pasokon_name": reservation.pasokon.pasokon_name if reservation.pasokon else "不明",  # パソコンが存在しない場合にデフォルト値
                 "start_time": reservation.start_time,
                 "finish_time": reservation.finish_time,
                 "reserve_day": reservation.reserve_day,

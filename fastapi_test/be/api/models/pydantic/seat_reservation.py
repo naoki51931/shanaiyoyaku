@@ -8,6 +8,7 @@ class SeatReservationCreate(BaseModel):
     person_id: Optional[int] = None
     office_id: Optional[int] = None
     seat_id: Optional[int] = None
+    pasokon_id: Optional[int] = None
     start_time: datetime | None = None
     finish_time: datetime | None = None
     reserve_day: datetime | None = None
@@ -20,6 +21,7 @@ class SeatReservationUpdate(BaseModel):
     person_id: Optional[int] = None
     office_id: Optional[int] = None
     seat_id: Optional[int] = None
+    pasokon_id: Optional[int] = None
     start_time: datetime | None = None
     finish_time: datetime | None = None
     reserve_day: datetime | None = None
@@ -36,6 +38,8 @@ class SeatReservationResponse(BaseModel):
     office_name: Optional[str] = None  # office_nameを追加
     seat_id: Optional[int] = None
     seat_name: Optional[str] = None  # seat_nameを追加
+    pasokon_id: Optional[int] = None
+    pasokon_name: Optional[str] = None
     start_time: datetime | None = None
     finish_time: datetime | None = None
     reserve_day: datetime | None = None

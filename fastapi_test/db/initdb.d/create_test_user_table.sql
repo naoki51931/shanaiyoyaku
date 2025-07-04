@@ -62,6 +62,7 @@ CREATE TABLE `seat_reservation` (
     person_id INT NOT NULL,
     office_id INT NOT NULL,
     seat_id INT NOT NULL,
+    pasokon_id INT NOT NULL,
     start_time DATETIME NOT NULL,
     finish_time DATETIME NOT NULL,
     reserve_day DATETIME NOT NULL,

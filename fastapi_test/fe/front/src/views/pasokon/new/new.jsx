@@ -281,7 +281,8 @@ export default function NewPasokon(props) {
                   id="performance"
                   name="performance"
                   label="性能"
-                  autoFocus
+                  multiline          // ←★ テキストエリア化
+                  minRows={8}        // ←★ 初期行数（必要に応じて調整）
                   value={props.performance ?? ""}
                   onChange={(e) => props.setPerformance?.(e.target.value)}
                 />

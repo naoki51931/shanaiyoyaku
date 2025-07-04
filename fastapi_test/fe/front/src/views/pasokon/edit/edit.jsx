@@ -326,7 +326,8 @@ export default function Edit(props) {
                   id="performance"
                   name="performance"
                   label="性能"
-                  autoFocus
+                  multiline           // ←★ テキストエリア化
+                  minRows={8}         // ←★ 初期高さ（行数）をお好みで
                   value={props.performance ?? ""}
                   onChange={(e) => props.setPerformance(e.target.value)}
                 />

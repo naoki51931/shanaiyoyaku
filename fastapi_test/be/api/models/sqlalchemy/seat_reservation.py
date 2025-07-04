@@ -12,6 +12,7 @@ class SeatReservation(Base):
     person_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     office_id = Column(Integer, ForeignKey("office.id"), nullable=False)
     seat_id = Column(Integer, ForeignKey("seat_regist.id"), nullable=False)
+    pasokon_id = Column(Integer, ForeignKey("pasokon.id"), nullable=False)
     start_time = Column(DateTime(timezone=True), nullable=False)
     finish_time = Column(DateTime(timezone=True), nullable=False)
     reserve_day = Column(DateTime(timezone=True), nullable=False)
@@ -26,3 +27,10 @@ class SeatReservation(Base):
 
     # Office とのリレーション
     office = relationship("Office", back_populates="seat_reservations")
+
+    # Pasokon とのリレーション
+    pasokon_reserve = relationship(
+        "Pasokon",
+        back_populates="seat_reserve_pasokon"   # ← 1 つだけ書く
+        # overlaps="pasokon_tags"  # *必要なら* overlaps を追加
+    )
