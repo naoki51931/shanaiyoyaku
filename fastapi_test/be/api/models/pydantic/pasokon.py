@@ -29,7 +29,9 @@ class PasokonResponse(BaseModel):
     soft_ids: List[int] = []  # 空リストをデフォルト値として設定
     soft_names: List[str] = []  # 空リストをデフォルト値として設定
     office_id: Optional[int] = None
+    office_name: Optional[str] = None
     seat_id: Optional[int] = None
+    seat_name: Optional[str] = None
     performance: Optional[str] = None
     created_at: Optional[datetime] = None  # 型の統一
     updated_at: Optional[datetime] = None  # 型の統一

@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from typing import List
+
 
 from database.database import get_db
 from models.sqlalchemy.pasokon import Pasokon as DBPasokon
@@ -114,7 +116,7 @@ async def create_pasokon(pasokon: PasokonCreate, db: Session = Depends(get_db)):
 # ------------------------------------------------------------------
 # 一覧取得
 # ------------------------------------------------------------------
-@router.get("/pasokon/all/")
+@router.get("/pasokon/all/", response_model=List[PasokonResponse])
 def read_pasokon_all(db: Session = Depends(get_db)):
     pasokons = db.query(DBPasokon).all()
     return [
@@ -203,3 +205,12 @@ async def delete_pasokon(pasokon_id: int, db: Session = Depends(get_db)):
 
     db.delete(db_pasokon)
     db.commit()
+
+
+@router.get("/pasokon/by-seat/{seat_id}")
+def get_pasokons_by_seat(seat_id: int, db: Session = Depends(get_db)):
+    pasokons = db.query(DBPasokon).filter(DBPasokon.seat_id == seat_id).all()
+    return [
+        {"id": p.id, "pasokon_name": p.pasokon_name}
+        for p in pasokons
+    ]

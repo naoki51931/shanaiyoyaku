@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text, DateTime, func
 from sqlalchemy.orm import relationship
 from database.database import Base
-from models.sqlalchemy.pasokon_tags import PasokonTag  # 中間テーブルをインポート
+from models.sqlalchemy.pasokon_tags import pasokon_tags  # 中間テーブルをインポート
 from models.sqlalchemy.tag import Tag  # Tagクラスのインポート
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -22,7 +22,6 @@ class Pasokon(Base):
     seat_in_pasokon = relationship("SeatRegist", back_populates="pasokon_seats")
 
     # タグとのリレーションシップを定義
-    pasokon_tags = relationship("PasokonTag", back_populates="pasokon")  # 中間テーブルとのリレーション
     tags = relationship("Tag", secondary="pasokon_tags", back_populates="pasokons")  # Pasokon と Tag の多対多リレーション
     
     seat_reserve_pasokon = relationship(

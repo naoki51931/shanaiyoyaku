@@ -1,3 +1,4 @@
+// 修正された `edit.jsx`
 import { useState, useEffect } from "react"
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -11,182 +12,63 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
+import { jwtDecode } from "jwt-decode";
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
-
-
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-// TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 const BASE_URL = "http://localhost:8000";
-
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [users, setUsers] = useState([]);
   const [seats, setSeats] = useState([]);
-  const [pasokons, setPasokons] = useState([]);
   const [selectedOfficeId, setSelectedOfficeId] = useState(props.office_id ?? '');
+  const [selectedSeatId, setSelectedSeatId] = useState(props.seat_id || "");
+  const [pasokonOptions, setPasokonOptions] = useState([]);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/office/all/`)
-      .then((res) => {
-        setOffices(res.data);
-      })
-      .catch((error) => {
-        console.error("オフィス取得エラー:", error);
-      });
+    axios.get(`${BASE_URL}/office/all/`).then(res => setOffices(res.data)).catch(console.error);
+    axios.get(`${BASE_URL}/user/all/`).then(res => setUsers(res.data)).catch(console.error);
+    axios.get(`${BASE_URL}/seat/all/`).then(res => setSeats(res.data)).catch(console.error);
   }, []);
 
   useEffect(() => {
-      axios.get('http://localhost:8000/user/all/') // ← ユーザー情報一覧を取得するエンドポイント
-        .then((res) => {
-          setUsers(res.data);
-        })
-        .catch((error) => {
-          console.error('ユーザー情報の取得に失敗:', error);
-        });
-    }, []);
-  
-  useEffect(() => {
-    axios.get('http://localhost:8000/seat/all/') // ← 予約シート情報一覧を取得するエンドポイント
-      .then((res) => {
-        setSeats(res.data);
-      })
-      .catch((error) => {
-        console.error('予約シート情報の取得に失敗:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    axios.get('http://localhost:8000/pasokon/all/') // ← パソコン情報一覧を取得するエンドポイント
-      .then((res) => {
-        setPasokons(res.data);
-      })
-      .catch((error) => {
-        console.error('パソコン情報の取得に失敗:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (props.office_id) {
-      setSelectedOfficeId(props.office_id);
-    }
+    if (props.office_id) setSelectedOfficeId(props.office_id);
   }, [props.office_id]);
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    if (selectedSeatId) {
+      axios.get(`${BASE_URL}/pasokon/by-seat/${selectedSeatId}`)
+        .then(res => {
+          setPasokonOptions(res.data);
+          if (res.data.length > 0) props.setPasokon_id(res.data[0].id);
+        })
+        .catch(console.error);
+    }
+  }, [selectedSeatId]);
 
+  const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    
 
-    const token = localStorage.getItem('token'); // ローカルストレージに保存されているトークン
-    console.log(token);
-    if (typeof token !== 'string') {
-      console.error("Invalid token:", token); // トークンが文字列でない場合、エラーメッセージを表示
-    }
+    const token = localStorage.getItem('token');
     const decodedToken = jwtDecode(token);
-    const loginUserIsApproval = decodedToken?.is_approval; // ログインユーザーの承認ステータス
+    const loginUserIsApproval = decodedToken?.is_approval;
+
+    if (loginUserIsApproval !== 2) {
+      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
+      return;
+    }
 
     const startTime = new Date(data.get('start_time'));
     const finishTime = new Date(data.get('finish_time'));
     const reserveDay = new Date(data.get('reserve_day'));
 
-    // // 日時形式でない場合、'00:00' を補完して修正する処理
-    // if (isNaN(startTime.getTime())) {
-    //   const correctedStartTime = new Date(data.get('start_time') + "T00:00");
-    //   startTime.setTime(correctedStartTime.getTime());
-    // }
-    // if (isNaN(finishTime.getTime())) {
-    //   const correctedFinishTime = new Date(data.get('finish_time') + "T00:00");
-    //   finishTime.setTime(correctedFinishTime.getTime());
-    // }
-    // if (isNaN(reserveDay.getTime())) {
-    //   const correctedReserveDay = new Date(data.get('reserve_day') + "T00:00");
-    //   reserveDay.setTime(correctedReserveDay.getTime());
-    // }
-
-    console.log(loginUserIsApproval);
-    const Approval_level = 2;
-    // ログインユーザーの is_approval が 2 でない場合はユーザー作成を許可しない
-    if (loginUserIsApproval !== Approval_level) {
-      alert("ユーザー作成には管理者及び上位ユーザーの承認が必要です。");
-      return; // ユーザー作成をキャンセル
-    }
-
-    console.log({
-      reserve_id: data.get('reserve_id'),
-      todo_content: data.get('todo_content'),
-      person_id: data.get('person_id'),
-      office_id: data.get('office_id'),
-      seat_id: data.get('seat_id'),
-      pasokon_id: data.get('pasokon_id'),
-      start_time: data.get('start_time'),
-      finish_time: data.get('finish_time'),
-      reserve_day: data.get('reserve_day'),
-    });
-    if (data.get('reserve_id') === ""){
-      alert("予約IDを入力して下さい。")
-      return
-    }
-    if (data.get('todo_content') === ""){
-      alert("タスク内容を入力して下さい。")
-      return
-    }
-    if (data.get('person_id') === ""){
-      alert("人物IDを選択して下さい。")
-      return
-    }
-    if (data.get('office_id') === ""){
-      alert("事業所IDを選択して下さい。")
-      return
-    }
-    if (data.get('seat_id') === ""){
-      alert("座席IDを選択して下さい。")
-      return
-    }
-    if (data.get('pasokon_id') === ""){
-      alert("パソコンIDを選択して下さい。")
-      return
-    }
-    if (data.get('start_time') === ""){
-      alert("開始時間を選択して下さい。")
-      return
-    }
-    if (data.get('finish_time') === ""){
-      alert("終了時間を選択して下さい。")
-      return
-    }
-    if (finishTime <= startTime) {
-      alert("終了時間は開始時間より後に設定してください。");
+    if (finishTime <= startTime || startTime.toISOString().split('T')[0] !== reserveDay.toISOString().split('T')[0]) {
+      alert("時間または日付の整合性エラー");
       return;
     }
-    // 開始時間と予約日の日付が異なる場合にエラー
-    const startDateString = startTime.toISOString().split('T')[0];
-    const reserveDateString = reserveDay.toISOString().split('T')[0];
 
-    if (startDateString !== reserveDateString) {
-      alert("開始時間と予約日は同じ日付にしてください。");
-      return;
-    }
-    if (data.get('reserve_day') === ""){
-      alert("予約日を選択して下さい。")
-      return
-    }
     const seat_reservation = {
       reserve_id: data.get('reserve_id'),
       todo_content: data.get('todo_content'),
@@ -196,255 +78,93 @@ export default function SignUp(props) {
       pasokon_id: data.get('pasokon_id'),
       start_time: data.get('start_time'),
       finish_time: data.get('finish_time'),
-      reserve_day: data.get('reserve_day'),
-    };   
-  
-    axios.put(BASE_URL + `/seat_reservation/${props.id}`, seat_reservation, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(function (res) {
-            console.log(res)
-            props.setEditModalIsOpen(false);
-        })
-        .catch(function (error) {
-            console.log("error", error);
-        });
+      reserve_day: data.get('reserve_day')
+    };
+
+    axios.put(`${BASE_URL}/seat_reservation/${props.id}`, seat_reservation)
+      .then(() => props.setEditModalIsOpen(false))
+      .catch(console.error);
   };
+
   const DeleteUser = () => {
-    console.log({
-      id: props.id
-    });
-    const params = new URLSearchParams();
-    params.append('id', props.id);
-    axios.delete(BASE_URL + `/seat_reservation/${props.id}`, params)
-        .then(function (res) {
-            console.log(res)
-            props.setEditModalIsOpen(false);
-        })
-        .catch(function (error) {
-            console.log("error", error);
-        });
+    axios.delete(`${BASE_URL}/seat_reservation/${props.id}`, { params: { id: props.id } })
+      .then(() => props.setEditModalIsOpen(false))
+      .catch(console.error);
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Edit
-          </Typography>
+        <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}><LockOutlinedIcon /></Avatar>
+          <Typography component="h1" variant="h5">Edit</Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField
-                  autoComplete="reserve_id"
-                  name="reserve_id"
-                  required
-                  fullWidth
-                  id="reserve_id"
-                  label="予約ID"
-                  autoFocus
-                  value={props.reserve_id || ""}
-                  onChange={(event) => props.setReserve_id(event.target.value)}
-                />
+                <TextField name="reserve_id" required fullWidth label="予約ID" value={props.reserve_id || ""} onChange={(e) => props.setReserve_id(e.target.value)} />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  autoComplete="todo_content"
-                  name="todo_content"
-                  required
-                  fullWidth
-                  id="todo_content"
-                  label="タスク内容"
-                  autoFocus
-                  value={props.todo_content || ""}
-                  onChange={(event) => props.setTodo_content(event.target.value)}
-                />
+                <TextField name="todo_content" required fullWidth label="タスク内容" value={props.todo_content || ""} onChange={(e) => props.setTodo_content(e.target.value)} />
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="person-select-label">予約者</InputLabel>
-                  <Select
-                    labelId="person-select-label"
-                    id="person_id"
-                    name="person_id"
-                    value={props.person_id || ""}
-                    label="予約者"
-                    onChange={(event) => props.setPerson_id(event.target.value)}
-                  >
-                    {/* 空の状態の場合のデフォルト表示 */}
+                  <Select labelId="person-select-label" name="person_id" value={props.person_id || ""} onChange={(e) => props.setPerson_id(e.target.value)}>
                     <MenuItem value="">予約者を選択してください</MenuItem>
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.kanji_name}
-                      </MenuItem>
-                    ))}
+                    {users.map(user => <MenuItem key={user.id} value={user.id}>{user.kanji_name}</MenuItem>)}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="office-select-label">事務所</InputLabel>
-                  <Select
-                    labelId="office-select-label"
-                    id="office_id"
-                    name="office_id"
-                    value={props.office_id ?? ''}
-                    label="事務所"
-                    onChange={(event) => {
-                      const selected = event.target.value;
-                      setSelectedOfficeId(selected);
-                      props.setOffice_id(selected);
-                      props.setSeat_id(''); // シートをリセット（事務所変更時に不要なデータを避ける）
-                    }}
-                  >
+                  <Select labelId="office-select-label" name="office_id" value={props.office_id ?? ''} onChange={(e) => {
+                    setSelectedOfficeId(e.target.value);
+                    props.setOffice_id(e.target.value);
+                    props.setSeat_id("");
+                  }}>
                     <MenuItem value="">事務所を選択してください</MenuItem>
-                    {offices.map((office) => (
-                      <MenuItem key={office.id} value={String(office.id)}>
-                      {office.office_name}
-                      </MenuItem>
-                    ))}
+                    {offices.map(office => <MenuItem key={office.id} value={String(office.id)}>{office.office_name}</MenuItem>)}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="seat-select-label">予約シート</InputLabel>
-                  <Select
-                    labelId="seat-select-label"
-                    id="seat_id"
-                    name="seat_id"
-                    value={props.seat_id || ""}
-                    label="予約シート"
-                    onChange={(event) => props.setSeat_id(event.target.value)}
-                  >
+                  <Select labelId="seat-select-label" name="seat_id" value={props.seat_id || ""} onChange={(e) => {
+                    props.setSeat_id(e.target.value);
+                    setSelectedSeatId(e.target.value);
+                  }}>
                     <MenuItem value="">予約シートを選択してください</MenuItem>
-                    {seats
-                      .filter(seat => seat.office_id === parseInt(selectedOfficeId)) // 選択中の事務所に一致するシートのみ表示
-                      .map((seat) => (
-                        <MenuItem key={seat.id} value={seat.id}>
-                          {seat.seat_name}
-                        </MenuItem>
-                      ))}
+                    {seats.filter(s => s.office_id === parseInt(selectedOfficeId)).map(seat => <MenuItem key={seat.id} value={seat.id}>{seat.seat_name}</MenuItem>)}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="pasokon-select-label">パソコン名</InputLabel>
-                  <Select
-                    labelId="pasokon-select-label"
-                    id="pasokon_id"
-                    name="pasokon_id"
-                    value={props.seat_id || ""}
-                    label="パソコン名"
-                    onChange={(event) => props.setPasokon_id(event.target.value)}
-                  >
+                  <Select labelId="pasokon-select-label" name="pasokon_id" title="パソコン名が見つからない場合はパソコン修正画面で、使用するシートを選択してから選択してください" value={props.pasokon_id || ""} onChange={(e) => props.setPasokon_id(e.target.value)}>
                     <MenuItem value="">パソコン名を選択してください</MenuItem>
-                    {pasokons
-                      .filter(pasokon => pasokon.office_id === parseInt(selectedOfficeId)) // 選択中の事務所に一致するシートのみ表示
-                      .map((pasokon) => (
-                        <MenuItem key={pasokon.id} value={pasokon.id}>
-                          {pasokon.pasokon_name}
-                        </MenuItem>
-                      ))}
+                    {pasokonOptions.map(p => <MenuItem key={p.id} value={p.id}>{p.pasokon_name}</MenuItem>)}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  label="開始時間"
-                  type="datetime-local"
-                  id="start_time"
-                  name="start_time"
-                  value={props.start_time || ""}
-                  onChange={(event) => props.setStart_time(event.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+                <TextField required fullWidth label="開始時間" type="datetime-local" name="start_time" value={props.start_time || ""} onChange={(e) => props.setStart_time(e.target.value)} InputLabelProps={{ shrink: true }} />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  label="終了時間"
-                  type="datetime-local"
-                  id="finish_time"
-                  name="finish_time"
-                  value={props.finish_time || ""}
-                  onChange={(event) => props.setFinish_time(event.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+                <TextField required fullWidth label="終了時間" type="datetime-local" name="finish_time" value={props.finish_time || ""} onChange={(e) => props.setFinish_time(e.target.value)} InputLabelProps={{ shrink: true }} />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  title="予約日は開始時間と同じ日にしてください"
-                  label="予約日時"
-                  type="datetime-local"
-                  id="reserve_day"
-                  name="reserve_day"
-                  value={props.reserve_day || ""}
-                  onChange={(event) => props.setReserve_day(event.target.value)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+                <TextField required fullWidth label="予約日時" type="datetime-local" name="reserve_day" value={props.reserve_day || ""} onChange={(e) => props.setReserve_day(e.target.value)} InputLabelProps={{ shrink: true }} />
               </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Update
-            </Button>
-            <Button
-              type="button"
-              fullWidth
-              variant="contained"
-              color="error"
-              sx={{ mt: 3, mb: 2 }}
-              onClick={() => {DeleteUser()}}
-            >
-              Delete
-            </Button>
-            {/* <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid> */}
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>Update</Button>
+            <Button type="button" fullWidth variant="contained" color="error" sx={{ mt: 3, mb: 2 }} onClick={DeleteUser}>Delete</Button>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>Copyright © Your Website {new Date().getFullYear()}.</Typography>
       </Container>
     </ThemeProvider>
   );
