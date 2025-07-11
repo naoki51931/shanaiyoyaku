@@ -49,6 +49,8 @@ export default function Form(props) {
                                 office_name: res.data[i].office_name,
                                 seat_id: res.data[i].seat_id,
                                 seat_name: res.data[i].seat_name,
+                                pasokon_id: res.data[i].pasokon_id,
+                                pasokon_name: res.data[i].pasokon_name,
                                 start_time: res.data[i].start_time,
                                 finish_time: res.data[i].finish_time,
                                 reserve_day: res.data[i].reserve_day,

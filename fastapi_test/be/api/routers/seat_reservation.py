@@ -40,7 +40,7 @@ def get_all_reservations(db: Session = Depends(get_db)):
                 "seat_id": reservation.seat_id,
                 "seat_name": reservation.seat_regist.seat_name if reservation.seat_regist else "不明",  # 座席が存在しない場合にデフォルト値
                 "pasokon_id": reservation.pasokon_id,
-                "pasokon_name": reservation.pasokon.pasokon_name if reservation.pasokon else "不明",  # パソコンが存在しない場合にデフォルト値
+                "pasokon_name": reservation.pasokon_reserve.pasokon_name if reservation.pasokon_reserve else "不明",  # パソコンが存在しない場合にデフォルト値
                 "start_time": reservation.start_time,
                 "finish_time": reservation.finish_time,
                 "reserve_day": reservation.reserve_day,

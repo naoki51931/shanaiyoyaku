@@ -25,6 +25,8 @@ export default function List(props) {
     const [office_name, setOffice_name] = React.useState("");
     const [seat_id, setSeat_id] = React.useState("");
     const [seat_name, setSeat_name] = React.useState("");
+    const [pasokon_id, setPasokon_id] = React.useState("");
+    const [pasokon_name, setPasokon_name] = React.useState("");
     const [start_time, setStart_time] = React.useState("");
     const [finish_time, setFinish_time] = React.useState("");
     const [reserve_day, setReserve_day] = React.useState("");
@@ -38,6 +40,7 @@ export default function List(props) {
         setPerson_id(person_id);
         setOffice_id(office_id);
         setSeat_id(seat_id);
+        setPasokon_id(pasokon_id);
         setStart_time(start_time);
         setFinish_time(finish_time);
         setReserve_day(reserve_day);
@@ -84,6 +87,7 @@ export default function List(props) {
                     <TableCell align="left">{v.person_name}</TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
+                    <TableCell align="left">{v.pasokon_name}</TableCell>
                     <TableCell align="left">{formatTime(v.start_time)}</TableCell> {/* 時間のみ表示 */}
                     <TableCell align="left">{formatTime(v.finish_time)}</TableCell> {/* 時間のみ表示 */}
                     <TableCell align="left">{formatDate(v.start_time, v.finish_time)}</TableCell> {/* 日付が異なれば表示 */}
@@ -91,7 +95,7 @@ export default function List(props) {
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.reserve_id, v.todo_content, v.person_id, v.office_id, v.seat_id, v.start_time, v.finish_time, v.reserve_day)}}>
+                                onClick={() => {openEditModal(v.id, v.reserve_id, v.todo_content, v.person_id, v.office_id, v.seat_id, v.pasokon_id, v.start_time, v.finish_time, v.reserve_day)}}>
                             Edit
                         </Button>
                     </TableCell>
@@ -115,6 +119,7 @@ export default function List(props) {
                         <p>{v.reserve_id}</p>
                         <p>{v.person_name}</p>
                         <p>{v.seat_name}</p>
+                        <p>{v.pasokon_name}</p>
                         <p>{v.todo_content}</p>
                         <p>{formatDate(v.start_time, v.finish_time)}</p> {/* 日付が異なれば表示 */}
                         <p>{formatTime(v.start_time)} - {formatTime(v.finish_time)}</p> {/* 時間のみ表示 */}
@@ -155,6 +160,7 @@ export default function List(props) {
                                 <TableCell align="left">予約者名</TableCell>
                                 <TableCell align="left">事務所名</TableCell>
                                 <TableCell align="left">予約座席名</TableCell>
+                                <TableCell align="left">パソコン名</TableCell>
                                 <TableCell align="left">開始時間</TableCell>
                                 <TableCell align="left">終了時間</TableCell>
                                 <TableCell align="left">予約日</TableCell>
@@ -195,6 +201,7 @@ export default function List(props) {
                         person_id={person_id} setPerson_id={setPerson_id}
                         office_id={office_id} setOffice_id={setOffice_id}
                         seat_id={seat_id} setSeat_id={setSeat_id}
+                        pasokon_id={pasokon_id} setPasokon_id={setPasokon_id}
                         start_time={start_time} setStart_time={setStart_time}
                         finish_time={finish_time} setFinish_time={setFinish_time}
                         reserve_day={reserve_day} setReserve_day={setReserve_day}

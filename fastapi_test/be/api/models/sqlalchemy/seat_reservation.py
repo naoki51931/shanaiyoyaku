@@ -1,6 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
 from database.database import Base
+from models.sqlalchemy.pasokon import Pasokon
 
 
 class SeatReservation(Base):

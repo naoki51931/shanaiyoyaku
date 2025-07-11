@@ -19,6 +19,7 @@ export default function SeatRegist() {
   const [person_id, setPerson_id] = React.useState("");
   const [office_id, setOffice_id] = React.useState("");
   const [seat_id, setSeat_id] = React.useState("");
+  const [pasokon_id, setPasokon_id] = React.useState("");
   const [start_time, setStart_time] = React.useState("");
   const [finish_time, setFinish_time] = React.useState("");
   const [reserve_day, setReserve_day] = React.useState("");
@@ -47,6 +48,8 @@ export default function SeatRegist() {
             setOffice_id={setOffice_id}
             seat_id={seat_id}
             setSeat_id={setSeat_id}
+            pasokon_id={pasokon_id}
+            setPasokon_id={setPasokon_id}
             start_time={start_time}
             setStart_time={setStart_time}
             finish_time={finish_time}

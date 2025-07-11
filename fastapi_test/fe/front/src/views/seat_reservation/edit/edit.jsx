@@ -39,6 +39,7 @@ export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [users, setUsers] = useState([]);
   const [seats, setSeats] = useState([]);
+  const [pasokons, setPasokons] = useState([]);
   const [selectedOfficeId, setSelectedOfficeId] = useState(props.office_id ?? '');
 
   useEffect(() => {
@@ -52,7 +53,7 @@ export default function SignUp(props) {
   }, []);
 
   useEffect(() => {
-      axios.get('http://localhost:8000/user/all/') // ← オフィス一覧を取得するエンドポイント
+      axios.get('http://localhost:8000/user/all/') // ← ユーザー情報一覧を取得するエンドポイント
         .then((res) => {
           setUsers(res.data);
         })
@@ -62,7 +63,7 @@ export default function SignUp(props) {
     }, []);
   
   useEffect(() => {
-    axios.get('http://localhost:8000/seat/all/') // ← オフィス一覧を取得するエンドポイント
+    axios.get('http://localhost:8000/seat/all/') // ← 予約シート情報一覧を取得するエンドポイント
       .then((res) => {
         setSeats(res.data);
       })
@@ -70,6 +71,17 @@ export default function SignUp(props) {
         console.error('予約シート情報の取得に失敗:', error);
       });
   }, []);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/pasokon/all/') // ← パソコン情報一覧を取得するエンドポイント
+      .then((res) => {
+        setPasokons(res.data);
+      })
+      .catch((error) => {
+        console.error('パソコン情報の取得に失敗:', error);
+      });
+  }, []);
+
   useEffect(() => {
     if (props.office_id) {
       setSelectedOfficeId(props.office_id);
@@ -122,6 +134,7 @@ export default function SignUp(props) {
       person_id: data.get('person_id'),
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
+      pasokon_id: data.get('pasokon_id'),
       start_time: data.get('start_time'),
       finish_time: data.get('finish_time'),
       reserve_day: data.get('reserve_day'),
@@ -144,6 +157,10 @@ export default function SignUp(props) {
     }
     if (data.get('seat_id') === ""){
       alert("座席IDを選択して下さい。")
+      return
+    }
+    if (data.get('pasokon_id') === ""){
+      alert("パソコンIDを選択して下さい。")
       return
     }
     if (data.get('start_time') === ""){
@@ -176,6 +193,7 @@ export default function SignUp(props) {
       person_id: data.get('person_id'),
       office_id: data.get('office_id'),
       seat_id: data.get('seat_id'),
+      pasokon_id: data.get('pasokon_id'),
       start_time: data.get('start_time'),
       finish_time: data.get('finish_time'),
       reserve_day: data.get('reserve_day'),
@@ -319,6 +337,28 @@ export default function SignUp(props) {
                       .map((seat) => (
                         <MenuItem key={seat.id} value={seat.id}>
                           {seat.seat_name}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="pasokon-select-label">パソコン名</InputLabel>
+                  <Select
+                    labelId="pasokon-select-label"
+                    id="pasokon_id"
+                    name="pasokon_id"
+                    value={props.seat_id || ""}
+                    label="パソコン名"
+                    onChange={(event) => props.setPasokon_id(event.target.value)}
+                  >
+                    <MenuItem value="">パソコン名を選択してください</MenuItem>
+                    {pasokons
+                      .filter(pasokon => pasokon.office_id === parseInt(selectedOfficeId)) // 選択中の事務所に一致するシートのみ表示
+                      .map((pasokon) => (
+                        <MenuItem key={pasokon.id} value={pasokon.id}>
+                          {pasokon.pasokon_name}
                         </MenuItem>
                       ))}
                   </Select>

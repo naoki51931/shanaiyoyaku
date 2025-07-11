@@ -5,10 +5,12 @@ import axios from 'axios';
 function NewReservationForm({ closeModal }) {
     const [users, setUsers] = useState([]);
     const [seats, setSeats] = useState([]);
+    const [pasokons, setPasokons] = useState([]);
     const [reserveId, setReserveId] = useState('');
     const [todoContent, setTodoContent] = useState('');
     const [personId, setPersonId] = useState('');
     const [seatId, setSeatId] = useState('');
+    const [pasokonId, setPasokonId] = useState('');
     const [startTime, setStartTime] = useState('');
     const [finishTime, setFinishTime] = useState('');
     const [reserveDay, setReserveDay] = useState('');
@@ -31,6 +33,14 @@ function NewReservationForm({ closeModal }) {
             .catch((error) => {
                 console.error('座席情報の取得に失敗:', error);
             });
+        // パソコンデータを取得
+        axios.get('http://localhost:8000/pasokon/all/')
+            .then((response) => {
+                setPasokons(response.data);
+            })
+            .catch((error) => {
+                console.error('パソコン情報の取得に失敗:', error);
+            });
     }, []);
 
     const handleSubmit = (event) => {
@@ -41,6 +51,7 @@ function NewReservationForm({ closeModal }) {
             todo_content: todoContent,
             person_id: personId,
             seat_id: seatId,
+            pasokon_id: pasokonId,
             start_time: startTime,
             finish_time: finishTime,
             reserve_day: reserveDay,
@@ -106,6 +117,24 @@ function NewReservationForm({ closeModal }) {
                         {seats.map((seat) => (
                             <MenuItem key={seat.id} value={seat.id}>
                                 {seat.seat_name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                {/* パソコン選択 */}
+                <FormControl fullWidth margin="normal" required>
+                    <InputLabel id="pasokon-select-label">パソコン名</InputLabel>
+                    <Select
+                        labelId="pasokon-select-label"
+                        value={seatId}
+                        onChange={(e) => setPasokonId(e.target.value)}
+                        label="パソコン名"
+                    >
+                        <MenuItem value="">パソコン名を選択してください</MenuItem>
+                        {pasokons.map((pasokon) => (
+                            <MenuItem key={pasokon.id} value={pasokon.id}>
+                                {pasokon.pasokon_name}
                             </MenuItem>
                         ))}
                     </Select>
