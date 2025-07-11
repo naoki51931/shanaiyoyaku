@@ -66,6 +66,14 @@ export default function New(props) {
       .catch(error => console.error('パソコン予約シート情報の取得に失敗:', error));
   }, []);
 
+  // ランダムな3桁の予約IDを初期設定
+  useEffect(() => {
+    if (props.setReserve_id && !props.reserve_id) {
+      const randomId = Math.floor(100 + Math.random() * 900).toString(); // 100〜999
+      props.setReserve_id(randomId);
+    }
+  }, []);
+
   // 座席が選択されたら、その座席に紐づくパソコンを取得してセット
   const handleSeatChange = (event) => {
     const selectedSeatId = event.target.value;

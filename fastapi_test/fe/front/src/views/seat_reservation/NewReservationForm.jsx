@@ -32,6 +32,13 @@ function NewReservationForm({ closeModal }) {
             .catch(error => console.error('座席情報の取得に失敗:', error));
     }, []);
 
+    useEffect(() => {
+        // 初期表示時に予約IDを3桁ランダム数字で自動入力
+        const randomId = Math.floor(100 + Math.random() * 900).toString(); // 100〜999
+        setReserveId(randomId);
+    }, []);
+    
+
     // 事務所変更時、座席・パソコンの選択をリセットする
     const handleOfficeChange = (event) => {
         const selectedOfficeId = event.target.value;
