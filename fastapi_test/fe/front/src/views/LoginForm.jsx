@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -34,7 +36,7 @@ const Login = () => {
             formData.append('password', password);
 
             // FastAPI の `/token` エンドポイントにリクエスト
-            const response = await axios.post('http://localhost:8000/auth/token', formData, {
+            const response = await axios.post(`${API_URL}/auth/token`, formData, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 withCredentials: true,  // 追加（必要なら）
                 

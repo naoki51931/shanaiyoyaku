@@ -79,6 +79,15 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
 
     if db.query(overlap_query.exists()).scalar():
         raise HTTPException(status_code=400, detail="同じ座席またはパソコンで既に予約があります")
+    
+    # reserve_id + reserve_day の重複チェック
+    same_reserve_id = db.query(DBSeatReservation).filter(
+        DBSeatReservation.reserve_id == reservation.reserve_id,
+        DBSeatReservation.reserve_day == reservation.reserve_day
+    ).first()
+
+    if same_reserve_id:
+        raise HTTPException(status_code=400, detail="同じ日付に同じ予約IDの予約が既に存在します")
 
     try:
         db_reservation = DBSeatReservation(**reservation.dict())
@@ -108,8 +117,20 @@ def update_reservation(reservation_id: int, reservation_update: SeatReservationU
     updated_end = db_reservation.finish_time
     updated_seat_id = db_reservation.seat_id
     updated_pasokon_id = db_reservation.pasokon_id
+    updated_reserve_id = db_reservation.reserve_id
+    updated_reserve_day = db_reservation.reserve_day
 
-    # 自身を除いた重複チェック
+    # 同日・同予約IDの重複チェック（自分以外）
+    same_reserve = db.query(DBSeatReservation).filter(
+        DBSeatReservation.id != reservation_id,
+        DBSeatReservation.reserve_id == updated_reserve_id,
+        DBSeatReservation.reserve_day == updated_reserve_day
+    ).first()
+
+    if same_reserve:
+        raise HTTPException(status_code=400, detail="同じ日付に同じ予約IDの予約が既に存在します")
+    
+    # 自身を除いた重複チェック（時間 × 座席 or パソコン）
     overlapping_reservation = db.query(DBSeatReservation).filter(
         DBSeatReservation.id != reservation_id,
         DBSeatReservation.finish_time > updated_start,

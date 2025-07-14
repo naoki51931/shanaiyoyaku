@@ -34,7 +34,7 @@ function Copyright(props) {
 }
 
 const defaultTheme = createTheme();
-const BASE_URL = "http://localhost:8000";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export default function Edit(props) {
   // offices & seats
@@ -52,15 +52,15 @@ export default function Edit(props) {
   /*                             Fetch master                           */
   /* ------------------------------------------------------------------ */
   useEffect(() => {
-    axios.get(`${BASE_URL}/office/all/`).then((res) => setOffices(res.data));
+    axios.get(`${API_URL}/office/all/`).then((res) => setOffices(res.data));
   }, []);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/seat/all/`).then((res) => setSeats(res.data));
+    axios.get(`${API_URL}/seat/all/`).then((res) => setSeats(res.data));
   }, []);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/tags/`).then((res) => setAvailableTags(res.data));
+    axios.get(`${API_URL}/tags/`).then((res) => setAvailableTags(res.data));
   }, []);
 
   /* ------------------------------------------------------------------ */
@@ -152,7 +152,7 @@ export default function Edit(props) {
     };
 
     try {
-      await axios.put(`${BASE_URL}/pasokon/${props.id}`, payload, {
+      await axios.put(`${API_URL}/pasokon/${props.id}`, payload, {
         headers: { "Content-Type": "application/json" },
       });
       props.setEditModalIsOpen(false);
@@ -166,7 +166,7 @@ export default function Edit(props) {
   /* ------------------------------------------------------------------ */
   const handleDelete = async () => {
     try {
-      await axios.delete(`${BASE_URL}/pasokon/${props.id}`);
+      await axios.delete(`${API_URL}/pasokon/${props.id}`);
       props.setEditModalIsOpen(false);
     } catch (err) {
       console.error("Delete error:", err);

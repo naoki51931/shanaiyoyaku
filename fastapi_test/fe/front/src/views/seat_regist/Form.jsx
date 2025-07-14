@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import NewForm from "./new/new";
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 export default function Form(props) {
     const [query, setQuery] = useState('');
 
@@ -13,7 +15,7 @@ export default function Form(props) {
     };
 
     const searchSeats = () => {
-        axios.post('http://localhost:8000/seat/search/', { query })
+        axios.post(`${API_URL}/seat/search/`, { query })
             .then((res) => {
                 console.log("検索結果:", res.data);
                 
@@ -31,7 +33,7 @@ export default function Form(props) {
     };
 
     const funget = () => {
-        axios.get('http://localhost:8000/seat/all/')
+        axios.get(`${API_URL}/seat/all/`)
             .then(function (res) {
                 console.log(res.data.length)
                 console.log(res)

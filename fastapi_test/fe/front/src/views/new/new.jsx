@@ -27,6 +27,7 @@ function Copyright(props) {
 }
 
 const defaultTheme = createTheme();
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export default function SignUp(props) {
   const handleSubmit = (event) => {
@@ -98,7 +99,7 @@ export default function SignUp(props) {
       is_approval: isApprovalValue,
     };
 
-    axios.post('http://localhost:8000/user/new/', user, {
+    axios.post(`${API_URL}/user/new/`, user, {
       headers: {
           'Content-Type': 'application/json'
       },

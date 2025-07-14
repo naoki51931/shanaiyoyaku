@@ -14,8 +14,6 @@ import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
-
-
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -32,14 +30,14 @@ function Copyright(props) {
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
-const BASE_URL = "http://localhost:8000";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/office/all/`)
+    axios.get(`${API_URL}/office/all/`)
       .then((res) => {
         setOffices(res.data);
       })
@@ -89,7 +87,7 @@ export default function SignUp(props) {
       office_id: data.get('office_id'),
     };    
   
-    axios.put(BASE_URL + `/seat/${props.id}`, seat, {
+    axios.put(`${API_URL}/seat/${props.id}`, seat, {
         headers: {
             'Content-Type': 'application/json'
         }
@@ -108,7 +106,7 @@ export default function SignUp(props) {
     });
     const params = new URLSearchParams();
     params.append('id', props.id);
-    axios.delete(BASE_URL + `/seat/${props.id}`, params)
+    axios.delete(`${API_URL}/seat/${props.id}`, params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);

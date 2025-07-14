@@ -14,6 +14,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 function Copyright(props) {
   return (
@@ -36,7 +37,7 @@ export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/office/all/') // ← オフィス一覧を取得するエンドポイント
+    axios.get(`${API_URL}/office/all/`) // ← オフィス一覧を取得するエンドポイント
       .then((res) => {
         setOffices(res.data);
       })
@@ -84,7 +85,7 @@ export default function SignUp(props) {
       seat_name: data.get('seat_name'),
       office_id: parseInt(data.get('office_id')),
     };
-    axios.post('http://localhost:8000/seat/new/', seat, {
+    axios.post(`${API_URL}/seat/new/`, seat, {
       headers: {
           'Content-Type': 'application/json'
       },

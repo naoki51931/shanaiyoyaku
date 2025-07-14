@@ -33,8 +33,9 @@ function Copyright(props) {
   );
 }
 
+
 const defaultTheme = createTheme();
-const BASE_URL = "http://localhost:8000";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export default function NewPasokon(props) {
   /* ------------------------------------------------------------------ */
@@ -56,9 +57,9 @@ export default function NewPasokon(props) {
   /*                               fetch                                */
   /* ------------------------------------------------------------------ */
   useEffect(() => {
-    axios.get(`${BASE_URL}/office/all/`).then((res) => setOffices(res.data));
-    axios.get(`${BASE_URL}/seat/all/`).then((res) => setSeats(res.data));
-    axios.get(`${BASE_URL}/tags/`).then((res) => setAvailableTags(res.data));
+    axios.get(`${API_URL}/office/all/`).then((res) => setOffices(res.data));
+    axios.get(`${API_URL}/seat/all/`).then((res) => setSeats(res.data));
+    axios.get(`${API_URL}/tags/`).then((res) => setAvailableTags(res.data));
   }, []);
 
   useEffect(() => {
@@ -126,7 +127,7 @@ export default function NewPasokon(props) {
     };
 
     try {
-      await axios.post(`${BASE_URL}/pasokon/new/`, payload, {
+      await axios.post(`${API_URL}/pasokon/new/`, payload, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });

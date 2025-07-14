@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 function NewReservationForm({ closeModal }) {
     const [offices, setOffices] = useState([]);
     const [users, setUsers] = useState([]);
@@ -19,15 +21,15 @@ function NewReservationForm({ closeModal }) {
     const [reserveDay, setReserveDay] = useState('');
 
     useEffect(() => {
-        axios.get('http://localhost:8000/office/all/')
+        axios.get(`${API_URL}/office/all/`)
             .then(response => setOffices(response.data))
             .catch(error => console.error('オフィス情報の取得に失敗:', error));
 
-        axios.get('http://localhost:8000/user/all/')
+        axios.get(`${API_URL}/user/all/`)
             .then(response => setUsers(response.data))
             .catch(error => console.error('予約者情報の取得に失敗:', error));
 
-        axios.get('http://localhost:8000/seat/all/')
+        axios.get(`${API_URL}/seat/all/`)
             .then(response => setSeats(response.data))
             .catch(error => console.error('座席情報の取得に失敗:', error));
     }, []);
@@ -59,7 +61,7 @@ function NewReservationForm({ closeModal }) {
             return;
         }
 
-        axios.get(`http://localhost:8000/pasokon/by-seat/${selectedSeatId}`)
+        axios.get(`${API_URL}/pasokon/by-seat/${selectedSeatId}`)
             .then(response => {
                 const pasokonsFromSeat = response.data; // [{id, pasokon_name}, ...]
                 setPasokonOptions(pasokonsFromSeat);
@@ -108,7 +110,7 @@ function NewReservationForm({ closeModal }) {
             reserve_day: reserveDay,
         };
 
-        axios.post('http://localhost:8000/seat_reservation/new/', reservationData)
+        axios.post(`${API_URL}/seat_reservation/new/`, reservationData)
             .then(response => {
                 console.log('新規予約作成:', response.data);
                 closeModal();

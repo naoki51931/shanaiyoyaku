@@ -16,7 +16,7 @@ import { jwtDecode } from "jwt-decode";
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 const defaultTheme = createTheme();
-const BASE_URL = "http://localhost:8000";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
@@ -27,9 +27,9 @@ export default function SignUp(props) {
   const [pasokonOptions, setPasokonOptions] = useState([]);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/office/all/`).then(res => setOffices(res.data)).catch(console.error);
-    axios.get(`${BASE_URL}/user/all/`).then(res => setUsers(res.data)).catch(console.error);
-    axios.get(`${BASE_URL}/seat/all/`).then(res => setSeats(res.data)).catch(console.error);
+    axios.get(`${API_URL}/office/all/`).then(res => setOffices(res.data)).catch(console.error);
+    axios.get(`${API_URL}/user/all/`).then(res => setUsers(res.data)).catch(console.error);
+    axios.get(`${API_URL}/seat/all/`).then(res => setSeats(res.data)).catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function SignUp(props) {
 
   useEffect(() => {
     if (selectedSeatId) {
-      axios.get(`${BASE_URL}/pasokon/by-seat/${selectedSeatId}`)
+      axios.get(`${API_URL}/pasokon/by-seat/${selectedSeatId}`)
         .then(res => {
           setPasokonOptions(res.data);
           if (res.data.length > 0) props.setPasokon_id(res.data[0].id);
@@ -81,13 +81,13 @@ export default function SignUp(props) {
       reserve_day: data.get('reserve_day')
     };
 
-    axios.put(`${BASE_URL}/seat_reservation/${props.id}`, seat_reservation)
+    axios.put(`${API_URL}/seat_reservation/${props.id}`, seat_reservation)
       .then(() => props.setEditModalIsOpen(false))
       .catch(console.error);
   };
 
   const DeleteUser = () => {
-    axios.delete(`${BASE_URL}/seat_reservation/${props.id}`, { params: { id: props.id } })
+    axios.delete(`${API_URL}/seat_reservation/${props.id}`, { params: { id: props.id } })
       .then(() => props.setEditModalIsOpen(false))
       .catch(console.error);
   };

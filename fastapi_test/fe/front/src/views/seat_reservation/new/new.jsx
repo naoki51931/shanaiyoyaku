@@ -40,28 +40,28 @@ export default function New(props) {
 
   // オフィス取得
   useEffect(() => {
-    axios.get('http://localhost:8000/office/all/')
+    axios.get(`${API_URL}/office/all/`)
       .then(res => setOffices(res.data))
       .catch(error => console.error('オフィス情報の取得に失敗:', error));
   }, []);
 
   // ユーザー取得
   useEffect(() => {
-    axios.get('http://localhost:8000/user/all/')
+    axios.get(`${API_URL}/user/all/`)
       .then(res => setUsers(res.data))
       .catch(error => console.error('ユーザー情報の取得に失敗:', error));
   }, []);
 
   // 予約シート取得
   useEffect(() => {
-    axios.get('http://localhost:8000/seat/all/')
+    axios.get(`${API_URL}/seat/all/`)
       .then(res => setSeats(res.data))
       .catch(error => console.error('予約シート情報の取得に失敗:', error));
   }, []);
 
   // パソコン一覧取得（全体）
   useEffect(() => {
-    axios.get('http://localhost:8000/pasokon/all/')
+    axios.get(`${API_URL}/pasokon/all/`)
       .then(res => setPasokons(res.data))
       .catch(error => console.error('パソコン予約シート情報の取得に失敗:', error));
   }, []);
@@ -80,7 +80,7 @@ export default function New(props) {
     props.setSeat_id && props.setSeat_id(selectedSeatId);
 
     if (selectedSeatId) {
-      axios.get(`http://localhost:8000/pasokon/by-seat/${selectedSeatId}`)
+      axios.get(`${API_URL}/pasokon/by-seat/${selectedSeatId}`)
         .then(res => {
           const pasokonsFromSeat = res.data; // 例: [{id, pasokon_name}, ...]
           setPasokonOptions(pasokonsFromSeat);
@@ -194,7 +194,7 @@ export default function New(props) {
       reserve_day: data.get('reserve_day'),
     };
 
-    axios.post('http://localhost:8000/seat_reservation/new/', seat_reservation, {
+    axios.post(`${API_URL}/seat_reservation/new/`, seat_reservation, {
       headers: { 'Content-Type': 'application/json' },
       withCredentials: true,
     })

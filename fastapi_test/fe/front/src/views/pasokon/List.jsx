@@ -12,6 +12,8 @@ import Edit from './edit/edit';
 import Modal from "react-modal";
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 export default function List(props) {
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [id, setId] = useState("");
@@ -28,7 +30,7 @@ export default function List(props) {
 
     // ソフトIDに対応するソフト名を取得
     useEffect(() => {
-        axios.get('http://localhost:8000/tags/')  // ソフト名のリストを取得
+        axios.get(`${API_URL}/tags/`)  // ソフト名のリストを取得
             .then((res) => {
                 setAvailableTags(res.data);
             })

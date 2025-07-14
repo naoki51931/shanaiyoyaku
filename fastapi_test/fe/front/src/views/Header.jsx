@@ -17,6 +17,8 @@ import Modal from "react-modal";
 import New from './new/new';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 // トークンをリフレッシュする関数
 const getAccessToken = async () => {
   const refreshToken = localStorage.getItem('refresh_token');
@@ -25,7 +27,7 @@ const getAccessToken = async () => {
   }
 
   try {
-    const response = await axios.post('http://localhost:8000/auth/refresh_token/', {
+    const response = await axios.post(`${API_URL}/auth/refresh_token/`, {
       refresh_token: refreshToken, // リフレッシュトークンを送信
     });
     const { access_token } = response.data; // 新しいアクセストークンを受け取る
@@ -48,7 +50,7 @@ const makeRequest = async (endpoint, method = 'GET', data = null) => {
 
   try {
     const response = await axios({
-      url: `http://localhost:8000${endpoint}`,
+      url: `${API_URL}${endpoint}`,
       method: method,
       headers: {
         'Authorization': `Bearer ${token}`, // トークンをAuthorizationヘッダーに追加
@@ -66,7 +68,7 @@ const makeRequest = async (endpoint, method = 'GET', data = null) => {
         token = await getAccessToken(); // 新しいトークンを取得
         // 新しいトークンでリクエストを再試行
         const retryResponse = await axios({
-          url: `http://localhost:8000${endpoint}`,
+          url: `${API_URL}${endpoint}`,
           method: method,
           headers: {
             'Authorization': `Bearer ${token}`,

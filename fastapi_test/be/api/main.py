@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, status
@@ -14,6 +15,14 @@ from routers import pasokon
 from routers import seat_reservation
 from routers import tag
 from auth import router as auth_router  # auth.py をインポート
+from dotenv import load_dotenv
+
+
+load_dotenv()  # .envファイルから環境変数を読み込む
+
+HOST = os.environ.get("HOST")  
+if not HOST:
+    raise ValueError("HOSTが設定されていません。環境変数に設定してください。")
 
 app = FastAPI()
 
@@ -23,7 +32,7 @@ logger.setLevel("INFO")            # ただしこれらの設定が必要
 
 # CORS設定
 origins = [
-    "http://localhost:3000",
+    HOST,
 ]
 
 app.add_middleware(

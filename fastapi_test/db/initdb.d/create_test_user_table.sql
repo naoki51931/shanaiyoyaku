@@ -57,7 +57,7 @@ CREATE TABLE `pasokon` (
 
 CREATE TABLE `seat_reservation` (
     id INT NOT NULL AUTO_INCREMENT,
-    reserve_id INT UNIQUE NOT NULL,
+    reserve_id INT NOT NULL,
     todo_content VARCHAR(128) NOT NULL,
     person_id INT NOT NULL,
     office_id INT NOT NULL,
