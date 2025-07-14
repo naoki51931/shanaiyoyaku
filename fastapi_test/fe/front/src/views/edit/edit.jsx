@@ -134,7 +134,7 @@ export default function SignUp(props) {
     });
     const params = new URLSearchParams();
     params.append('id', props.id);
-    axios.delete(BASE_URL + `/user/${props.id}`, params)
+    axios.delete(`${API_URL}/user/${props.id}`, params)
         .then(function (res) {
             console.log(res)
             props.setEditModalIsOpen(false);

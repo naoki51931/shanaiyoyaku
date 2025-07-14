@@ -6,6 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from logging import getLogger, StreamHandler
+import logging
 
 
 from routers import user
@@ -16,6 +17,8 @@ from routers import seat_reservation
 from routers import tag
 from auth import router as auth_router  # auth.py をインポート
 from dotenv import load_dotenv
+from apscheduler.schedulers.background import BackgroundScheduler
+from scheduler_config import scheduler
 
 
 load_dotenv()  # .envファイルから環境変数を読み込む
@@ -30,6 +33,10 @@ logger = getLogger(__name__)
 logger.addHandler(StreamHandler()) # ただしこれらの設定が必要
 logger.setLevel("INFO")            # ただしこれらの設定が必要
 
+# APScheduler のログレベルを DEBUG に設定
+logging.basicConfig()
+logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+
 # CORS設定
 origins = [
     HOST,
@@ -42,6 +49,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+scheduler.start()
 
 #ステータスコード422エラーの表示
 @app.exception_handler(RequestValidationError)

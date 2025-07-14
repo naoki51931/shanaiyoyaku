@@ -102,7 +102,7 @@ export default function Edit(props) {
 
     try {
       // create new tag and get ID
-      const { data: newTag } = await axios.post(`${BASE_URL}/tags/`, { name });
+      const { data: newTag } = await axios.post(`${API_URL}/tags/`, { name });
       setTags((prev) => [...prev, newTag]);   // {id,name}
       setAvailableTags((prev) => [...prev, newTag]);
       setSoftName("");

@@ -2,6 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from apscheduler.triggers.date import DateTrigger
+from utils.utils import change_pasokon_status  # 状態変更関数
+from scheduler_config import scheduler
+from apscheduler.triggers.date import DateTrigger
 
 from database.database import get_db
 from models.sqlalchemy.seat_reservation import SeatReservation as DBSeatReservation
@@ -94,6 +98,20 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
         db.add(db_reservation)
         db.commit()
         db.refresh(db_reservation)
+
+        # スケジュール登録：開始時刻に「予約中」、終了時刻に「使用可」
+        scheduler.add_job(
+            change_pasokon_status,
+            trigger=DateTrigger(run_date=reservation.start_time),
+            args=[db, reservation.pasokon_id, 1] #予約中
+        )
+
+        scheduler.add_job(
+            change_pasokon_status,
+            trigger=DateTrigger(run_date=reservation.finish_time),
+            args=[db, reservation.pasokon_id, 2] #使用可
+        )
+
         return db_reservation
     except IntegrityError:
         db.rollback()

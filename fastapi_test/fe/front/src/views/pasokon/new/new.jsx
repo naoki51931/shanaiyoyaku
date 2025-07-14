@@ -81,7 +81,7 @@ export default function NewPasokon(props) {
     if (!name || tags.some((t) => t.name === name)) return;
 
     try {
-      const { data: newTag } = await axios.post(`${BASE_URL}/tags/`, { name });
+      const { data: newTag } = await axios.post(`${API_URL}/tags/`, { name });
       setTags((prev) => [...prev, newTag]);
       setAvailableTags((prev) => [...prev, newTag]);
       setSoftName("");
