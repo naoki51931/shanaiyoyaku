@@ -6,6 +6,10 @@ from apscheduler.triggers.date import DateTrigger
 from utils.utils import change_pasokon_status  # 状態変更関数
 from scheduler_config import scheduler
 from apscheduler.triggers.date import DateTrigger
+from fastapi import APIRouter
+from datetime import datetime
+from zoneinfo import ZoneInfo  # Python 3.9 以上対応
+from pytz import timezone
 
 from database.database import get_db
 from models.sqlalchemy.seat_reservation import SeatReservation as DBSeatReservation
@@ -72,6 +76,8 @@ def get_reservation_by_id(reservation_id: int, db: Session = Depends(get_db)):
 
 @router.post("/seat_reservation/new/", response_model=SeatReservationResponse)
 def create_reservation(reservation: SeatReservationCreate, db: Session = Depends(get_db)):
+    in_active_yoyakuchu = 1
+    in_active_shiyouka = 2
     # 重複チェック：時間が重なり、同一の座席または同一のパソコン
     overlap_query = db.query(DBSeatReservation).filter(
         DBSeatReservation.finish_time > reservation.start_time,
@@ -99,17 +105,24 @@ def create_reservation(reservation: SeatReservationCreate, db: Session = Depends
         db.commit()
         db.refresh(db_reservation)
 
+        # 日本時間のタイムゾーンを取得
+        jst = timezone('Asia/Tokyo')
+
+        # start_time と finish_time を JST に変換（もし既に tzinfo ありなら astimezone）
+        start_time_jst = reservation.start_time.astimezone(jst) if reservation.start_time.tzinfo else jst.localize(reservation.start_time)
+        finish_time_jst = reservation.finish_time.astimezone(jst) if reservation.finish_time.tzinfo else jst.localize(reservation.finish_time)
+
         # スケジュール登録：開始時刻に「予約中」、終了時刻に「使用可」
         scheduler.add_job(
             change_pasokon_status,
-            trigger=DateTrigger(run_date=reservation.start_time),
-            args=[db, reservation.pasokon_id, 1] #予約中
+            trigger=DateTrigger(run_date=start_time_jst),
+            args=[db, reservation.pasokon_id, in_active_yoyakuchu]  # 予約中
         )
 
         scheduler.add_job(
             change_pasokon_status,
-            trigger=DateTrigger(run_date=reservation.finish_time),
-            args=[db, reservation.pasokon_id, 2] #使用可
+            trigger=DateTrigger(run_date=finish_time_jst),
+            args=[db, reservation.pasokon_id, in_active_shiyouka]  # 使用可
         )
 
         return db_reservation
