@@ -16,6 +16,8 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Modal from "react-modal";
 import New from './new/new';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useEffect, useState } from 'react';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -95,6 +97,8 @@ function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [isSuperUser, setIsSuperUser] = useState(false); // ← 追加
+  
   const [user_name, setUser_name] = React.useState('');
   const [kanji_name, setKanji_name] = React.useState('');
   const [kata_name, setKata_name] = React.useState('');
@@ -103,6 +107,19 @@ function ResponsiveAppBar() {
   const [is_approval, setIs_approval] = React.useState('');
   const navigate = useNavigate(); // useNavigateを使用してリダイレクト
 
+    // JWTデコードして管理者かチェック
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode(token);
+      setIsSuperUser(decoded.is_superuser === true); // ← 管理者なら true
+    } catch (err) {
+      console.error("トークンのデコードに失敗しました", err);
+    }
+  }, []);
+  
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -278,6 +295,15 @@ function ResponsiveAppBar() {
                 >
                   座席予約追加
                 </Button>
+                {isSuperUser && (
+                  <Button 
+                    component={Link} 
+                    to="/backup/backup"
+                    sx={{ my: 2, color: 'black', display: 'block' }}
+                  >
+                    バックアップ
+                  </Button>
+                )}
                 
               </Menu>
             </Box>
@@ -380,6 +406,15 @@ function ResponsiveAppBar() {
               >
                 座席予約追加
               </Button>
+              {isSuperUser && (
+                <Button 
+                  component={Link} 
+                  to="/backup/backup"
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  バックアップ
+                </Button>
+              )}
             </Box>
 
             <Box sx={{ flexGrow: 0 }}>

@@ -15,6 +15,7 @@ from routers import office
 from routers import pasokon
 from routers import seat_reservation
 from routers import tag
+from utils import utils
 from auth import router as auth_router  # auth.py をインポート
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -50,6 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+scheduler.add_job(utils.backup_today, 'cron', hour=2)  # 毎日2時
 scheduler.start()
 
 #ステータスコード422エラーの表示
@@ -77,4 +79,5 @@ app.include_router(office.router)
 app.include_router(pasokon.router)
 app.include_router(seat_reservation.router)
 app.include_router(tag.router)
+app.include_router(utils.router)
 app.include_router(auth_router, prefix="/auth")  # 認証用のエンドポイントを登録

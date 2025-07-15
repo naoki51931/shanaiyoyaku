@@ -10,6 +10,7 @@ import SeatRegist from './views/seat_regist/seat_regist';
 import Office from './views/office/office';
 import Pasokon from './views/pasokon/pasokon';
 import SeatReservation from './views/seat_reservation/seat_reservation';
+import BackupManager from './views/backup/backup';
 
 
 
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/office/*" element={<Office />} />
           <Route path="/pasokon/*" element={<Pasokon />} />
           <Route path="/seat_reservation/*" element={<SeatReservation />} />
+          <Route path="/backup/*" element={<BackupManager />} />
         </Routes>
       </>
     </Router>
