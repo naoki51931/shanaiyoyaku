@@ -21,6 +21,18 @@ from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
 from scheduler_config import scheduler
 
+from fastapi import FastAPI
+from utils.utils import router, backup_today  # あなたのパスに合わせて修正
+
+#-----------------------------
+app = FastAPI()
+
+@app.on_event("startup")
+def run_backup_once():
+    backup_today()
+
+app.include_router(router)
+#-----------------------------
 
 load_dotenv()  # .envファイルから環境変数を読み込む
 

@@ -18,7 +18,8 @@ BACKUP_DIR = "backup"
 DB_USER = "root"
 DB_PASSWORD = "rootpass"
 DB_NAME = "sample_db"
-DB_HOST = "172.17.0.1:3308"
+DB_HOST = "172.17.0.1"
+DB_PORT = 3308
 
 def backup_today():
     today = date.today().isoformat()
@@ -26,8 +27,14 @@ def backup_today():
     filepath = os.path.join(BACKUP_DIR, filename)
     os.makedirs(BACKUP_DIR, exist_ok=True)
     
-    cmd = f"mysqldump -h{DB_HOST} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} > {filepath}"
-    subprocess.run(cmd, shell=True)
+    cmd = f"mysqldump -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} > {filepath}"
+    print("[実行コマンド]", cmd)  # ← これ重要！トラブル時に確認する
+    result = subprocess.run(cmd, shell=True)
+    if result.returncode != 0:
+        print("バックアップに失敗しました")
+    else:
+        print("バックアップ成功:", filepath)
+
 
 router = APIRouter()
 
@@ -47,7 +54,7 @@ def restore_backup(filename: str):
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="バックアップが見つかりません")
     
-    cmd = f"mysql -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
+    cmd = f"mysql -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
     result = subprocess.run(cmd, shell=True)
     if result.returncode != 0:
         raise HTTPException(status_code=500, detail="リストアに失敗しました")

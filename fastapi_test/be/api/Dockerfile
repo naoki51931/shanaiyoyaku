@@ -8,6 +8,8 @@ RUN pip install --upgrade setuptools
 ADD requirements.txt .
 RUN pip install -r requirements.txt
 
+RUN apt-get update && apt-get install -y default-mysql-client
+
 
 EXPOSE 8000
 
