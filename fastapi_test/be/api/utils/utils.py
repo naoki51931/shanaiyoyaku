@@ -3,11 +3,14 @@ from models.sqlalchemy.pasokon import Pasokon  # モデル名は適宜合わせ�
 from datetime import date
 import subprocess
 import os
+import logging
+from fastapi import UploadFile, File, HTTPException
+import shutil
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 
-def change_pasokon_status(db: Session, pasokon_id: int, new_status: str):
+def change_pasokon_status(db: Session, pasokon_id: int, new_status: int):
     pasokon = db.query(Pasokon).filter(Pasokon.id == pasokon_id).first()
     if pasokon:
         pasokon.in_active = new_status
@@ -21,6 +24,8 @@ DB_NAME = "sample_db"
 DB_HOST = "172.17.0.1"
 DB_PORT = 3308
 
+logger = logging.getLogger(__name__)
+
 def backup_today():
     today = date.today().isoformat()
     filename = f"{today}.sql"
@@ -28,12 +33,12 @@ def backup_today():
     os.makedirs(BACKUP_DIR, exist_ok=True)
     
     cmd = f"mysqldump -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} > {filepath}"
-    print("[実行コマンド]", cmd)  # ← これ重要！トラブル時に確認する
+    logger.info(f"[実行コマンド] {cmd}")  # ← こちらを使用
     result = subprocess.run(cmd, shell=True)
     if result.returncode != 0:
-        print("バックアップに失敗しました")
+        logger.error("バックアップに失敗しました")
     else:
-        print("バックアップ成功:", filepath)
+        logger.info(f"バックアップ成功: {filepath}")
 
 
 router = APIRouter()
@@ -70,3 +75,29 @@ def download_backup(filename: str):
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="ファイルが存在しません")
     return FileResponse(filepath, media_type="application/sql", filename=filename)
+
+@router.post("/restore/upload")
+def upload_and_restore_backup(file: UploadFile = File(...)):
+    filename = file.filename
+    filepath = os.path.join("backup", filename)
+    
+    os.makedirs("backup", exist_ok=True)
+
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # リストア処理（mysqldumpの逆）
+    cmd = f"mysql -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
+    result = subprocess.run(cmd, shell=True)
+    
+    if result.returncode != 0:
+        raise HTTPException(status_code=500, detail="リストアに失敗しました")
+    
+    return {"message": "アップロード＆リストア成功"}
+
+#-----------------------------
+@router.get("/backup/test")
+def test_backup():
+    backup_today()
+    return {"message": "バックアップ関数を実行しました"}
+#-----------------------------

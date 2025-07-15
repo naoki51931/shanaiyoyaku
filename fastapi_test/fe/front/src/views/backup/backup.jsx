@@ -111,6 +111,54 @@ export default function BackupManager() {
           )}
         </Paper>
       </Box>
+      {/* アップロードフォーム */}
+      <Box my={2}>
+        <Typography variant="h6">バックアップファイルをアップロードしてリストア</Typography>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const fileInput = e.target.elements.uploadFile;
+            const file = fileInput.files[0];
+            if (!file) {
+              setMessage('ファイルを選択してください');
+              return;
+            }
+
+            setLoading(true);
+            setMessage('アップロード中...');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+              const res = await fetch(`${BASE_URL}/restore/upload`, {
+                method: 'POST',
+                body: formData,
+              });
+              const data = await res.json();
+
+              if (res.ok) {
+                setMessage('アップロード＆リストア成功');
+                setBackups((prev) => [...prev, file.name]);
+              } else {
+                setMessage('リストア失敗: ' + (data.detail || '不明なエラー'));
+              }
+            } catch (err) {
+              setMessage('アップロード中にエラーが発生しました');
+            } finally {
+              setLoading(false);
+              fileInput.value = ''; // ファイルリセット
+            }
+          }}
+        >
+          <Stack direction="row" spacing={2} alignItems="center">
+            <input type="file" name="uploadFile" accept=".sql" />
+            <Button variant="contained" type="submit" disabled={loading}>
+              アップロード & リストア
+            </Button>
+          </Stack>
+        </form>
+      </Box>
     </Container>
   );
 }

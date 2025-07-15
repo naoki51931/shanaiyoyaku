@@ -24,15 +24,17 @@ from scheduler_config import scheduler
 from fastapi import FastAPI
 from utils.utils import router, backup_today  # あなたのパスに合わせて修正
 
-#-----------------------------
+
 app = FastAPI()
 
-@app.on_event("startup")
-def run_backup_once():
+#-----------------------------
+@router.get("/backup/test")
+def test_backup():
     backup_today()
+    return {"message": "バックアップ関数を実行しました"}
+#-----------------------------
 
 app.include_router(router)
-#-----------------------------
 
 load_dotenv()  # .envファイルから環境変数を読み込む
 
@@ -40,7 +42,7 @@ HOST = os.environ.get("HOST")
 if not HOST:
     raise ValueError("HOSTが設定されていません。環境変数に設定してください。")
 
-app = FastAPI()
+# app = FastAPI()
 
 logger = getLogger(__name__)
 logger.addHandler(StreamHandler()) # ただしこれらの設定が必要
