@@ -15,26 +15,19 @@ from routers import office
 from routers import pasokon
 from routers import seat_reservation
 from routers import tag
+from utils.restore import router as restore_router  # ← 修正したインポート
 from utils import utils
+from utils.restore import backup_today
 from auth import router as auth_router  # auth.py をインポート
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
 from scheduler_config import scheduler
 
 from fastapi import FastAPI
-from utils.utils import router, backup_today  # あなたのパスに合わせて修正
-
 
 app = FastAPI()
 
-#-----------------------------
-@router.get("/backup/test")
-def test_backup():
-    backup_today()
-    return {"message": "バックアップ関数を実行しました"}
-#-----------------------------
-
-app.include_router(router)
+# app.include_router(router)
 
 load_dotenv()  # .envファイルから環境変数を読み込む
 
@@ -65,7 +58,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-scheduler.add_job(utils.backup_today, 'cron', hour=2)  # 毎日2時
+scheduler.add_job(backup_today, 'cron', hour=2)  # 毎日2時
 scheduler.start()
 
 #ステータスコード422エラーの表示
@@ -93,5 +86,5 @@ app.include_router(office.router)
 app.include_router(pasokon.router)
 app.include_router(seat_reservation.router)
 app.include_router(tag.router)
-app.include_router(utils.router)
+app.include_router(restore_router)
 app.include_router(auth_router, prefix="/auth")  # 認証用のエンドポイントを登録
