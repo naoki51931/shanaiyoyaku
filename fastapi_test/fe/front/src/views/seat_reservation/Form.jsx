@@ -8,29 +8,33 @@ import NewForm from "./new/new";
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export default function Form(props) {
-    const [query, setQuery] = useState('');
+    const [searchResult, setSearchResult] = useState([]);
+    const [displayFlag, setDisplayFlag] = useState(false);
+    const [reserveId, setReserveId] = useState('');
+    const [personName, setPersonName] = useState('');
+    const [todoContent, setTodoContent] = useState('');
 
-    const handleQueryChange = (e) => {
-        setQuery(e.target.value);
+    const handleSearch = () => {
+        const queryParams = {
+            reserve_id: reserveId,
+            person_name: personName,
+            todo_content: todoContent
+        };
+
+        axios.post(`${API_URL}/seat_reservation/search/`, queryParams)
+            .then((res) => {
+                if (res.data.length > 0) {
+                    props.setDisplay(res.data);
+                    props.setFlag(true);
+                } else {
+                    props.setFlag(false);
+                }
+            })
+            .catch((error) => {
+                console.error("検索エラー", error);
+                props.setFlag(false);
+            });
     };
-
-    // const searchSeats = () => {
-    //     axios.post(`${API_URL}/seat_reservation/all/`, { query })
-    //         .then((res) => {
-    //             console.log("検索結果:", res.data);
-                
-    //             if (res.data.length > 0) {
-    //                 props.setDisplay(res.data);
-    //                 props.setFlag(true);
-    //             } else {
-    //                 props.setFlag(false);
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             console.error("検索エラー", error);
-    //             props.setFlag(false);
-    //         });
-    // };
 
     const funget = () => {
         axios.get(`${API_URL}/seat_reservation/all/`)
@@ -85,20 +89,37 @@ export default function Form(props) {
         funget()
     }, [])
     
-    // return (
-    //     <Grid container rowSpacing={1} position={'static'} marginTop={"15px"} marginLeft={"5px"}> 
-    //         <form onSubmit={(e) => { e.preventDefault(); searchSeats(); }}>
-    //             <Grid item>
-    //                 <TextField
-    //                     label="座席名を入力"
-    //                     value={query}
-    //                     onChange={handleQueryChange}
-    //                 />
-    //             </Grid>                
-    //             <Grid item>
-    //                 <Button variant="contained" onClick={searchSeats}>検索</Button>
-    //             </Grid>
-    //         </form>
-    //     </Grid>
-    // )
+    return (
+        <Grid container spacing={2} marginTop={2} marginLeft={1}>
+            <Grid item xs={12} sm={3}>
+                <TextField
+                    label="予約ID"
+                    fullWidth
+                    value={reserveId}
+                    onChange={(e) => setReserveId(e.target.value)}
+                />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+                <TextField
+                    label="予約ユーザー名"
+                    fullWidth
+                    value={personName}
+                    onChange={(e) => setPersonName(e.target.value)}
+                />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+                <TextField
+                    label="概要"
+                    fullWidth
+                    value={todoContent}
+                    onChange={(e) => setTodoContent(e.target.value)}
+                />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+                <Button variant="contained" color="primary" fullWidth onClick={handleSearch}>
+                    検索
+                </Button>
+            </Grid>
+        </Grid>
+    );
 }

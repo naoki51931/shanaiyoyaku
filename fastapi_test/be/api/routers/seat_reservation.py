@@ -7,6 +7,7 @@ from utils.utils import change_pasokon_status  # 状態変更関数
 from scheduler_config import scheduler
 from apscheduler.triggers.date import DateTrigger
 from fastapi import APIRouter
+from fastapi import Query
 from datetime import datetime
 from zoneinfo import ZoneInfo  # Python 3.9 以上対応
 from pytz import timezone
@@ -21,10 +22,68 @@ from models.pydantic.seat_reservation import (
 
 import logging
 
+from pydantic import BaseModel
+from typing import Optional, List
+from models.sqlalchemy.user import User as DBUser
+import logging
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+class SearchCondition(BaseModel):
+    reserve_id: Optional[str] = None
+    person_name: Optional[str] = None
+    todo_content: Optional[str] = None
+
+@router.post("/seat_reservation/search/", response_model=List[SeatReservationResponse])
+def search_reservations(
+    cond: SearchCondition,
+    db: Session = Depends(get_db)
+):
+    try:
+        query = db.query(DBSeatReservation).join(DBSeatReservation.user)
+
+        if cond.reserve_id:
+            query = query.filter(DBSeatReservation.reserve_id.contains(cond.reserve_id))
+        if cond.person_name:
+            query = query.filter(DBSeatReservation.user.has(DBUser.kanji_name.contains(cond.person_name)))
+        if cond.todo_content:
+            query = query.filter(DBSeatReservation.todo_content.contains(cond.todo_content))
+
+        results = query.options(
+            joinedload(DBSeatReservation.user),
+            joinedload(DBSeatReservation.office),
+            joinedload(DBSeatReservation.seat_regist),
+            joinedload(DBSeatReservation.pasokon_reserve)
+        ).all()
+
+        response = []
+        for reservation in results:
+            response.append({
+                "id": reservation.id,
+                "reserve_id": reservation.reserve_id,
+                "todo_content": reservation.todo_content,
+                "person_id": reservation.person_id,
+                "person_name": reservation.user.kanji_name if reservation.user else "不明",
+                "office_id": reservation.office_id,
+                "office_name": reservation.office.office_name if reservation.office else "不明",
+                "seat_id": reservation.seat_id,
+                "seat_name": reservation.seat_regist.seat_name if reservation.seat_regist else "不明",
+                "pasokon_id": reservation.pasokon_id,
+                "pasokon_name": reservation.pasokon_reserve.pasokon_name if reservation.pasokon_reserve else "不明",
+                "start_time": reservation.start_time,
+                "finish_time": reservation.finish_time,
+                "reserve_day": reservation.reserve_day,
+                "created_at": reservation.created_at,
+                "updated_at": reservation.updated_at,
+            })
+
+        return response
+
+    except SQLAlchemyError as e:
+        logger.error(f"検索中のDBエラー: {str(e)}")
+        raise HTTPException(status_code=500, detail="検索時にデータベースエラーが発生しました")
 
 @router.get("/seat_reservation/all/", response_model=list[SeatReservationResponse])
 def get_all_reservations(db: Session = Depends(get_db)):
