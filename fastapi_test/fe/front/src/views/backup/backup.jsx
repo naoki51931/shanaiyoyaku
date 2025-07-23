@@ -14,7 +14,7 @@ import {
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export default function BackupManager() {
   const [backups, setBackups] = useState([]);
@@ -33,7 +33,7 @@ export default function BackupManager() {
       setIsSuperUser(isAdmin);
   
       if (isAdmin) {
-        axios.get(`${BASE_URL}/backups`, {
+        axios.get(`${API_URL}/backups`, {
           headers: { Authorization: `Bearer ${token}` }
         }).then(res => setBackups(res.data))
           .catch(err => console.error('バックアップ取得エラー:', err));
@@ -45,14 +45,14 @@ export default function BackupManager() {
   
 
   const handleDownload = (filename) => {
-    window.location.href = `${BASE_URL}/download/${filename}`;
+    window.location.href = `${API_URL}/download/${filename}`;
   };
 
   const handleRestore = async (filename) => {
     setLoading(true);
     setMessage('リストア処理中...');
     try {
-      const res = await fetch(`${BASE_URL}/restore/${filename}`, {
+      const res = await fetch(`${API_URL}/restore/${filename}`, {
         method: 'POST',
       });
       const data = await res.json();
@@ -131,7 +131,7 @@ export default function BackupManager() {
             formData.append('file', file);
 
             try {
-              const res = await fetch(`${BASE_URL}/restore/upload`, {
+              const res = await fetch(`${API_URL}/restore/upload`, {
                 method: 'POST',
                 body: formData,
               });

@@ -10,11 +10,11 @@ from fastapi.responses import FileResponse
 
 
 BACKUP_DIR = "backup"
-DB_USER = "root"
-DB_PASSWORD = "rootpass"
-DB_NAME = "sample_db"
-DB_HOST = "172.17.0.1"
-DB_PORT = 3308
+DB_USER = os.environ.get("DB_USER", "mysqluser")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "mysqlpass")
+DB_NAME = os.environ.get("DB_NAME", "sample_db")
+DB_HOST = os.environ.get("DB_HOST", "db")  # ← コンテナ名
+DB_PORT = os.environ.get("DB_PORT", "3308")  # コンテナ内では3306でアクセス
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(

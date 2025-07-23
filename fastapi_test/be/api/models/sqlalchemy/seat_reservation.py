@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, func
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text, DateTime, func
 from sqlalchemy.orm import relationship
 from database.database import Base
 from models.sqlalchemy.pasokon import Pasokon
@@ -9,7 +9,7 @@ class SeatReservation(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     reserve_id = Column(Integer, unique=True, nullable=False)
-    todo_content = Column(String(30), nullable=True)
+    todo_content = Column(Text, nullable=True)
     person_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     office_id = Column(Integer, ForeignKey("office.id"), nullable=False)
     seat_id = Column(Integer, ForeignKey("seat_regist.id"), nullable=False)

@@ -13,6 +13,11 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_HOST: '%'
       SECRET_KEY: ${SECRET_KEY}
+      DB_USER: mysqluser
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: sample_db
+      DB_HOST: db
+      DB_PORT: 3308
     volumes:
       - ./db/data:/var/lib/mysql
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
