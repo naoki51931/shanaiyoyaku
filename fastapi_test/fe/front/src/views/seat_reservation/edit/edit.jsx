@@ -1,5 +1,4 @@
-// 修正された `edit.jsx`
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -22,31 +21,42 @@ export default function SignUp(props) {
   const [offices, setOffices] = useState([]);
   const [users, setUsers] = useState([]);
   const [seats, setSeats] = useState([]);
-  const [selectedOfficeId, setSelectedOfficeId] = useState(props.office_id ?? '');
-  const [selectedSeatId, setSelectedSeatId] = useState(props.seat_id || "");
   const [pasokonOptions, setPasokonOptions] = useState([]);
+  const [selectedOfficeId, setSelectedOfficeId] = useState(props.office_id ?? '');
+  const [selectedSeatId, setSelectedSeatId] = useState(props.seat_id || '');
 
+  // 初期データ取得
   useEffect(() => {
     axios.get(`${API_URL}/office/all/`).then(res => setOffices(res.data)).catch(console.error);
     axios.get(`${API_URL}/user/all/`).then(res => setUsers(res.data)).catch(console.error);
     axios.get(`${API_URL}/seat/all/`).then(res => setSeats(res.data)).catch(console.error);
   }, []);
 
-  useEffect(() => {
-    if (props.office_id) setSelectedOfficeId(props.office_id);
-  }, [props.office_id]);
-
+  // 座席に紐づくパソコン一覧を取得
   useEffect(() => {
     if (selectedSeatId) {
       axios.get(`${API_URL}/pasokon/by-seat/${selectedSeatId}`)
         .then(res => {
-          setPasokonOptions(res.data);
-          if (res.data.length > 0) props.setPasokon_id(res.data[0].id);
+          const pasokons = res.data;
+          setPasokonOptions(pasokons);
+          if (pasokons.length > 0) {
+            props.setPasokon_id && props.setPasokon_id(pasokons[0].id); // 自動選択
+          } else {
+            props.setPasokon_id && props.setPasokon_id('');
+          }
         })
-        .catch(console.error);
+        .catch(err => {
+          console.error('パソコン取得エラー', err);
+          setPasokonOptions([]);
+          props.setPasokon_id && props.setPasokon_id('');
+        });
+    } else {
+      setPasokonOptions([]);
+      props.setPasokon_id && props.setPasokon_id('');
     }
   }, [selectedSeatId]);
 
+  // 提出処理
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -82,14 +92,26 @@ export default function SignUp(props) {
     };
 
     axios.put(`${API_URL}/seat_reservation/${props.id}`, seat_reservation)
-      .then(() => props.setEditModalIsOpen(false))
-      .catch(console.error);
+      .then(() => {
+        alert("更新が完了しました");
+        props.setEditModalIsOpen(false);
+      })
+      .catch(error => {
+        console.error("更新エラー", error);
+        alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
+      });
   };
 
-  const DeleteUser = () => {
-    axios.delete(`${API_URL}/seat_reservation/${props.id}`, { params: { id: props.id } })
-      .then(() => props.setEditModalIsOpen(false))
-      .catch(console.error);
+  const handleDelete = () => {
+    axios.delete(`${API_URL}/seat_reservation/${props.id}`)
+      .then(() => {
+        alert("削除が完了しました");
+        props.setEditModalIsOpen(false);
+      })
+      .catch(error => {
+        console.error("削除エラー", error);
+        alert(`削除に失敗しました: ${error.response?.data?.detail || '不明なエラー'}`);
+      });
   };
 
   return (
@@ -98,7 +120,7 @@ export default function SignUp(props) {
         <CssBaseline />
         <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}><LockOutlinedIcon /></Avatar>
-          <Typography component="h1" variant="h5">Edit</Typography>
+          <Typography component="h1" variant="h5">Edit Reservation</Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
@@ -112,59 +134,88 @@ export default function SignUp(props) {
                   <InputLabel id="person-select-label">予約者</InputLabel>
                   <Select labelId="person-select-label" name="person_id" value={props.person_id || ""} onChange={(e) => props.setPerson_id(e.target.value)}>
                     <MenuItem value="">予約者を選択してください</MenuItem>
-                    {users.map(user => <MenuItem key={user.id} value={user.id}>{user.kanji_name}</MenuItem>)}
+                    {users.map(user => (
+                      <MenuItem key={user.id} value={user.id}>{user.kanji_name}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="office-select-label">事務所</InputLabel>
-                  <Select labelId="office-select-label" name="office_id" value={props.office_id ?? ''} onChange={(e) => {
-                    setSelectedOfficeId(e.target.value);
-                    props.setOffice_id(e.target.value);
-                    props.setSeat_id("");
-                  }}>
+                  <Select
+                    labelId="office-select-label"
+                    name="office_id"
+                    value={props.office_id ?? ''}
+                    onChange={(e) => {
+                      setSelectedOfficeId(e.target.value);
+                      props.setOffice_id(e.target.value);
+                      props.setSeat_id('');
+                      setSelectedSeatId('');
+                    }}
+                  >
                     <MenuItem value="">事務所を選択してください</MenuItem>
-                    {offices.map(office => <MenuItem key={office.id} value={String(office.id)}>{office.office_name}</MenuItem>)}
+                    {offices.map(office => (
+                      <MenuItem key={office.id} value={String(office.id)}>{office.office_name}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="seat-select-label">予約シート</InputLabel>
-                  <Select labelId="seat-select-label" name="seat_id" value={props.seat_id || ""} onChange={(e) => {
-                    props.setSeat_id(e.target.value);
-                    setSelectedSeatId(e.target.value);
-                  }}>
+                  <Select
+                    labelId="seat-select-label"
+                    name="seat_id"
+                    value={props.seat_id || ''}
+                    onChange={(e) => {
+                      const newSeatId = e.target.value;
+                      props.setSeat_id(newSeatId);
+                      setSelectedSeatId(newSeatId); // パソコン一覧更新
+                    }}
+                  >
                     <MenuItem value="">予約シートを選択してください</MenuItem>
-                    {seats.filter(s => s.office_id === parseInt(selectedOfficeId)).map(seat => <MenuItem key={seat.id} value={seat.id}>{seat.seat_name}</MenuItem>)}
+                    {seats
+                      .filter(seat => seat.office_id === parseInt(selectedOfficeId))
+                      .map(seat => (
+                        <MenuItem key={seat.id} value={seat.id}>{seat.seat_name}</MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="pasokon-select-label">パソコン名</InputLabel>
-                  <Select labelId="pasokon-select-label" name="pasokon_id" title="パソコン名が見つからない場合はパソコン修正画面で、使用するシートを選択してから選択してください" value={props.pasokon_id || ""} onChange={(e) => props.setPasokon_id(e.target.value)}>
+                  <Select
+                    labelId="pasokon-select-label"
+                    name="pasokon_id"
+                    value={props.pasokon_id || ''}
+                    onChange={(e) => props.setPasokon_id(e.target.value)}
+                  >
                     <MenuItem value="">パソコン名を選択してください</MenuItem>
-                    {pasokonOptions.map(p => <MenuItem key={p.id} value={p.id}>{p.pasokon_name}</MenuItem>)}
+                    {pasokonOptions.map(pasokon => (
+                      <MenuItem key={pasokon.id} value={pasokon.id}>{pasokon.pasokon_name}</MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth label="開始時間" type="datetime-local" name="start_time" value={props.start_time || ""} onChange={(e) => props.setStart_time(e.target.value)} InputLabelProps={{ shrink: true }} />
+                <TextField required fullWidth label="開始時間" type="datetime-local" name="start_time" value={props.start_time || ''} onChange={(e) => props.setStart_time(e.target.value)} InputLabelProps={{ shrink: true }} />
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth label="終了時間" type="datetime-local" name="finish_time" value={props.finish_time || ""} onChange={(e) => props.setFinish_time(e.target.value)} InputLabelProps={{ shrink: true }} />
+                <TextField required fullWidth label="終了時間" type="datetime-local" name="finish_time" value={props.finish_time || ''} onChange={(e) => props.setFinish_time(e.target.value)} InputLabelProps={{ shrink: true }} />
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth label="予約日時" type="datetime-local" name="reserve_day" value={props.reserve_day || ""} onChange={(e) => props.setReserve_day(e.target.value)} InputLabelProps={{ shrink: true }} />
+                <TextField required fullWidth label="予約日時" type="datetime-local" name="reserve_day" value={props.reserve_day || ''} onChange={(e) => props.setReserve_day(e.target.value)} InputLabelProps={{ shrink: true }} />
               </Grid>
             </Grid>
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>Update</Button>
-            <Button type="button" fullWidth variant="contained" color="error" sx={{ mt: 3, mb: 2 }} onClick={DeleteUser}>Delete</Button>
+            <Button type="button" fullWidth variant="contained" color="error" sx={{ mt: 1, mb: 2 }} onClick={handleDelete}>Delete</Button>
           </Box>
         </Box>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>Copyright © Your Website {new Date().getFullYear()}.</Typography>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>
+          Copyright © Your Website {new Date().getFullYear()}.
+        </Typography>
       </Container>
     </ThemeProvider>
   );
