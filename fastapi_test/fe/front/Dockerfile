@@ -1,18 +1,23 @@
-# React用Dockerfile
-FROM node:22.13.1
- 
-WORKDIR /usr/src/front
- 
-COPY ./package*.json ./
- 
-RUN npm install react-scripts
+# React 用 Dockerfile (最適化版)
+FROM node:20
 
-RUN npm install
- 
+WORKDIR /usr/src/front
+
+# 依存ファイルのみコピーして node_modules を Docker 内で生成
+COPY package.json package-lock.json ./
+
+# package.json に書かれた react-scripts を含む依存を正しくインストール
+RUN npm ci
+
+# アプリ本体をコピー
 COPY . .
 
-RUN  npm run build
- 
+# 本番ビルド
+RUN npm run build
+
 EXPOSE 3000
- 
-CMD ["npx", "serve", "-s", "build", "-l", "3000"]
+
+# serve を使って build をホスト（ローカルに serve が不要）
+RUN npm install -g serve
+CMD ["serve", "-s", "build", "-l", "3000"]
+
