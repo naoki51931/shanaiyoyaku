@@ -20,4 +20,7 @@ EXPOSE 3000
 # serve を使って build をホスト（ローカルに serve が不要）
 RUN npm install -g serve
 CMD ["serve", "-s", "build", "-l", "3000"]
+<<<<<<< HEAD
 
+=======
+>>>>>>> bca5fed647756c9a595b41e3be68819473451ef0
