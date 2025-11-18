@@ -1,6 +1,9 @@
-version: "3"
+version: "3.9"
 
 services:
+  # =========================
+  # MySQL
+  # =========================
   db:
     image: mysql:8.0
     container_name: db
@@ -8,63 +11,93 @@ services:
       - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
-      MYSQL_DATABASE: sample_db
-      MYSQL_USER: mysqluser
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_HOST: '%'
-      SECRET_KEY: ${SECRET_KEY}
-      DB_USER: mysqluser
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: sample_db
-      DB_HOST: db
-      DB_PORT: 3308
     volumes:
-      - ./db/data:/var/lib/mysql
+      - db_data:/var/lib/mysql
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./db/initdb.d:/docker-entrypoint-initdb.d
-      - ./db/log:/var/data/log
     ports:
-      - 3308:3308
-    command: --port 3308
-    tty: true
+      - "3306:3306"   # 開発でホストから触りたいなら残す。本番なら消してOK
     networks:
-      backend:
-        ipv4_address: 172.28.1.5
+      - shanaiyoyaku_net
 
+  # =========================
+  # FastAPI (バックエンド)
+  # =========================
   api:
-    container_name: "api"
+    build: ./be/api
+    container_name: api
     env_file:
       - .env
-    build: ./be/api
-    ports:
-      - "8000:8000"
+    # 開発中にホットリロードしたいなら volumes + --reload をそのまま使う
     volumes:
       - ./be/api:/usr/src/server
-    networks:
-      backend:
-        ipv4_address: 172.28.1.10
+      - ./be/api/wait-for-it.sh:/usr/src/server/wait-for-it.sh
+    command: [
+      "./wait-for-it.sh", "db:3306", "--",
+      "uvicorn", "main:app",
+      "--host", "0.0.0.0",
+      "--port", "8000",
+      "--reload"
+    ]
+    ports:
+      - "8000:8000"   # 本番で nginx 経由だけにするなら消してOK
     depends_on:
       - db
-    
+    networks:
+      - shanaiyoyaku_net
+
+  # =========================
+  # front: React を build する専用コンテナ
+  # =========================
   front:
-    container_name: "front"
+    build: ./fe/front
+    container_name: front
     env_file:
       - .env
-    build: ./fe/front
-    ports:
-      - "3000:3000"
+    # build 結果を front_build ボリュームに出す
     volumes:
-      - ./fe/front:/usr/src/front
-      - /usr/src/front/node_modules
+      - front_build:/usr/src/front/build
+    # ここの command で「コンテナ起動時に build して、そのまま待機」
+    # （Dockerfile の CMD よりこちらが優先される）
+    command: [
+      "sh", "-c",
+      "npm ci && npm run build && echo '✅ front build finished' && tail -f /dev/null"
+    ]
+    # フロントを配信するのは nginx なのでポート公開は不要
     networks:
-      - backend
+      - shanaiyoyaku_net
+
+  # =========================
+  # nginx: front_build を配信 + API へリバースプロキシ
+  # =========================
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      # nginx の設定（/ と /api を振り分ける想定）
+      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      # front コンテナが出力した build を静的配信
+      - front_build:/usr/share/nginx/html:ro
     depends_on:
       - api
+      - front
+    networks:
+      - shanaiyoyaku_net
+
+# =========================
+# ボリューム / ネットワーク
+# =========================
+volumes:
+  db_data:
+  front_build:   # React build 結果を格納する volume
 
 networks:
-  backend:
+  shanaiyoyaku_net:
     driver: bridge
-    name: app_network
-    ipam:
-      config:
-        - subnet: 172.28.1.0/24
+

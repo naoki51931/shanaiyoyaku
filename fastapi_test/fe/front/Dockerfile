@@ -1,26 +1,19 @@
-# React 用 Dockerfile (最適化版)
+# fe/front/Dockerfile
 FROM node:20
 
 WORKDIR /usr/src/front
 
-# 依存ファイルのみコピーして node_modules を Docker 内で生成
-COPY package.json package-lock.json ./
-
-# package.json に書かれた react-scripts を含む依存を正しくインストール
+# 依存関係インストール
+COPY package*.json ./
 RUN npm ci
 
-# アプリ本体をコピー
+# ソースをコピー
 COPY . .
 
-# 本番ビルド
+# ここでは build だけ準備しておく
+# （実際に /usr/src/front/build → volume に見えるのはコンテナ起動後）
 RUN npm run build
 
-EXPOSE 3000
+# front コンテナ単体ではサーバを立てないので、単に生かしておくだけ
+CMD ["sh", "-c", "echo 'front image ready (build済み)' && tail -f /dev/null"]
 
-# serve を使って build をホスト（ローカルに serve が不要）
-RUN npm install -g serve
-CMD ["serve", "-s", "build", "-l", "3000"]
-<<<<<<< HEAD
-
-=======
->>>>>>> bca5fed647756c9a595b41e3be68819473451ef0
