@@ -1,54 +1,64 @@
 import os
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+import logging
+from logging import getLogger, StreamHandler
+
 from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from logging import getLogger, StreamHandler
-import logging
-
-
-from routers import user
-from routers import seat_regist
-from routers import office
-from routers import pasokon
-from routers import seat_reservation
-from routers import tag
-from utils.restore import router as restore_router  # ← 修正したインポート
-from utils import utils
-from utils.restore import backup_today
-from auth import router as auth_router  # auth.py をインポート
 from dotenv import load_dotenv
-from apscheduler.schedulers.background import BackgroundScheduler
+
+from routers import (
+    user,
+    seat_regist,
+    office,
+    pasokon,
+    seat_reservation,
+    tag,
+)
+from utils.restore import router as restore_router
+from utils.restore import backup_today
+from auth import router as auth_router
 from scheduler_config import scheduler
 
-from fastapi import FastAPI
+from database.database import init_db  # ← ここは今のまま
 
+
+# ============================================================
+# 環境変数ロード
+# ============================================================
+load_dotenv()
+
+HOST = os.environ.get("HOST")
+if not HOST:
+    raise ValueError("HOSTが設定されていません。環境変数 HOST を .env に設定してください。")
+
+APP_ENV = os.environ.get("APP_ENV", "test")  # ← 追加: デフォルト test
+
+
+# ============================================================
+# ロガー設定
+# ============================================================
+logger = getLogger(__name__)
+handler = StreamHandler()
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+logging.basicConfig()
+logging.getLogger("apscheduler").setLevel(logging.DEBUG)
+
+
+# ============================================================
+# FastAPI アプリ本体
+# ============================================================
 app = FastAPI()
 
-# app.include_router(router)
 
-load_dotenv()  # .envファイルから環境変数を読み込む
-
-HOST = os.environ.get("HOST")  
-if not HOST:
-    raise ValueError("HOSTが設定されていません。環境変数に設定してください。")
-
-# app = FastAPI()
-
-logger = getLogger(__name__)
-logger.addHandler(StreamHandler()) # ただしこれらの設定が必要
-logger.setLevel("INFO")            # ただしこれらの設定が必要
-
-# APScheduler のログレベルを DEBUG に設定
-logging.basicConfig()
-logging.getLogger('apscheduler').setLevel(logging.DEBUG)
-
-# CORS設定
-origins = [
-    HOST,
-]
+# ============================================================
+# CORS 設定
+# ============================================================
+origins = [HOST]
 
 app.add_middleware(
     CORSMiddleware,
@@ -58,33 +68,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-scheduler.add_job(backup_today, 'cron', hour=2)  # 毎日2時
-scheduler.start()
 
-#ステータスコード422エラーの表示
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
-    )
+# ============================================================
+# アプリ起動時処理
+#   - APP_ENV == "production" のときだけ init_db() を走らせる
+#   - "test" のときは initdb.d の SQL に任せる
+# ============================================================
+@app.on_event("startup")
+def on_startup() -> None:
+    if APP_ENV == "production":
+        logger.info("APP_ENV=production → SQLAlchemy init_db() でテーブルを作成/更新します。")
+        init_db()
+    else:
+        logger.info("APP_ENV!=production → init_db() は実行せず、MySQL initdb.d のSQLに任せます。")
 
-@app.exception_handler(RequestValidationError)
-async def handler(request:Request, exc:RequestValidationError):
-    #print(exc)
-    logger.info(f"Returning {exc}")
+    if not scheduler.running:
+        logger.info("Registering daily backup job (2:00) and starting scheduler...")
+        scheduler.add_job(backup_today, "cron", hour=2)
+        scheduler.start()
 
-    return JSONResponse(content={}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-@app.exception_handler(Exception)
-async def exception_handler(request, exc):
-    return {"message": str(exc)}
-
-app.include_router(user.router)
-app.include_router(seat_regist.router)
-app.include_router(office.router)
-app.include_router(pasokon.router)
-app.include_router(seat_reservation.router)
-app.include_router(tag.router)
-app.include_router(restore_router)
-app.include_router(auth_router, prefix="/auth")  # 認証用のエンドポイントを登録
