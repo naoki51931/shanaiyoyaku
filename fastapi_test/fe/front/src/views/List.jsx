@@ -12,6 +12,8 @@ import Edit from './edit/edit';
 import Modal from "react-modal";
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 export default function List(props) {
     const [editModalIsOpen, setEditModalIsOpen] = React.useState(false);
     const [id, setId] = React.useState("");
@@ -30,7 +32,7 @@ export default function List(props) {
                 const token = localStorage.getItem("token");
                 if (!token) return;
 
-                const response = await axios.get("http://localhost:8000/auth/users/me", {
+                const response = await axios.get(`${API_URL}/auth/users/me`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
