@@ -58,13 +58,26 @@ services:
     volumes:
       - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./fe/front/build:/usr/share/nginx/html
+      - ./nginx/certbot/www:/var/www/certbot
+      - ./nginx/certbot/conf:/etc/letsencrypt
     depends_on:
       - front
       - api
     ports:
       - "80:80"
+      - "443:443"
     networks:
       - app_net
+
+  certbot:
+    image: certbot/certbot
+    container_name: fastapi_test-certbot
+    volumes:
+      - ./nginx/certbot/www:/var/www/certbot
+      - ./nginx/certbot/conf:/etc/letsencrypt
+    networks:
+      - app_net
+    # 通常は run で一回きり実行するので、ここでは常駐させない
 
 networks:
   app_net:
