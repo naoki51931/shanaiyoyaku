@@ -49,8 +49,9 @@ export default function Form(props) {
                                 password: res.data[i].password,
                                 position: res.data[i].position,
                                 is_superuser: res.data[i].is_superuser,
-                                is_approval: res.data[i].is_approval,
-                                created_at: res.data[i].created_at,
+				is_approval: res.data[i].is_approval,
+                                author: res.data[i].author,      // ★ 作成者を追加
+				created_at: res.data[i].created_at,
                                 updated_at: res.data[i].updated_at,
                             }
                         ])

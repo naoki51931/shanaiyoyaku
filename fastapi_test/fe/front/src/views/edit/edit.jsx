@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,6 +10,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
 
@@ -30,6 +33,8 @@ const defaultTheme = createTheme();
 const API_URL = "/api";
 
 export default function SignUp(props) {
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -167,6 +172,10 @@ export default function SignUp(props) {
     props.setIs_approval && props.setIs_approval(approvalValue);
   };
 
+  const handleShowPasswordChange = (event) => {
+    setShowPassword(event.target.checked);
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -232,11 +241,23 @@ export default function SignUp(props) {
                   fullWidth
                   name="password"
                   label="パスワード"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   autoComplete="new-password"
                   value={props.password || ""}
                   onChange={(event) => props.setPassword(event.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showPassword}
+                      onChange={handleShowPasswordChange}
+                      size="large"
+                    />
+                  }
+                  label="パスワードを表示"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -291,3 +312,4 @@ export default function SignUp(props) {
     </ThemeProvider>
   );
 }
+

@@ -80,15 +80,19 @@ async def login_for_access_token(
     
     return {"access_token": access_token, "token_type": "bearer"}
 
-# 🔐 保護されたエンドポイントの例
-@router.get("/auth/users/me", response_model=UserResponse)
-async def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+# ============================================================
+# 共通：トークンから現在のユーザー(DBUser)を取得する依存関数
+# ============================================================
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> DBUser:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, 
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="トークンにユーザー情報が含まれていません"
             )
     except ExpiredSignatureError:
@@ -96,12 +100,18 @@ async def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depen
     except JWTError:
         raise HTTPException(status_code=401, detail="無効なトークンまたはトークンクレームが無効です。")
 
-
     user = db.query(DBUser).filter(DBUser.user_name == username).first()
     if user is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="ユーザーが見つかりません"
         )
-    
+
     return user
+
+#🔐 保護されたエンドポイントの例
+@router.get("/auth/users/me", response_model=UserResponse)
+async def read_users_me(current_user: DBUser = Depends(get_current_user)):
+    # DBUser モデルをそのまま返せばOK（response_model が整形してくれる）
+    return current_user
+

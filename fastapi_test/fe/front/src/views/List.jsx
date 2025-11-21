@@ -74,6 +74,7 @@ export default function List(props) {
                     <TableCell align="left">{v.position}</TableCell>
                     <TableCell align="left">{v.is_superuser && <span>〇</span>}</TableCell>
                     <TableCell align="left">{v.is_approval}</TableCell>
+		    <TableCell align="left">{v.author}</TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
@@ -100,7 +101,8 @@ export default function List(props) {
                         <TableCell align="left">役職</TableCell>
                         <TableCell align="left">管理者</TableCell>
                         <TableCell align="left">承認ユーザー<span title="承認ユーザーが2になることですべての機能が使用できます。">[?]</span></TableCell>
-                        <TableCell align="left">作成日時</TableCell>
+                        <TableCell align="left">作成者</TableCell>
+	                <TableCell align="left">作成日時</TableCell>
                         <TableCell align="left">更新日時</TableCell>
                     </TableRow>
                 </TableHead>
