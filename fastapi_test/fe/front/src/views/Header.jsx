@@ -19,7 +19,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
 
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+const API_URL = process.env.REACT_APP_API_BASE_URL || "";
 
 // トークンをリフレッシュする関数
 const getAccessToken = async () => {

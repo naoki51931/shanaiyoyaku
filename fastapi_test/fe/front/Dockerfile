@@ -17,3 +17,5 @@ RUN npm run build
 # front コンテナ単体ではサーバを立てないので、単に生かしておくだけ
 CMD ["sh", "-c", "echo 'front image ready (build済み)' && tail -f /dev/null"]
 
+RUN cp -r /usr/src/front/build /tmp/build
+

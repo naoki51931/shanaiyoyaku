@@ -35,7 +35,7 @@ function Copyright(props) {
 
 
 const defaultTheme = createTheme();
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+const API_URL = process.env.REACT_APP_API_BASE_URL || "";
 
 export default function NewPasokon(props) {
   /* ------------------------------------------------------------------ */

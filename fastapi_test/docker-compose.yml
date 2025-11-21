@@ -44,13 +44,11 @@ services:
     env_file:
       - .env
     volumes:
-      - ./fe/front:/usr/src/front
-      - /usr/src/front/node_modules
+      - ./fe/front/build:/tmp/build
     depends_on:
       - api
-    # dev で直接 3000 を触るなら有効、本番は nginx 経由でもOK
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     networks:
       - app_net
 

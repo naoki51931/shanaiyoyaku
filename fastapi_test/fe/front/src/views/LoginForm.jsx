@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+// Nginx が /auth/token を FastAPI にリバースプロキシしてる構成なので
+// ベースURLのデフォルトは ""（ルート）でOK
+const API_URL = process.env.REACT_APP_API_BASE_URL || "";
+// ついでにデバッグログ仕込んでおくと安心
+console.log("API_URL =", API_URL);
 
 const Login = () => {
     const [username, setUsername] = useState('');
