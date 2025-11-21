@@ -8,6 +8,7 @@ class UserCreate(BaseModel):
     kanji_name: Optional[str] = None
     kata_name: Optional[str] = None
     position: Optional[str] = None
+    author: Optional[str] = None  # ←追加
     is_superuser: Optional[bool] = None
     is_approval: Optional[int] = None
 

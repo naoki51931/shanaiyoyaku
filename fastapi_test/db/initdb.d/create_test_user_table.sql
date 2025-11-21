@@ -8,6 +8,7 @@ CREATE TABLE `user` (
     is_superuser BOOLEAN NOT NULL,
     is_approval INT NOT NULL,
     is_active BOOLEAN NOT NULL,
+    author VARCHAR(30) NOT NULL DEFAULT 'author',  -- ★ 追加
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
@@ -43,7 +44,7 @@ CREATE TABLE tags (
 CREATE TABLE `pasokon` (
     id INT NOT NULL AUTO_INCREMENT,
     pasokon_name VARCHAR(30) UNIQUE NOT NULL,
-    in_active INT DEFAULT 1,  -- Optional: 'in_active'にデフォルト値を設定（例：1をデフォルト）
+    in_active INT DEFAULT 1,
     office_id INT NOT NULL,
     seat_id INT NOT NULL,
     performance TEXT NULL,
@@ -73,8 +74,6 @@ CREATE TABLE `seat_reservation` (
     PRIMARY KEY (id)
 );
 
-
-
 CREATE TABLE pasokon_tags (
     pasokon_id INT NOT NULL,
     tag_id INT NOT NULL,
@@ -82,3 +81,4 @@ CREATE TABLE pasokon_tags (
     FOREIGN KEY (pasokon_id) REFERENCES pasokon(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
+
