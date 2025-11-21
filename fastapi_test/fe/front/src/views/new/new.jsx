@@ -35,7 +35,14 @@ export default function SignUp(props) {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const storedToken = localStorage.getItem('token');
+  const storedTokenFromToken = localStorage.getItem('token');
+  const storedTokenFromAccessToken = localStorage.getItem('access_token');
+  // どこに入ってるか確認
+  console.log("🔑 localStorage(token):", storedTokenFromToken);
+  console.log("🔑 localStorage(access_token):", storedTokenFromAccessToken);
+  console.log("📦 localStorage keys:", Object.keys(localStorage));
+
+  const storedToken = storedTokenFromToken || storedTokenFromAccessToken;
   const isLoggedIn = Boolean(storedToken);
 
   let decodedToken = null;
@@ -44,6 +51,7 @@ export default function SignUp(props) {
   if (storedToken) {
     try {
       decodedToken = jwtDecode(storedToken);
+      console.log("🧾 decodedToken:", decodedToken);
       loginUserPosition = decodedToken?.position || 'C';
     } catch (err) {
       console.warn("token decode failed", err);
@@ -80,7 +88,9 @@ export default function SignUp(props) {
     }
 
     // === author を自動セット（未ログイン時限定） ===
-    const authorUser = isLoggedIn ? decodedToken?.user_name : "author";
+    const authorUser = isLoggedIn
+      ? (decodedToken?.user_name ?? decodedToken?.sub ?? "unknown")
+      : "author";
 
     const user = {
       user_name: data.get('user_name'),
@@ -91,6 +101,9 @@ export default function SignUp(props) {
       is_approval: isApprovalValue, 
       author: authorUser          // ← 追加
     };
+
+    // 🔥 ここでconsole.log！
+    console.log("📝 送信する user データ:", user);
 
     axios.post(`${API_URL}/user/new/`, user, {
       headers: { "Content-Type": "application/json" }

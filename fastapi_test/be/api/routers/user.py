@@ -63,12 +63,20 @@ async def create_user(
         # パスワードをハッシュ化
         hashed_password = hash_password(user.password)
 
-        # ユーザーの作成（ハッシュ化されたパスワードを使用）
+        # Pydantic -> dict に変換（password は除外）
+        user_data = user.dict(exclude_unset=True)
+        user_data.pop("password", None)
+
+        # 🔹 author 未指定 / None / 空文字 のときは 'author' をセット
+        author_value = user_data.get("author")
+        if author_value is None or str(author_value).strip() == "":
+            user_data["author"] = "author"
+
+        # ユーザーの作成
         db_user = DBUser(
-            **{k: v for k, v in user.dict().items() if k != 'password'},
+            **user_data,
             password=hashed_password,
         )
-
 
         db.add(db_user)
         db.commit()
@@ -86,7 +94,6 @@ async def create_user(
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
-
 
 @router.get("/user/all/")
 def read_user_all(db: Session = Depends(get_db)):
