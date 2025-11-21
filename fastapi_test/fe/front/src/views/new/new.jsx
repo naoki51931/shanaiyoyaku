@@ -35,37 +35,42 @@ export default function SignUp(props) {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const storedToken = localStorage.getItem('token');
+  const isLoggedIn = Boolean(storedToken);
+
+  let decodedToken = null;
+  let loginUserPosition = 'C';
+
+  if (storedToken) {
+    try {
+      decodedToken = jwtDecode(storedToken);
+      loginUserPosition = decodedToken?.position || 'C';
+    } catch (err) {
+      console.warn("token decode failed", err);
+    }
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    const isLoggedIn = Boolean(localStorage.getItem('token'));
-    const token = isLoggedIn ? localStorage.getItem('token') : null;
-    const decodedToken = token ? jwtDecode(token) : null;
-    const loginUserPosition = decodedToken?.position || 'C';
-
-    let positionValue = data.get('position');
-    let isApprovalValue = data.get('is_approval');
-
-    const positionHierarchy = ['C', 'B', 'A'];
-
-    if (positionHierarchy.indexOf(positionValue) > positionHierarchy.indexOf(loginUserPosition)) {
-      isApprovalValue = '1';
-      alert('選択した役職は変更できません。未承認ユーザーとして設定されました。');
-    }
-
-    if (!isLoggedIn) {
-      isApprovalValue = '1';
-    }
+    // === 未ログイン時：author 登録専用 ===
+    let positionValue = isLoggedIn ? data.get('position') : 'C';
+    let isApprovalValue = isLoggedIn ? data.get('is_approval') : '1';
 
     const requiredFields = [
       ['user_name', 'ユーザーネーム'],
       ['kanji_name', '名前(漢字)'],
       ['kata_name', '名前(カタカナ)'],
       ['password', 'パスワード'],
-      ['position', '役職'],
-      ['is_approval', '承認ユーザー']
     ];
+
+    if (isLoggedIn) {
+      requiredFields.push(
+        ['position', '役職'],
+        ['is_approval', '承認ユーザー']
+      );
+    }
 
     for (const [field, label] of requiredFields) {
       if (!data.get(field)) {
@@ -74,77 +79,69 @@ export default function SignUp(props) {
       }
     }
 
+    // === author を自動セット（未ログイン時限定） ===
+    const authorUser = isLoggedIn ? decodedToken?.user_name : "author";
+
     const user = {
       user_name: data.get('user_name'),
       kanji_name: data.get('kanji_name'),
       kata_name: data.get('kata_name'),
       password: data.get('password'),
-      position: positionValue,
-      is_approval: isApprovalValue,
+      position: positionValue,    // A/B/C
+      is_approval: isApprovalValue, 
+      author: authorUser          // ← 追加
     };
 
     axios.post(`${API_URL}/user/new/`, user, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true
+      headers: { "Content-Type": "application/json" }
     })
-      .then(function (res) {
+      .then((res) => {
         console.log(res);
+        alert("登録が完了しました。ログインしてください。");
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log("error", error);
-        alert(`エラーが発生しました: ${error.response?.data?.detail || '不明なエラー'}`);
+        alert(`エラー: ${error.response?.data?.detail || '不明なエラー'}`);
       });
   };
 
-  const handlePositionChange = (event) => {
-    let positionValue = event.target.value;
-
-    positionValue = positionValue
+  const handlePositionChange = (e) => {
+    let v = e.target.value
       .replace(/[ａ-ｚＡ-Ｚ]/g, (m) => String.fromCharCode(m.charCodeAt(0) - 0xfee0))
       .toUpperCase();
 
-    props.setPosition && props.setPosition(positionValue);
+    props.setPosition && props.setPosition(v);
   };
 
-  const handleApprovalChange = (event) => {
-    let approvalValue = event.target.value;
-
-    approvalValue = approvalValue.replace(/[Ａ-Ｚａ-ｚ０-９]/g, (m) =>
+  const handleApprovalChange = (e) => {
+    let v = e.target.value.replace(/[Ａ-Ｚａ-ｚ０-９]/g, (m) =>
       String.fromCharCode(m.charCodeAt(0) - 0xfee0)
     );
 
-    props.setIs_approval && props.setIs_approval(approvalValue);
+    props.setIs_approval && props.setIs_approval(v);
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
+        <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
+
           <Typography component="h1" variant="h5">
             New
           </Typography>
+
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
+
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="username"
                   name="user_name"
                   required
                   fullWidth
-                  id="user_name"
                   label="ユーザーネーム"
                   autoFocus
                   value={props.user_name ?? ''}
@@ -154,12 +151,10 @@ export default function SignUp(props) {
 
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="given-name"
                   name="kanji_name"
                   required
                   fullWidth
-                  id="kanji_name"
-                  label="名前(漢字)"
+                  label="名前（漢字）"
                   value={props.kanji_name ?? ''}
                   onChange={(e) => props.setKanji_name && props.setKanji_name(e.target.value)}
                 />
@@ -167,12 +162,10 @@ export default function SignUp(props) {
 
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="given-name"
                   name="kata_name"
                   required
                   fullWidth
-                  id="kata_name"
-                  label="名前(カタカナ)"
+                  label="名前（カタカナ）"
                   value={props.kata_name ?? ''}
                   onChange={(e) => props.setKata_name && props.setKata_name(e.target.value)}
                 />
@@ -180,17 +173,14 @@ export default function SignUp(props) {
 
               <Grid item xs={12}>
                 <TextField
+                  name="password"
                   required
                   fullWidth
-                  name="password"
                   label="パスワード"
                   type={showPassword ? "text" : "password"}
-                  id="password"
                   value={props.password ?? ''}
                   onChange={(e) => props.setPassword && props.setPassword(e.target.value)}
                 />
-
-                {/* 🔥 チェックボックス：大きめ */}
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -201,45 +191,43 @@ export default function SignUp(props) {
                   }
                   label="パスワードを表示"
                 />
-
               </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  title="役職は「A」「B」「C」の三つです。"
-                  id="position"
-                  label="役職"
-                  name="position"
-                  value={props.position ?? ''}
-                  onChange={handlePositionChange}
-                />
-              </Grid>
+              {/* 🔹 ログイン時のみ position と is_approval を表示 */}
+              {isLoggedIn && (
+                <>
+                  <Grid item xs={12}>
+                    <TextField
+                      name="position"
+                      required
+                      fullWidth
+                      label="役職 (A/B/C)"
+                      value={props.position ?? ''}
+                      onChange={handlePositionChange}
+                    />
+                  </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  title="承認ユーザーが2になることで全機能が使用できます。"
-                  id="is_approval"
-                  label="承認ユーザー"
-                  name="is_approval"
-                  value={props.is_approval ?? ''}
-                  onChange={handleApprovalChange}
-                />
-              </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      name="is_approval"
+                      required
+                      fullWidth
+                      label="承認ユーザー"
+                      value={props.is_approval ?? ''}
+                      onChange={handleApprovalChange}
+                    />
+                  </Grid>
+                </>
+              )}
 
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
+
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Create
             </Button>
+
           </Box>
+
         </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>

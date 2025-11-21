@@ -58,7 +58,6 @@ async def search_users(user_search: UserSearch, db: Session = Depends(get_db)):
 async def create_user(
     user: UserCreate,
     db: Session = Depends(get_db),
-    current_user: DBUser = Depends(get_current_user),  # ★ ログインユーザー
 ):
     try:
         # パスワードをハッシュ化
@@ -70,10 +69,6 @@ async def create_user(
             password=hashed_password,
         )
 
-        # ★ ここで作成者をセット
-        # current_user.user_name / current_user.kanji_name など、
-        # 好きな情報を author に使ってOK
-        db_user.author = current_user.user_name
 
         db.add(db_user)
         db.commit()
