@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import NewForm from "./new/new";
 
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+const API_URL = "/api";
 
 export default function Form(props) {
     const [query, setQuery] = useState('');

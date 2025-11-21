@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 
 // Nginx が /auth/token を FastAPI にリバースプロキシしてる構成なので
 // ベースURLのデフォルトは ""（ルート）でOK
-const API_URL = process.env.REACT_APP_API_BASE_URL || "";
+const API_URL = "/api";
 // ついでにデバッグログ仕込んでおくと安心
 console.log("API_URL =", API_URL);
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false); // 👈 追加: パスワード表示フラグ
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -43,7 +44,6 @@ const Login = () => {
             const response = await axios.post(`${API_URL}/auth/token`, formData, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 withCredentials: true,  // 追加（必要なら）
-                
             });
 
             const token = response.data.access_token;
@@ -75,11 +75,22 @@ const Login = () => {
                 <div>
                     <label>パスワード:</label>
                     <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}  // 👈 ここで表示/非表示を切り替え
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                </div>
+                <div style={{ marginTop: '4px', marginBottom: '12px' }}>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={showPassword}
+                            onChange={(e) => setShowPassword(e.target.checked)}
+                            style={{ marginRight: '4px' }}
+                        />
+                        パスワードを表示
+                    </label>
                 </div>
                 <button type="submit">ログイン</button>
             </form>
@@ -88,3 +99,4 @@ const Login = () => {
 };
 
 export default Login;
+

@@ -29,7 +29,7 @@ function Copyright(props) {
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+const API_URL = "/api";
 
 
 export default function SignUp(props) {

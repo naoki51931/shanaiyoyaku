@@ -14,7 +14,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";  // デフォルトインポートに戻す
 
-const API_URL = process.env.REACT_APP_API_BASE_URL || "";
+const API_URL = "/api";
 
 function Copyright(props) {
   return (

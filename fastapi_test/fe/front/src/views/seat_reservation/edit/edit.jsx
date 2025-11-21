@@ -15,7 +15,7 @@ import { jwtDecode } from "jwt-decode";
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 const defaultTheme = createTheme();
-const API_URL = process.env.REACT_APP_API_BASE_URL || "";
+const API_URL = "/api";
 
 export default function SignUp(props) {
   const [offices, setOffices] = useState([]);

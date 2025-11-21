@@ -53,7 +53,7 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 # 🔒 ログインエンドポイント
-@router.post("/token")
+@router.post("/auth/token")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), 
     db: Session = Depends(get_db)
@@ -81,7 +81,7 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 # 🔐 保護されたエンドポイントの例
-@router.get("/users/me", response_model=UserResponse)
+@router.get("/auth/users/me", response_model=UserResponse)
 async def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

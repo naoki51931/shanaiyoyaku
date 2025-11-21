@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+const API_URL = "/api";
 
 function NewReservationForm({ closeModal }) {
     const [offices, setOffices] = useState([]);
