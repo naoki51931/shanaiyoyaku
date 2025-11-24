@@ -87,7 +87,9 @@ export default function List(props) {
                     </TableCell>
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
-                    <TableCell align="left">{v.performance}</TableCell>
+                    <TableCell align="left" onClick={() => alert(v.performance)}>
+                      {v.performance.length > 30 ? v.performance.slice(0,30) + "…" : v.performance}
+                    </TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
