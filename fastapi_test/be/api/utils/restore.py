@@ -14,7 +14,7 @@ DB_USER = os.environ.get("DB_USER", "mysqluser")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "mysqlpass")
 DB_NAME = os.environ.get("DB_NAME", "sample_db")
 DB_HOST = os.environ.get("DB_HOST", "db")  # ← コンテナ名
-DB_PORT = os.environ.get("DB_PORT", "3308")  # コンテナ内では3306でアクセス
+DB_PORT = os.environ.get("DB_PORT", "3306")  # コンテナ内では3306でアクセス
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -70,7 +70,7 @@ def upload_and_restore_backup(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
     
     # リストア処理（mysqldumpの逆）
-    cmd = f"mysql -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
+    cmd = f"mysql --ssl-mode=DISABLED -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
     result = subprocess.run(cmd, shell=True)
     
     if result.returncode != 0:
@@ -85,7 +85,7 @@ def restore_backup(filename: str):
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="バックアップが見つかりません")
     
-    cmd = f"mysql -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
+    cmd = f"mysql --ssl-mode=DISABLED -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
     result = subprocess.run(cmd, shell=True)
     if result.returncode != 0:
         raise HTTPException(status_code=500, detail="リストアに失敗しました")
