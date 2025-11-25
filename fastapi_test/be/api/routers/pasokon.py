@@ -46,6 +46,7 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
     return [
         {
             "id": p.id,
+            "pasokon_id": p.pasokon_id,
             "pasokon_name": p.pasokon_name,
             "in_active": p.in_active,
             "office_id": p.office_id,
@@ -86,12 +87,9 @@ async def create_pasokon(pasokon: PasokonCreate, db: Session = Depends(get_db)):
         if not seat:
             raise HTTPException(404, "Seat not found")
 
-        # ---------- 重複チェック ----------
-        if db.query(DBPasokon).filter(DBPasokon.pasokon_name == pasokon.pasokon_name).first():
-            raise HTTPException(409, "pasokon_name already exists")
-
         # ---------- Pasokon 作成 ----------
         db_pasokon = DBPasokon(
+            pasokon_id=pasokon.pasokon_id,
             pasokon_name=pasokon.pasokon_name,
             in_active=pasokon.in_active,
             office_id=pasokon.office_id,
@@ -122,6 +120,7 @@ def read_pasokon_all(db: Session = Depends(get_db)):
     return [
         {
             "id": p.id,
+            "pasokon_id": p.pasokon_id,
             "pasokon_name": p.pasokon_name,
             "in_active": p.in_active,
             "office_id": p.office_id,
@@ -170,16 +169,12 @@ async def update_pasokon(pasokon_id: int, pasokon_update: PasokonUpdate, db: Ses
     if not seat:
         raise HTTPException(404, "Seat not found")
 
-    # 重複名チェック（自分以外）
-    dup = (
-        db.query(DBPasokon)
-        .filter(DBPasokon.pasokon_name == pasokon_update.pasokon_name, DBPasokon.id != pasokon_id)
         .first()
     )
     if dup:
-        raise HTTPException(409, "pasokon_name already exists")
 
     # 値を反映
+    db_pasokon.pasokon_id = pasokon_update.pasokon_id
     db_pasokon.pasokon_name = pasokon_update.pasokon_name
     db_pasokon.in_active = pasokon_update.in_active
     db_pasokon.office_id = pasokon_update.office_id
@@ -211,6 +206,7 @@ async def delete_pasokon(pasokon_id: int, db: Session = Depends(get_db)):
 def get_pasokons_by_seat(seat_id: int, db: Session = Depends(get_db)):
     pasokons = db.query(DBPasokon).filter(DBPasokon.seat_id == seat_id).all()
     return [
-        {"id": p.id, "pasokon_name": p.pasokon_name}
+        {"id": p.id,
+            "pasokon_id": p.pasokon_id, "pasokon_name": p.pasokon_name}
         for p in pasokons
     ]

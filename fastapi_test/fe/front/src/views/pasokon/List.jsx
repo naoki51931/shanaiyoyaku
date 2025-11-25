@@ -17,6 +17,7 @@ const API_URL = "/api";
 export default function List(props) {
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [id, setId] = useState("");
+    const [pasokon_id, setPasokon_id] = useState("");
     const [pasokon_name, setPasokon_name] = useState("");
     const [in_active, setIn_active] = useState("");
     const [soft_ids, setSoft_ids] = useState([]);
@@ -39,8 +40,9 @@ export default function List(props) {
             });
     }, []);
 
-    const openEditModal = (id, pasokon_name, in_active, soft_ids, soft_names, office_id, office_name, seat_id, seat_name, performance) => {
+    const openEditModal = (id, pasokon_id, pasokon_name, in_active, soft_ids, soft_names, office_id, office_name, seat_id, seat_name, performance) => {
         setId(id);
+        setPasokon_id(pasokon_id);
         setPasokon_name(pasokon_name);
         setIn_active(in_active);
         setSoft_ids(soft_ids);
@@ -68,6 +70,7 @@ export default function List(props) {
             {props.searchResult.map((v) => 
                 <TableRow key={v.id}>
                     <TableCell align="left">{v.id}</TableCell>
+                    <TableCell align="left">{v.pasokon_id}</TableCell>
                     <TableCell align="left">{v.pasokon_name}</TableCell>
                     <TableCell align="left">
                     {v.in_active === null || v.in_active === 0
@@ -88,13 +91,13 @@ export default function List(props) {
                     <TableCell align="left">{v.office_name}</TableCell>
                     <TableCell align="left">{v.seat_name}</TableCell>
                     <TableCell align="left" onClick={() => alert(v.performance)}>
-                      {v.performance.length > 30 ? v.performance.slice(0,30) + "…" : v.performance}
+                      {v.performance.length > 10 ? v.performance.slice(0,10) + "…" : v.performance}
                     </TableCell>
                     <TableCell align="left">{v.created_at}</TableCell>
                     <TableCell align="left">{v.updated_at}</TableCell>
                     <TableCell align="center">
                         <Button variant="outlined" 
-                                onClick={() => {openEditModal(v.id, v.pasokon_name, v.in_active, v.soft_ids, v.soft_names, v.office_id, v.office_name, v.seat_id, v.seat_name, v.performance)}}>
+                                onClick={() => {openEditModal(v.id, v.pasokon_id, v.pasokon_name, v.in_active, v.soft_ids, v.soft_names, v.office_id, v.office_name, v.seat_id, v.seat_name, v.performance)}}>
                             Edit
                         </Button>
                     </TableCell>
@@ -109,6 +112,7 @@ export default function List(props) {
                 <TableHead>
                     <TableRow>
                         <TableCell align="left">id</TableCell>
+                        <TableCell align="left">パソコンID</TableCell>
                         <TableCell align="left">パソコン名</TableCell>
                         <TableCell align="left">使用可不可</TableCell>
                         <TableCell align="left">導入ソフト</TableCell>
@@ -141,7 +145,7 @@ export default function List(props) {
                 >
                     <Edit
                         setEditModalIsOpen={setEditModalIsOpen}
-                        id={id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} in_active={in_active} setIn_active={setIn_active} soft_ids={soft_ids} setSoft_ids={setSoft_ids} soft_names={soft_names} setSoft_names={setSoft_names} office_id={office_id} setOffice_id={setOffice_id} office_name={office_name} setOffice_name={setOffice_name} seat_id={seat_id} setSeat_id={setSeat_id} seat_name={seat_name} setSeat_name={setSeat_name} performance={performance} setPerformance={setPerformance}
+                        id={id} pasokon_id={pasokon_id} setPasokon_id={setPasokon_id} pasokon_name={pasokon_name} setPasokon_name={setPasokon_name} in_active={in_active} setIn_active={setIn_active} soft_ids={soft_ids} setSoft_ids={setSoft_ids} soft_names={soft_names} setSoft_names={setSoft_names} office_id={office_id} setOffice_id={setOffice_id} office_name={office_name} setOffice_name={setOffice_name} seat_id={seat_id} setSeat_id={setSeat_id} seat_name={seat_name} setSeat_name={setSeat_name} performance={performance} setPerformance={setPerformance}
                     />
                 </Modal>
             </div>

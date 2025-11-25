@@ -70,7 +70,7 @@ def upload_and_restore_backup(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
     
     # リストア処理（mysqldumpの逆）
-    cmd = f"mysql --ssl-mode=DISABLED -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
+    cmd = f"mysql --skip-ssl -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
     result = subprocess.run(cmd, shell=True)
     
     if result.returncode != 0:
@@ -85,7 +85,7 @@ def restore_backup(filename: str):
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="バックアップが見つかりません")
     
-    cmd = f"mysql --ssl-mode=DISABLED -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
+    cmd = f"mysql --skip-ssl -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} < {filepath}"
     result = subprocess.run(cmd, shell=True)
     if result.returncode != 0:
         raise HTTPException(status_code=500, detail="リストアに失敗しました")

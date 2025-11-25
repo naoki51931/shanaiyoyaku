@@ -43,7 +43,8 @@ CREATE TABLE tags (
 
 CREATE TABLE `pasokon` (
     id INT NOT NULL AUTO_INCREMENT,
-    pasokon_name VARCHAR(30) UNIQUE NOT NULL,
+    pasokon_id VARCHAR(30) UNIQUE NOT NULL,
+    pasokon_name VARCHAR(30) NOT NULL,
     in_active INT DEFAULT 1,
     office_id INT NOT NULL,
     seat_id INT NOT NULL,

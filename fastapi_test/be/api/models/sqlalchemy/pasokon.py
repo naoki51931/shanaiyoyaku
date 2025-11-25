@@ -9,7 +9,8 @@ class Pasokon(Base):
     __tablename__ = "pasokon"  # これを追加
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    pasokon_name = Column(String(30), unique=True, nullable=False)
+    pasokon_id = Column(String(30), unique=True, nullable=False)
+    pasokon_name = Column(String(30), nullable=False)
     in_active = Column(Integer, nullable=True)
     office_id = Column(Integer, ForeignKey("office.id"), nullable=False)
     seat_id = Column(Integer,  ForeignKey("seat_regist.id"), nullable=False)
