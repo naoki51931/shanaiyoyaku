@@ -28,7 +28,7 @@ def backup_today():
     filepath = os.path.join(BACKUP_DIR, filename)
     os.makedirs(BACKUP_DIR, exist_ok=True)
     
-    cmd = f"mysqldump -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} > {filepath}"
+    cmd = f"mysqldump --skip-ssl -h{DB_HOST} -P{DB_PORT} -u{DB_USER} -p{DB_PASSWORD} {DB_NAME} > {filepath}"
     logger.info(f"[実行コマンド] {cmd}")  # ← こちらを使用
     result = subprocess.run(cmd, shell=True)
     if result.returncode != 0:
