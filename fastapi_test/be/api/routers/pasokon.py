@@ -18,26 +18,43 @@ router = APIRouter()
 # 検索用モデル
 # ------------------------------------------------------------------
 class PasokonSearch(BaseModel):
-    query: str
-
+    pasokon_name: str | None = None
+    tag_name: str | None = None
+    office_name: str | None = None
 
 # ------------------------------------------------------------------
 # 検索エンドポイント
 # ------------------------------------------------------------------
 @router.post("/pasokon/search/", response_model=list[PasokonResponse])
 async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(get_db)):
-    query = pasokon_search.query.strip()
+    filters = []
+
+    # パソコン名 / ID
+    if pasokon_search.pasokon_name:
+        q = pasokon_search.pasokon_name.strip()
+        if q:
+            filters.append(DBPasokon.pasokon_name.ilike(f"%{q}%"))
+            filters.append(DBPasokon.pasokon_id.ilike(f"%{q}%"))
+
+    # 事業所名
+    if pasokon_search.office_name:
+        q = pasokon_search.office_name.strip()
+        if q:
+            filters.append(DBOffice.office_name.ilike(f"%{q}%"))
+
+    # タグ名（多対多）
+    if pasokon_search.tag_name:
+        q = pasokon_search.tag_name.strip()
+        if q:
+            filters.append(DBPasokon.tags.any(Tag.name.ilike(f"%{q}%")))
+
+    if not filters:
+        raise HTTPException(400, "検索条件が空です")
 
     db_pasokons = (
         db.query(DBPasokon)
         .join(DBOffice, DBPasokon.office_id == DBOffice.id)
-        .filter(
-            or_(
-                DBPasokon.pasokon_id.ilike(f"%{query}%"),
-                DBPasokon.pasokon_name.ilike(f"%{query}%"),
-                DBOffice.office_name.ilike(f"%{query}%"),
-            )
-        )
+        .filter(or_(*filters))
         .all()
     )
 
@@ -54,11 +71,11 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
             "office_name": p.office_in_pasokon.office_name if p.office_in_pasokon else None,
             "seat_id": p.seat_id,
             "seat_name": p.seat_in_pasokon.seat_name if p.seat_in_pasokon else None,
+            "soft_ids": [t.id for t in p.tags],
+            "soft_names": [t.name for t in p.tags],
             "performance": p.performance,
             "created_at": p.created_at.isoformat() if p.created_at else None,
             "updated_at": p.updated_at.isoformat() if p.updated_at else None,
-            "soft_ids": [t.id for t in p.tags],
-            "soft_names": [t.name for t in p.tags],
         }
         for p in db_pasokons
     ]
