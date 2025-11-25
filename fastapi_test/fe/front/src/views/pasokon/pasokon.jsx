@@ -14,6 +14,7 @@ const PrivateRoute = ({ element }) => {
 export default function Pasokon() {
   const [display, setDisplay] = useState([]);
   const [flag, setFlag] = useState(false);
+  const [pasokon_id, setPasokon_id] = React.useState("");
   const [pasokon_name, setPasokon_name] = React.useState("");
   const [in_active, setIn_active] = React.useState("");
   const [soft_ids, setSoft_ids] = React.useState([]);
@@ -39,6 +40,8 @@ export default function Pasokon() {
         <Route
           path="new"
           element={<New 
+            pasokon_id={pasokon_id}
+            setPasokon_id={setPasokon_id}
             pasokon_name={pasokon_name}
             setPasokon_name={setPasokon_name}
             in_active={in_active}

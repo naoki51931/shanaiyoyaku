@@ -42,6 +42,7 @@ CREATE TABLE tags (
 );
 
 CREATE TABLE `pasokon` (
+    pasokon_id VARCHAR(30) UNIQUE NOT NULL,
     id INT NOT NULL AUTO_INCREMENT,
     pasokon_id VARCHAR(30) UNIQUE NOT NULL,
     pasokon_name VARCHAR(30) NOT NULL,

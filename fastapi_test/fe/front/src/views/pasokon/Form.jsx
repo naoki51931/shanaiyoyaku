@@ -43,6 +43,7 @@ export default function Form(props) {
                         tmpUsers = tmpUsers.concat([
                             {
                                 id: res.data[i].id,
+                                pasokon_id: res.data[i].pasokon_id,
                                 pasokon_name: res.data[i].pasokon_name,
                                 in_active: res.data[i].in_active,
                                 soft_ids:   res.data[i].soft_ids,

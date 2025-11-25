@@ -1,10 +1,9 @@
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import List
-
 
 from database.database import get_db
 from models.sqlalchemy.pasokon import Pasokon as DBPasokon
@@ -21,6 +20,7 @@ router = APIRouter()
 class PasokonSearch(BaseModel):
     query: str
 
+
 # ------------------------------------------------------------------
 # 検索エンドポイント
 # ------------------------------------------------------------------
@@ -33,8 +33,9 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
         .join(DBOffice, DBPasokon.office_id == DBOffice.id)
         .filter(
             or_(
-                DBPasokon.office_id.ilike(f"%{query}%"),
+                DBPasokon.pasokon_id.ilike(f"%{query}%"),
                 DBPasokon.pasokon_name.ilike(f"%{query}%"),
+                DBOffice.office_name.ilike(f"%{query}%"),
             )
         )
         .all()
@@ -54,13 +55,14 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
             "seat_id": p.seat_id,
             "seat_name": p.seat_in_pasokon.seat_name if p.seat_in_pasokon else None,
             "performance": p.performance,
-            "created_at": p.created_at,
-            "updated_at": p.updated_at,
+            "created_at": p.created_at.isoformat() if p.created_at else None,
+            "updated_at": p.updated_at.isoformat() if p.updated_at else None,
             "soft_ids": [t.id for t in p.tags],
             "soft_names": [t.name for t in p.tags],
         }
         for p in db_pasokons
     ]
+
 
 # ------------------------------------------------------------------
 # 新規作成
@@ -105,11 +107,12 @@ async def create_pasokon(pasokon: PasokonCreate, db: Session = Depends(get_db)):
 
     except IntegrityError as e:
         db.rollback()
-        # 万一のユニーク制約違反 (念のため)
-        raise HTTPException(409, "Duplicate pasokon_name") from e
+        # ユニーク制約違反など
+        raise HTTPException(409, "Duplicate pasokon") from e
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(400, "Database error") from e
+        raise HTTPException(400, f"Database error: {e}") from e
+
 
 # ------------------------------------------------------------------
 # 一覧取得
@@ -136,6 +139,7 @@ def read_pasokon_all(db: Session = Depends(get_db)):
         for p in pasokons
     ]
 
+
 # ------------------------------------------------------------------
 # 個別取得
 # ------------------------------------------------------------------
@@ -145,6 +149,7 @@ def read_pasokon_by_id(pasokon_id: int, db: Session = Depends(get_db)):
     if not db_pasokon:
         raise HTTPException(404, "Pasokon not found")
     return db_pasokon
+
 
 # ------------------------------------------------------------------
 # 更新
@@ -169,10 +174,6 @@ async def update_pasokon(pasokon_id: int, pasokon_update: PasokonUpdate, db: Ses
     if not seat:
         raise HTTPException(404, "Seat not found")
 
-        .first()
-    )
-    if dup:
-
     # 値を反映
     db_pasokon.pasokon_id = pasokon_update.pasokon_id
     db_pasokon.pasokon_name = pasokon_update.pasokon_name
@@ -189,6 +190,7 @@ async def update_pasokon(pasokon_id: int, pasokon_update: PasokonUpdate, db: Ses
         db.rollback()
         raise HTTPException(400, "Database error occurred") from e
 
+
 # ------------------------------------------------------------------
 # 削除
 # ------------------------------------------------------------------
@@ -202,11 +204,18 @@ async def delete_pasokon(pasokon_id: int, db: Session = Depends(get_db)):
     db.commit()
 
 
+# ------------------------------------------------------------------
+# 座席ごとのパソコン一覧（セレクトボックス用）
+# ------------------------------------------------------------------
 @router.get("/pasokon/by-seat/{seat_id}")
 def get_pasokons_by_seat(seat_id: int, db: Session = Depends(get_db)):
     pasokons = db.query(DBPasokon).filter(DBPasokon.seat_id == seat_id).all()
     return [
-        {"id": p.id,
-            "pasokon_id": p.pasokon_id, "pasokon_name": p.pasokon_name}
+        {
+            "id": p.id,
+            "pasokon_id": p.pasokon_id,
+            "pasokon_name": p.pasokon_name,
+        }
         for p in pasokons
     ]
+

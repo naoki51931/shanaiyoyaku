@@ -117,6 +117,7 @@ export default function NewPasokon(props) {
 
     const data = new FormData(e.currentTarget);
     const payload = {
+      pasokon_id: data.get("pasokon_id"),
       pasokon_name: data.get("pasokon_name"),
       in_active: data.get("in_active"),
       soft_ids: tags.map((t) => t.id),
@@ -155,6 +156,29 @@ export default function NewPasokon(props) {
 
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
+              {/* パソコンID */}
+
+              <Grid item xs={12}>
+
+                <TextField
+
+                  required
+
+                  fullWidth
+
+                  id="pasokon_id"
+
+                  name="pasokon_id"
+
+                  label="パソコンID"
+
+                  value={props.pasokon_id ?? ""}
+
+                  onChange={(e) => props.setPasokon_id?.(e.target.value)}
+
+                />
+
+              </Grid>
               {/* パソコン名 */}
               <Grid item xs={12}>
                 <TextField
