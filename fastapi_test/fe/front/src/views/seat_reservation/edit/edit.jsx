@@ -185,16 +185,18 @@ export default function SignUp(props) {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required>
-                  <InputLabel id="pasokon-select-label">パソコン名</InputLabel>
+                  <InputLabel id="pasokon-select-label">パソコンID / 名</InputLabel>
                   <Select
                     labelId="pasokon-select-label"
                     name="pasokon_id"
                     value={props.pasokon_id || ''}
                     onChange={(e) => props.setPasokon_id(e.target.value)}
                   >
-                    <MenuItem value="">パソコン名を選択してください</MenuItem>
+                    <MenuItem value="">パソコンID / 名を選択してください</MenuItem>
                     {pasokonOptions.map(pasokon => (
-                      <MenuItem key={pasokon.id} value={pasokon.id}>{pasokon.pasokon_name}</MenuItem>
+                      <MenuItem key={pasokon.id} value={pasokon.id}>
+                        {`${pasokon.pasokon_id ?? 'ID未設定'} / ${pasokon.pasokon_name}`}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>

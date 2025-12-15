@@ -321,20 +321,20 @@ export default function New(props) {
 
               <Grid item xs={12}>
                 <FormControl fullWidth required>
-                  <InputLabel id="pasokon-select-label">パソコン名</InputLabel>
+                  <InputLabel id="pasokon-select-label">パソコンID / 名</InputLabel>
                   <Select
                     labelId="pasokon-select-label"
                     id="pasokon_id"
                     name="pasokon_id"
                     value={props.pasokon_id ?? ''}
-                    label="パソコン名"
+                    label="パソコンID / 名"
                     title="パソコン名が見つからない場合はパソコン修正画面で、使用するシートを選択してから選択してください"
                     onChange={e => props.setPasokon_id && props.setPasokon_id(e.target.value)}
                   >
-                    <MenuItem value="">パソコン名を選択してください</MenuItem>
+                    <MenuItem value="">パソコンID / 名を選択してください</MenuItem>
                     {pasokonOptions.map(pasokon => (
                       <MenuItem key={pasokon.id} value={pasokon.id}>
-                        {pasokon.pasokon_name}
+                        {`${pasokon.pasokon_id ?? 'ID未設定'} / ${pasokon.pasokon_name}`}
                       </MenuItem>
                     ))}
                   </Select>

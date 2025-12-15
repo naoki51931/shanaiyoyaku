@@ -200,18 +200,18 @@ function NewReservationForm({ closeModal }) {
 
                 {/* パソコン選択（座席に紐づくパソコンのみ表示） */}
                 <FormControl fullWidth margin="normal" required>
-                    <InputLabel id="pasokon-select-label">パソコン名</InputLabel>
+                    <InputLabel id="pasokon-select-label">パソコンID / 名</InputLabel>
                     <Select
                         labelId="pasokon-select-label"
                         value={pasokonId}
                         onChange={(e) => setPasokonId(e.target.value)}
-                        label="パソコン名"
+                        label="パソコンID / 名"
                         title="パソコン名が見つからない場合はパソコン修正画面で、使用するシートを選択してから選択してください"
                     >
-                        <MenuItem value="">パソコン名を選択してください</MenuItem>
+                        <MenuItem value="">パソコンID / 名を選択してください</MenuItem>
                         {pasokonOptions.map((pasokon) => (
                             <MenuItem key={pasokon.id} value={pasokon.id}>
-                                {pasokon.pasokon_name}
+                                {`${pasokon.pasokon_id ?? 'ID未設定'} / ${pasokon.pasokon_name}`}
                             </MenuItem>
                         ))}
                     </Select>
