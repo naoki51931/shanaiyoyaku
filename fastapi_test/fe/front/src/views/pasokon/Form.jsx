@@ -11,6 +11,7 @@ export default function Form(props) {
     const [pasokonName, setPasokonName] = useState('');
     const [tagName, setTagName] = useState('');
     const [officeName, setOfficeName] = useState('');
+    const [performance, setPerformance] = useState('');
 
     const searchPasokons = () => {
         const payload = {};
@@ -23,6 +24,9 @@ export default function Form(props) {
         }
         if (officeName.trim()) {
             payload.office_name = officeName.trim();
+        }
+        if (performance.trim()) {
+            payload.performance = performance.trim();
         }
 
         // 何も入ってなければ API に投げない
@@ -115,6 +119,13 @@ export default function Form(props) {
                         size="small"
                         sx={{ mr: 1, minWidth: 220 }}
                     />
+                    <TextField
+                        label="性能で検索（CPU/メモリ等）"
+                        value={performance}
+                        onChange={(e) => setPerformance(e.target.value)}
+                        size="small"
+                        sx={{ mr: 1, minWidth: 220 }}
+                    />
                     <Button
                         variant="contained"
                         type="submit"
@@ -133,4 +144,3 @@ export default function Form(props) {
         </Grid>
     )
 }
-

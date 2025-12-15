@@ -21,6 +21,7 @@ class PasokonSearch(BaseModel):
     pasokon_name: str | None = None
     tag_name: str | None = None
     office_name: str | None = None
+    performance: str | None = None
 
 # ------------------------------------------------------------------
 # 検索エンドポイント
@@ -47,6 +48,12 @@ async def search_pasokons(pasokon_search: PasokonSearch, db: Session = Depends(g
         q = pasokon_search.tag_name.strip()
         if q:
             filters.append(DBPasokon.tags.any(Tag.name.ilike(f"%{q}%")))
+
+    # 性能情報
+    if pasokon_search.performance:
+        q = pasokon_search.performance.strip()
+        if q:
+            filters.append(DBPasokon.performance.ilike(f"%{q}%"))
 
     if not filters:
         raise HTTPException(400, "検索条件が空です")
@@ -235,4 +242,3 @@ def get_pasokons_by_seat(seat_id: int, db: Session = Depends(get_db)):
         }
         for p in pasokons
     ]
-
