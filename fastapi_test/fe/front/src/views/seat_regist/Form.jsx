@@ -8,14 +8,32 @@ import NewForm from "./new/new";
 const API_URL = "/api";
 
 export default function Form(props) {
-    const [query, setQuery] = useState('');
+    const [seatName, setSeatName] = useState('');
+    const [officeName, setOfficeName] = useState('');
 
-    const handleQueryChange = (e) => {
-        setQuery(e.target.value);
+    const handleSeatNameChange = (e) => {
+        setSeatName(e.target.value);
+    };
+
+    const handleOfficeNameChange = (e) => {
+        setOfficeName(e.target.value);
     };
 
     const searchSeats = () => {
-        axios.post(`${API_URL}/seat/search/`, { query })
+        const payload = {};
+        if (seatName.trim()) {
+            payload.seat_name = seatName.trim();
+        }
+        if (officeName.trim()) {
+            payload.office_name = officeName.trim();
+        }
+
+        if (Object.keys(payload).length === 0) {
+            alert("座席名か事務所名のいずれかを入力してください");
+            return;
+        }
+
+        axios.post(`${API_URL}/seat/search/`, payload)
             .then((res) => {
                 console.log("検索結果:", res.data);
                 
@@ -78,11 +96,20 @@ export default function Form(props) {
     return (
         <Grid container rowSpacing={1} position={'static'} marginTop={"15px"} marginLeft={"5px"}> 
             <form onSubmit={(e) => { e.preventDefault(); searchSeats(); }}>
-                <Grid item>
+                <Grid item sx={{ mb: 1 }}>
                     <TextField
-                        label="座席名を入力"
-                        value={query}
-                        onChange={handleQueryChange}
+                        label="座席名で検索"
+                        value={seatName}
+                        onChange={handleSeatNameChange}
+                        size="small"
+                        sx={{ mr: 1, minWidth: 220 }}
+                    />
+                    <TextField
+                        label="事務所名で検索"
+                        value={officeName}
+                        onChange={handleOfficeNameChange}
+                        size="small"
+                        sx={{ mr: 1, minWidth: 220 }}
                     />
                 </Grid>                
                 <Grid item>

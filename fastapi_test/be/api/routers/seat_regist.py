@@ -16,7 +16,9 @@ router = APIRouter()
 
 # 検索リクエスト用の Pydantic モデル
 class SeatRegistSearch(BaseModel):
-    query: str
+    query: str | None = None
+    seat_name: str | None = None
+    office_name: str | None = None
 
 # ① レスポンス用のスキーマを定義
 # class OfficeResponse(BaseModel):
@@ -38,18 +40,32 @@ async def search_seats(seat_search: SeatRegistSearch, db: Session = Depends(get_
     """
     seat_name、office_name のいずれかにキーワードが含まれる座席を検索する
     """
-    query = seat_search.query.strip()
+    filters = []
+
+    if seat_search.query:
+        q = seat_search.query.strip()
+        if q:
+            filters.append(DBSeatRegist.seat_name.ilike(f"%{q}%"))
+            filters.append(DBOffice.office_name.ilike(f"%{q}%"))
+
+    if seat_search.seat_name:
+        q = seat_search.seat_name.strip()
+        if q:
+            filters.append(DBSeatRegist.seat_name.ilike(f"%{q}%"))
+
+    if seat_search.office_name:
+        q = seat_search.office_name.strip()
+        if q:
+            filters.append(DBOffice.office_name.ilike(f"%{q}%"))
+
+    if not filters:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="検索条件が空です")
 
     db_seats = (
         db.query(DBSeatRegist)
         .join(DBOffice)
         .options(joinedload(DBSeatRegist.office))
-        .filter(
-            or_(
-                DBSeatRegist.seat_name.ilike(f"%{query}%"),
-                DBOffice.office_name.ilike(f"%{query}%"),
-            )
-        )
+        .filter(or_(*filters))
         .all()
     )
 
